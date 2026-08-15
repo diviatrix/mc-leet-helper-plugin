@@ -28,6 +28,7 @@ base:
 feature:
   multiplier: 0.5     # 0.1 – 10.0
   min-damage: 1        # Minimum damage applied per hit
+  cost: 0              # Vault economy cost per damaged event (0 = free)
   whitelist:
     - WOODEN_SWORD
     - WOODEN_SHOVEL
@@ -86,13 +87,16 @@ feature:
     - TURTLE_HELMET
     - ELYTRA
 
-messages: {}
+messages:
+  insufficient-funds: "<red>Insufficient funds! Cost: <cost>"
 ```
 
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `multiplier` | double | `0.5` | Damage multiplier. `0.5` = half damage (items last ~2×), `1.0` = vanilla, `2.0` = double damage |
 | `min-damage` | int | `1` | Minimum damage per event (prevents 0/infinite-durability items) |
+| `cost` | double | `0.0` | Vault economy cost per protected item-damage event. `0` or any value `≤ 0` = free. |
+| `insufficient-funds` | message | — | Sent when the player lacks funds for the `cost`; the damage reduction is blocked (the item takes full damage) |
 | `whitelist` | list of Material names | all tools & equipment | Only these materials are affected |
 
 > **Note:** any entry that is not a valid Bukkit `Material` name is skipped with a `Invalid material in durability whitelist:` warning at load and has no effect. Only use exact enum names (e.g. `WOODEN_SWORD`, `DIAMOND_PICKAXE`) — generic names like `HELMET`, `CHESTPLATE`, `LEGGINGS`, `BOOTS` (unprefixed armor slots) are not valid Materials and were removed from the defaults; use the material-specific forms (`LEATHER_HELMET`, `IRON_CHESTPLATE`, etc.) instead.

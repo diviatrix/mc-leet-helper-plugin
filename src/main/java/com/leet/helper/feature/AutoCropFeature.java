@@ -67,6 +67,8 @@ public class AutoCropFeature extends AbstractFeature {
 
         if (requireHoe && !isHoe(player.getInventory().getItemInMainHand())) return;
 
+        if (!chargeUse(player)) return;
+
         ItemStack tool = player.getInventory().getItemInMainHand();
 
         harvesting = true;

@@ -50,6 +50,8 @@ public class DurabilityFeature extends AbstractFeature {
         Material itemType = event.getItem().getType();
         if (!whitelist.contains(itemType)) return;
 
+        if (!chargeUse(player)) return;
+
         int newDamage = (int) Math.round(event.getDamage() * multiplier);
         if (newDamage < minDamage) {
             newDamage = minDamage;

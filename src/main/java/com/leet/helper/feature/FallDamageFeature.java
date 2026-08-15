@@ -34,6 +34,8 @@ public class FallDamageFeature extends AbstractFeature {
         if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
         if (!check(player)) return;
 
+        if (!chargeUse(player)) return;
+
         event.setCancelled(true);
     }
 }

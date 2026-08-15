@@ -1,5 +1,5 @@
 name: LeetHelper
-version: "1.1.1"
+version: "${version}"
 main: com.leet.helper.HelperPlugin
 api-version: "26.2"
 description: Leet Helper Plugin

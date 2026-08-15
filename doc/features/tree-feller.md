@@ -41,13 +41,17 @@ feature:
     - CRIMSON_STEM
     - WARPED_STEM
   max-blocks: 100
+  cost: 0                # Vault economy cost per felled tree (0 = free)
 
-messages: {}
+messages:
+  insufficient-funds: "<red>Insufficient funds! Cost: <cost>"
 ```
 
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `logs` | list of Material names | oak/spruce/birch/jungle/acacia/dark-oak/mangrove/cherry/pale-oak logs + crimson/warped stems | Log materials treated as tree trunks. Invalid names are skipped with a warning. |
 | `max-blocks` | int | `100` | Hard cap on how many logs the search will collect/break in one tree. Prevents breaking player-built log structures or giant trees from causing lag. |
+| `cost` | double | `0.0` | Vault economy cost per trigger (one broken log → one tree fell). `0` or any value `≤ 0` = free. |
+| `insufficient-funds` | message | — | Sent when the player lacks funds for the `cost`; the tree fell is blocked (only the single broken log is removed). |
 
 **Cooldown:** none.

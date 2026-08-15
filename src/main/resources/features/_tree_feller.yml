@@ -19,6 +19,8 @@ feature:
     - PALE_OAK_LOG
     - CRIMSON_STEM
     - WARPED_STEM
+  cost: 0
   max-blocks: 100
 
-messages: {}
+messages:
+  insufficient-funds: "<red>Insufficient funds! Cost: <cost>"

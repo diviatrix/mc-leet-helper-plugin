@@ -50,6 +50,8 @@ public class DoubleJumpFeature extends AbstractFeature {
 
         if (!checkCooldown(player.getUniqueId())) return;
 
+        if (!chargeUse(player)) return;
+
         Vector direction = player.getLocation().getDirection();
         Vector velocity = new Vector(
             direction.getX() * horizontalMultiplier,

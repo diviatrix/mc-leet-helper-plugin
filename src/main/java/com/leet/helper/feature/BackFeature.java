@@ -16,7 +16,6 @@ import java.util.UUID;
 public class BackFeature extends AbstractFeature {
 
     private int maxAge;
-    private double cost;
 
     public BackFeature(HelperPlugin plugin) {
         super(plugin);
@@ -30,7 +29,6 @@ public class BackFeature extends AbstractFeature {
     @Override
     protected void loadFeatureConfig(YamlConfiguration cfg) {
         maxAge = cfg.getInt("feature.max-age", 300);
-        cost = cfg.getDouble("feature.cost", 0.0);
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -79,13 +77,7 @@ public class BackFeature extends AbstractFeature {
             return false;
         }
 
-        if (cost > 0) {
-            if (!hasBalance(player, cost)) {
-                sendMessage(player, "insufficient-funds", "<cost>", String.valueOf(cost));
-                return false;
-            }
-            withdraw(player, cost);
-        }
+        if (!chargeUse(player)) return false;
 
         player.teleport(deathLoc);
         setCooldownPersistent(player.getUniqueId());

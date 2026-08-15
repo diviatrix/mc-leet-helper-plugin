@@ -9,6 +9,7 @@ base:
 feature:
   multiplier: 0.5
   min-damage: 1
+  cost: 0
   whitelist:
     - WOODEN_SWORD
     - WOODEN_SHOVEL
@@ -67,4 +68,5 @@ feature:
     - TURTLE_HELMET
     - ELYTRA
 
-messages: {}
+messages:
+  insufficient-funds: "<red>Insufficient funds! Cost: <cost>"

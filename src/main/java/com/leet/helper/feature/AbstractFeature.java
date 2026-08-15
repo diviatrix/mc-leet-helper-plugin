@@ -31,6 +31,7 @@ public abstract class AbstractFeature implements Listener {
     protected String defaultPermission;
     protected List<String> worlds;
     protected int cooldownSeconds;
+    protected double cost;
     protected String messageType;
     protected Map<String, String> messages;
 
@@ -59,6 +60,7 @@ public abstract class AbstractFeature implements Listener {
         worlds = cfg.getStringList("base.worlds");
         cooldownSeconds = cfg.getInt("base.cooldown", 0);
         messageType = cfg.getString("base.message-type", "ACTION_BAR");
+        cost = cfg.getDouble("feature.cost", 0.0);
 
         messages.clear();
         if (cfg.isConfigurationSection("messages")) {
@@ -183,6 +185,23 @@ public abstract class AbstractFeature implements Listener {
         if (amount <= 0) return true;
         if (plugin.economy() == null) return true;
         return plugin.economy().withdrawPlayer(player, amount).transactionSuccess();
+    }
+
+    /**
+     * Applies the feature's per-use {@code feature.cost}: returns true (free,
+     * no economy, or the charge succeeded) when the use may proceed. If the
+     * player lacks the funds it sends the "insufficient-funds" message and
+     * returns false, blocking the use. With a cost of 0 (the default) this is
+     * always free.
+     */
+    protected boolean chargeUse(Player player) {
+        if (cost <= 0) return true;
+        if (plugin.economy() == null) return true;
+        if (!hasBalance(player, cost)) {
+            sendMessage(player, "insufficient-funds", "<cost>", String.valueOf(cost));
+            return false;
+        }
+        return withdraw(player, cost);
     }
 
     /**

@@ -34,6 +34,7 @@ feature:
   radius: 3              # 1 – 5 (hard-capped at 5)
   require-mature: true   # Only harvest fully grown crops
   require-hoe: false     # Only scan/break nearby crops when holding a hoe
+  cost: 0                # Vault economy cost per harvest (0 = free)
   materials:
     - WHEAT
     - CARROTS
@@ -43,7 +44,8 @@ feature:
     - COCOA
     - SWEET_BERRY_BUSH
 
-messages: {}
+messages:
+  insufficient-funds: "<red>Insufficient funds! Cost: <cost>"
 ```
 
 | Key | Type | Default | Description |
@@ -51,6 +53,8 @@ messages: {}
 | `radius` | int | `3` | Square half-size (horizontal x/z) around the broken block. Values > 5 are **clamped to 5**. |
 | `require-mature` | bool | `true` | Only break fully grown crops. Maturity uses `Ageable` block data (`age == maximumAge`). |
 | `require-hoe` | bool | `false` | Only run the square scan while the player is holding a hoe (any of wooden/stone/iron/golden/diamond/netherite). With no hoe, only the single broken crop is removed. |
+| `cost` | double | `0.0` | Vault economy cost per trigger (one broken crop → one batch harvest). `0` or any value `≤ 0` = free. |
+| `insufficient-funds` | message | — | Sent when the player lacks funds for the `cost`; the batch harvest is blocked (only the single broken crop is removed). |
 | `materials` | list of Material names | wheat, carrots, potatoes, etc. | Crop materials to auto-harvest. Invalid names are skipped with a warning. |
 
 > Radius scans a horizontal square `-radius`..`+radius` on the x/z axes at one block high → `(2×radius+1)² − 1` candidate blocks (e.g. radius 3 = 48 candidates). Lower the radius on lag-heavy worlds. The scan is performed on the server thread.

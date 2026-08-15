@@ -1,6 +1,6 @@
 # LeetHelper
 
-A **Paper 26.2** plugin providing modular gameplay features. Each feature has its own on-disk YAML config, its own permission node, per-world whitelisting, optional cooldowns, and (for the Back feature) optional Vault economy integration.
+A **Paper 26.2** plugin providing modular gameplay features. Each feature has its own on-disk YAML config, its own permission node, per-world whitelisting, optional cooldowns, and an optional per-use Vault economy cost.
 
 Licensed under **CC0 1.0** (public domain) — see [LICENSE](LICENSE).
 
@@ -59,7 +59,7 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`).
 |---|---|
 | Server software | Paper **26.2**+ (Bundled API jar is compiled against `26.2`). Spigot/CraftBukkit are **not** supported. |
 | Java | **26+** (the build toolchain targets Java 26). Run your server on a JVM that supports the compiled bytecode. |
-| Vault | Optional. Only needed for the Back economy cost. The plugin works fully without it. |
+| Vault | Optional. Only needed for feature per-use costs. The plugin works fully without it. |
 
 > Java runtime vs. build JDK: the Gradle build uses a Java 26 toolchain, and the plugin bytecode targets Java 26. Use a Java 26 (or later) runtime on your server when running the plugin.
 
@@ -67,11 +67,11 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`).
 
 ## Installation
 
-1. **Build or obtain the jar** — see [Building from Source](#building-from-source). The build produces `build/libs/leet-helper-1.1.1.jar`.
+1. **Build or obtain the jar** — see [Building from Source](#building-from-source). The build produces `build/libs/leet-helper-1.1.2.jar`.
 2. **Copy the jar** into your server's `plugins/` folder:
 
    ```bash
-   cp build/libs/leet-helper-1.1.1.jar /path/to/server/plugins/
+   cp build/libs/leet-helper-1.1.2.jar /path/to/server/plugins/
    ```
 
 3. **Start the server.** On first launch the plugin creates its data folder and writes default configuration files:
@@ -117,7 +117,9 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`).
 ./gradlew compileJava
 ```
 
-**Output artifact:** `build/libs/leet-helper-1.1.1.jar`
+**Output artifact:** `build/libs/leet-helper-1.1.2.jar`
+
+> **Version is single-sourced:** the release version lives in **`build.gradle.kts`** (`version = "1.1.2"`). It drives both the jar filename and the `version` injected into the packaged `plugin.yml` at build time — bump it in exactly one place.
 
 > **First build note:** the paperweight plugin downloads and runs a Paper server JAR to produce the remapped API (~40s). Subsequent builds are cached and faster.
 
@@ -194,7 +196,7 @@ log-level: INFO
 
 The `log-level` is read from `config.yml`, though most feature-related messages are logged at the `INFO`/`WARNING`/`SEVERE` level regardless.
 
-> **Console prefix & color:** startup and status messages (e.g. `[LeetHelper] Initializing LeetHelper v1.1.1`, `[LeetHelper] Enabled 4/4 feature(s).`, the Vault status) are sent to the console via the console sender with a green `[LeetHelper]` prefix. These colored lines appear in the live console but color codes are stripped from `logs/latest.log`. The automatically-printed Paper line `[LeetHelper] Enabling LeetHelper v1.1.1` and the plugin-logger `[LeetHelper]` WARN/SEVERE lines come from Paper's logger and are not recolored.
+> **Console prefix & color:** startup and status messages (e.g. `[LeetHelper] Initializing LeetHelper v1.1.2`, `[LeetHelper] Enabled 4/4 feature(s).`, the Vault status) are sent to the console via the console sender with a green `[LeetHelper]` prefix. These colored lines appear in the live console but color codes are stripped from `logs/latest.log`. The automatically-printed Paper line `[LeetHelper] Enabling LeetHelper v1.1.2` and the plugin-logger `[LeetHelper]` WARN/SEVERE lines come from Paper's logger and are not recolored.
 
 > **Renaming a plugin (`name` in `plugin.yml`):** the data folder and all file paths follow the plugin's display name (now `plugins/LeetHelper/`). If you previously ran under the old name (`plugins/HelperPlugin/`), move those files across to keep existing configs and the SQLite `data.db`.
 
@@ -413,13 +415,13 @@ Vault is an **optional soft dependency** (`softdepend: [Vault]`). The plugin det
 
 | Area | Without Vault | With Vault (economy provider) |
 |---|---|---|
-| Economy (`/back` cost) | Cost is silently skipped — free teleports, no balance checks | Cost checked and deducted per `/back` use |
+| Economy (`feature.cost`) | Cost is silently skipped — no charges, no balance checks | Cost checked and deducted per use for any feature with `feature.cost > 0` |
 | Permissions | Uses Bukkit `player.hasPermission()` | Stills uses Bukkit `player.hasPermission()` (the Vault `Permission` provider is resolved but **not used**) |
 
 Notes:
-- Only the **Back** feature uses the economy.
+- Any feature can declare a per-use `feature.cost` (default `0` = free); all features except XP do.
 - `cost` is charged only when `feature.cost > 0`.
-- If the player lacks funds, the `insufficient-funds` message is shown and the teleport is blocked.
+- If the player lacks funds, the `insufficient-funds` message is shown and the use is blocked.
 
 ---
 
@@ -431,7 +433,7 @@ Notes:
 | Feature config changes have no effect | Feature configs are read at startup; there is **no reload command**. Restart the server. |
 | `/leeta` not recognized / "unknown command" | The `leeta` command permission (`leet.admin`) is `op` by default — grant it or run as op. |
 | Durability whitelist warnings at startup | `Invalid material in durability whitelist:` — an entry in the on-disk `features/_durability.yml` whitelist is not a valid `Material` name (e.g. leftover `STEEL_*` or `HELMET`) and is being ignored. Remove it or use the correct enum name (see the note in [Durability](doc/features/durability.md)). |
-| `/back` cost not charged | Vault is not installed, or no economy provider is registered. Without Vault the cost feature is silently disabled. |
+| Feature cost not charged | Vault is not installed, or no economy provider is registered. Without Vault the cost feature is silently disabled. |
 | Death locations reset on restart | The `data.db` file was deleted/moved, or the SQLite connection failed to initialize (SEVERE log). |
 | `data.db` not created | Check the startup logs for `Failed to initialize SQLite`. The plugin degrades gracefully (Back feature won't persist). |
 | DoubleJump not triggering | Check game mode (Creative/Spectator excluded), `double_jump` cooldown (1s default), or the permission/world whitelist. |
@@ -443,7 +445,7 @@ Notes:
 - **No reload command** — config file changes require a restart. Only `/leeta toggle` can change `base.enabled` live.
 - **`config-version` is informational only** — the merge adds missing keys regardless of the version value; it never removes or rewrites existing keys.
 - **Vault permission provider is unused** — permission checks are Bukkit-native even with Vault installed.
-- **No admin bypass** for Back cooldown/cost/max-age.
+- **No admin bypass** for feature cooldowns/costs (e.g. Back cooldown/cost/max-age).
 - **No bStats** — sends zero analytics/metrics telemetry.
 - **Auto Crop scan is server-thread** — large radii can be expensive on busy worlds.
 - **No unit tests** — verification is manual on a Paper server.

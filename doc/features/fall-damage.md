@@ -13,7 +13,7 @@ Negates all fall damage for eligible players, as a standalone feature **independ
 1. A player takes fall damage (`EntityDamageEvent`, cause `FALL`).
 2. If the player passes the feature checks (enabled + `leet.feat.fall_damage` permission + personal `/leet` toggle + world), the fall damage is cancelled entirely.
 
-There are no feature-specific config options — the feature is controlled by `base.enabled`, the `leet.feat.fall_damage` permission, and the personal `/leet fall` toggle.
+There are no feature-specific config options **except the per-use `cost`** — the feature is otherwise controlled by `base.enabled`, the `leet.feat.fall_damage` permission, and the personal `/leet fall` toggle. A non-zero `cost` charges the player for each fall that is negated and blocks the negation (damage applies) when they lack funds.
 
 ```yaml
 base:
@@ -24,9 +24,16 @@ base:
   cooldown: 0
   message-type: ACTION_BAR
 
-feature: {}
+feature:
+  cost: 0              # Vault economy cost per negated fall (0 = free)
 
-messages: {}
+messages:
+  insufficient-funds: "<red>Insufficient funds! Cost: <cost>"
 ```
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `cost` | double | `0.0` | Vault economy cost per negated fall. `0` or any value `≤ 0` = free. |
+| `insufficient-funds` | message | — | Sent when the player lacks funds for the `cost`; the fall damage is **not** negated |
 
 **Cooldown:** none.

@@ -10,6 +10,7 @@ feature:
   radius: 3
   require-mature: true
   require-hoe: false
+  cost: 0
   materials:
     - WHEAT
     - CARROTS
@@ -19,4 +20,5 @@ feature:
     - COCOA
     - SWEET_BERRY_BUSH
 
-messages: {}
+messages:
+  insufficient-funds: "<red>Insufficient funds! Cost: <cost>"

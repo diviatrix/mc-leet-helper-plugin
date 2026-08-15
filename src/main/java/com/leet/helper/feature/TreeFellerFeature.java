@@ -62,6 +62,8 @@ public class TreeFellerFeature extends AbstractFeature {
         Block broken = event.getBlock();
         if (!logs.contains(broken.getType())) return;
 
+        if (!chargeUse(player)) return;
+
         ItemStack tool = player.getInventory().getItemInMainHand();
 
         // Component search over the log blocks so the whole trunk and any

@@ -33,13 +33,17 @@ base:
 feature:
   horizontal-multiplier: 0.25  # Forward/sideways velocity multiplier
   vertical-multiplier: 1.0     # Upward velocity
+  cost: 0                      # Vault economy cost per jump (0 = free)
 
-messages: {}
+messages:
+  insufficient-funds: "<red>Insufficient funds! Cost: <cost>"
 ```
 
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `horizontal-multiplier` | double | `0.25` | Horizontal (look-direction) velocity multiplier |
 | `vertical-multiplier` | double | `1.0` | Fixed upward velocity on jump |
+| `cost` | double | `0.0` | Vault economy cost per use. `0` or any value `≤ 0` = free (cost is only applied when `> 0`). |
+| `insufficient-funds` | message | — | Sent when the player lacks funds for the `cost`; the jump is blocked |
 
 **Cooldown:** runtime only (in-memory), lost on restart. Default `1` second. When on cooldown, the jump is skipped (no velocity) but the flight-toggle event is still cancelled.

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.leet"
-version = "1.1.1"
+version = "1.1.2"
 
 base {
     archivesName = "leet-helper"
@@ -25,4 +25,14 @@ repositories {
 dependencies {
     paperweight.paperDevBundle("26.2.build.+")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1") { isTransitive = false }
+}
+
+// Single source of truth for the version: rely on the project `version`
+// property, then inject it into plugin.yml at build time. Bumping once in
+// build.gradle.kts updates both the jar filename and the runtime version.
+tasks.processResources {
+    val versionTokens = mapOf("version" to project.version.toString())
+    filesMatching("plugin.yml") {
+        expand(versionTokens)
+    }
 }

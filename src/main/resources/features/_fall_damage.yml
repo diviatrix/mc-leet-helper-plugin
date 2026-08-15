@@ -6,6 +6,8 @@ base:
   cooldown: 0
   message-type: ACTION_BAR
 
-feature: {}
+feature:
+  cost: 0
 
-messages: {}
+messages:
+  insufficient-funds: "<red>Insufficient funds! Cost: <cost>"

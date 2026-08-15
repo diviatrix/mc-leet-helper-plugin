@@ -225,7 +225,7 @@ Covers six actions with per-material/per-mob amounts:
 
 **Usage:**
 - Permission checks: Vault Permission API if available, fallback to Bukkit `player.hasPermission()`
-- Economy: BackFeature only. `hasBalance()` / `withdraw()` via base class helpers.
+- Economy: optional per-feature cost via `feature.cost` (all features except XP). `chargeUse()` / `hasBalance()` / `withdraw()` via base class helpers.
 
 ---
 
@@ -289,7 +289,7 @@ log-level: INFO  # OFF / INFO / DEBUG
 | Config migration | Versioned merge |
 | Event priority | NORMAL (most); MONITOR for multi-block breakers (TreeFeller/AutoCrop) so claim cancellations are seen |
 | Soft dependencies | Vault |
-| Economy | Vault, Back only, cost-per-use |
+| Economy | Vault, optional per-feature cost-per-use (all features except XP) |
 | Insufficient funds | Block + ActionBar |
 | Admin bypass | None |
 | Reload command | None |
