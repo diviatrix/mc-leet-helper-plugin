@@ -1,8 +1,13 @@
 # Feature: Fall Damage
 
-> Common `base:`/`messages:` config layout and control model: [README](../README.md#common-feature-config-structure) · Permissions: [permissions.md](../permissions.md) · All features: [index](README.md)
+> Common `base:`/`messages:` config layout and control model: [README](../README.md#common-feature-config-structure) · Admin: [Admin.md](../Admin.md) · All features: [index](README.md)
 
 Negates all fall damage for eligible players, as a standalone feature **independent of Double Jump**. Config file `features/_fall_damage.yml`.
+
+**Permissions**
+- **Node:** `leet.feat.fall_damage` · **default:** `false` (nobody).
+- Grant the node (e.g. LuckPerms) to give a player fall-damage immunity; it also unlocks the `/leet fall` personal off-toggle. The node alone is not enough — `base.enabled`, the permission, and `base.worlds` must all pass.
+- Set `base.default-permission` in `_fall_damage.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
 
 **Behavior**
 1. A player takes fall damage (`EntityDamageEvent`, cause `FALL`).

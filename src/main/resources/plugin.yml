@@ -1,5 +1,5 @@
 name: LeetHelper
-version: "1.1.0"
+version: "1.1.1"
 main: com.leet.helper.HelperPlugin
 api-version: "26.2"
 description: Leet Helper Plugin
@@ -7,10 +7,10 @@ author: Leet
 softdepend: [Vault]
 
 commands:
-  helper:
+  leeta:
     description: Admin helper command
-    usage: /helper <list|toggle|info> [args]
-    permission: helper.admin
+    usage: /leeta <list|toggle|info> [args]
+    permission: leet.admin
   back:
     description: Teleport back to death location
     usage: /back
@@ -21,19 +21,19 @@ commands:
     aliases: []
 
 permissions:
-  helper.admin:
-    description: Admin access to helper commands
+  leet.admin:
+    description: Admin access to leeta commands
     default: op
     children:
-      helper.admin.list: true
-      helper.admin.toggle: true
-      helper.admin.info: true
-  helper.admin.list:
+      leet.admin.list: true
+      leet.admin.toggle: true
+      leet.admin.info: true
+  leet.admin.list:
     description: List all features
     default: op
-  helper.admin.toggle:
+  leet.admin.toggle:
     description: Toggle features on/off
     default: op
-  helper.admin.info:
+  leet.admin.info:
     description: View feature info
     default: op

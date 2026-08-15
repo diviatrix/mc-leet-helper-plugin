@@ -23,7 +23,7 @@ Licensed under **CC0 1.0** (public domain) — see [LICENSE](LICENSE).
   - [Admin Permissions](#admin-permissions)
   - [Feature Permissions](#feature-permissions)
 - [Commands](#commands)
-  - [/helper](#helper)
+  - [/leeta](#leeta)
   - [/back](#back)
 - [Features](#features)
   - [Feature docs (doc/features/)](doc/features/README.md)
@@ -49,7 +49,7 @@ LeetHelper registers seven gameplay features plus one admin command.
 | Fall Damage | `fall_damage` | Negates all fall damage for eligible players |
 | XP | `xp` | Bonus vanilla XP for mining, woodcutting, crops, fishing, building, and killing |
 
-Admin features are managed with the `/helper` command (`list`, `toggle`, `info`).
+Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`).
 
 ---
 
@@ -67,11 +67,11 @@ Admin features are managed with the `/helper` command (`list`, `toggle`, `info`)
 
 ## Installation
 
-1. **Build or obtain the jar** — see [Building from Source](#building-from-source). The build produces `build/libs/leet-helper-1.1.0.jar`.
+1. **Build or obtain the jar** — see [Building from Source](#building-from-source). The build produces `build/libs/leet-helper-1.1.1.jar`.
 2. **Copy the jar** into your server's `plugins/` folder:
 
    ```bash
-   cp build/libs/leet-helper-1.1.0.jar /path/to/server/plugins/
+   cp build/libs/leet-helper-1.1.1.jar /path/to/server/plugins/
    ```
 
 3. **Start the server.** On first launch the plugin creates its data folder and writes default configuration files:
@@ -90,7 +90,7 @@ Admin features are managed with the `/helper` command (`list`, `toggle`, `info`)
        └── _xp.yml
    ```
 
-4. **Configure to taste** — edit the files inside `plugins/LeetHelper/features/`. Restart the server for changes to take effect (there is **no reload command**; `base.enabled` toggles are the only thing that can be changed live, via `/helper toggle`).
+4. **Configure to taste** — edit the files inside `plugins/LeetHelper/features/`. Restart the server for changes to take effect (there is **no reload command**; `base.enabled` toggles are the only thing that can be changed live, via `/leeta toggle`).
 
 > **Updating the plugin:** on startup the global `config.yml` and every feature config are merged against the bundled defaults. Any **new key** introduced by a newer plugin version (e.g. `require-hoe`) is automatically added to your existing configs while all your other values are preserved. No manual copying needed.
 
@@ -117,7 +117,7 @@ Admin features are managed with the `/helper` command (`list`, `toggle`, `info`)
 ./gradlew compileJava
 ```
 
-**Output artifact:** `build/libs/leet-helper-1.1.0.jar`
+**Output artifact:** `build/libs/leet-helper-1.1.1.jar`
 
 > **First build note:** the paperweight plugin downloads and runs a Paper server JAR to produce the remapped API (~40s). Subsequent builds are cached and faster.
 
@@ -146,7 +146,7 @@ src/main/
       FallDamageFeature.java     # Fall-damage immunity implementation
       XpFeature.java             # Bonus XP for actions implementation
     command/
-      HelperCommand.java         # /helper list|toggle|info (+ tab completion)
+      HelperCommand.java         # /leeta list|toggle|info (+ tab completion)
       BackCommand.java           # /back
       LeetCommand.java           # /leet player feature toggles (+ tab completion)
     storage/
@@ -194,7 +194,7 @@ log-level: INFO
 
 The `log-level` is read from `config.yml`, though most feature-related messages are logged at the `INFO`/`WARNING`/`SEVERE` level regardless.
 
-> **Console prefix & color:** startup and status messages (e.g. `[LeetHelper] Initializing LeetHelper v1.1.0`, `[LeetHelper] Enabled 4/4 feature(s).`, the Vault status) are sent to the console via the console sender with a green `[LeetHelper]` prefix. These colored lines appear in the live console but color codes are stripped from `logs/latest.log`. The automatically-printed Paper line `[LeetHelper] Enabling LeetHelper v1.1.0` and the plugin-logger `[LeetHelper]` WARN/SEVERE lines come from Paper's logger and are not recolored.
+> **Console prefix & color:** startup and status messages (e.g. `[LeetHelper] Initializing LeetHelper v1.1.1`, `[LeetHelper] Enabled 4/4 feature(s).`, the Vault status) are sent to the console via the console sender with a green `[LeetHelper]` prefix. These colored lines appear in the live console but color codes are stripped from `logs/latest.log`. The automatically-printed Paper line `[LeetHelper] Enabling LeetHelper v1.1.1` and the plugin-logger `[LeetHelper]` WARN/SEVERE lines come from Paper's logger and are not recolored.
 
 > **Renaming a plugin (`name` in `plugin.yml`):** the data folder and all file paths follow the plugin's display name (now `plugins/LeetHelper/`). If you previously ran under the old name (`plugins/HelperPlugin/`), move those files across to keep existing configs and the SQLite `data.db`.
 
@@ -268,20 +268,20 @@ Full per-feature behavior, config files, and key tables live in **[doc/features/
 
 ## Permissions
 
-> **Full reference:** see [doc/permissions.md](doc/permissions.md) for the complete list, defaults, registration logic, gate order, and `/leet` permission behavior.
+Admin permissions for `/leeta` are in **[doc/Admin.md](doc/Admin.md)**. Each gameplay feature's `leet.feat.*` permission is documented in its own feature document (index: [doc/features/README.md](doc/features/README.md)).
 
-### Admin Permissions
+### Admin Permissions (`/leeta`)
 
-Declared statically in `plugin.yml`. They control access to the `/helper` command.
+Declared statically in `plugin.yml`. They control access to the `/leeta` command. Full reference in [doc/Admin.md](doc/Admin.md).
 
 | Permission | Default | Description |
 |---|---|---|
-| `helper.admin` | op | Full admin access **to commands** (children included). Does **not** grant the group these permissions are all `op`. |
-| `helper.admin.list` | op | Use `/helper list` |
-| `helper.admin.toggle` | op | Use `/helper toggle` |
-| `helper.admin.info` | op | Use `/helper info` |
+| `leet.admin` | op | Full admin access **to commands** (children included). |
+| `leet.admin.list` | op | Use `/leeta list` |
+| `leet.admin.toggle` | op | Use `/leeta toggle` |
+| `leet.admin.info` | op | Use `/leeta info` |
 
-`helper.admin` automatically includes the three children (`list`, `toggle`, `info`) via its `children` map.
+`leet.admin` automatically includes the three children (`list`, `toggle`, `info`) via its `children` map.
 
 ### Command-Facing Permissions
 
@@ -289,22 +289,22 @@ Declared in `plugin.yml` on the commands themselves:
 
 | Permission | Default | Found on |
 |---|---|---|
-| `helper.admin` | op | `helper` command (base command requires it) |
+| `leet.admin` | op | `leeta` command (base command requires it) |
 | `leet.feat.back` | (dynamic) | `back` command |
 
 ### Feature Permissions (dynamic)
 
-Feature permissions are **not** declared in `plugin.yml`. Instead, `HelperPlugin` registers them at runtime from each feature's config: on every startup it calls `Bukkit.getPluginManager().addPermission()` with the node from `base.permission` and the default from `base.default-permission`.
+Feature permissions are **not** declared in `plugin.yml`. Instead, `HelperPlugin` registers them at runtime from each feature's config: on every startup it calls `Bukkit.getPluginManager().addPermission()` with the node from `base.permission` and the default from `base.default-permission`. Each node is documented in its feature doc's **Permissions** section.
 
-| Permission | Default (from config) | Description |
+| Permission | Default (from config) | Feature doc |
 |---|---|---|
-| `leet.feat.double_jump` | false | Can use double jump |
-| `leet.feat.durability` | false | Durability multiplier applies |
-| `leet.feat.auto_crop` | false | Auto-harvest crops |
-| `leet.feat.back` | false | Can have death locations saved and use `/back` |
-| `leet.feat.tree_feller` | false | Whole-tree felling |
-| `leet.feat.fall_damage` | false | Fall-damage immunity |
-| `leet.feat.xp` | false | Bonus XP from actions |
+| `leet.feat.double_jump` | false | [Double Jump](doc/features/double-jump.md) |
+| `leet.feat.durability` | false | [Durability](doc/features/durability.md) |
+| `leet.feat.auto_crop` | false | [Auto Crop](doc/features/auto-crop.md) |
+| `leet.feat.back` | false | [Back](doc/features/back.md) |
+| `leet.feat.tree_feller` | false | [Tree Feller](doc/features/tree-feller.md) |
+| `leet.feat.fall_damage` | false | [Fall Damage](doc/features/fall-damage.md) |
+| `leet.feat.xp` | false | [XP](doc/features/xp.md) |
 
 `base.default-permission` maps to a Bukkit default:
 - `true` → `PermissionDefault.TRUE` (every player)
@@ -319,16 +319,16 @@ Feature permissions are **not** declared in `plugin.yml`. Instead, `HelperPlugin
 
 ## Commands
 
-### /helper
+### /leeta
 
-Admin command for managing features. Requires the `helper` command permission (`helper.admin`, op by default).
+Admin command for managing features. Requires the `leeta` command permission (`leet.admin`, op by default). Full reference in [doc/Admin.md](doc/Admin.md).
 
 | Subcommand | Permission | Description |
 |---|---|---|
-| `/helper` | (base command) | Prints usage: `/helper <list\|toggle\|info>` |
-| `/helper list` | `helper.admin` | Lists all features with ON/OFF status |
-| `/helper toggle <id>` | `helper.admin.toggle` | Toggles a feature on/off and **persists** `base.enabled` to its YAML |
-| `/helper info <id>` | `helper.admin` | Shows the feature's ID, permission node, and current status |
+| `/leeta` | (base command) | Prints usage: `/leeta <list\|toggle\|info>` |
+| `/leeta list` | `leet.admin` | Lists all features with ON/OFF status |
+| `/leeta toggle <id>` | `leet.admin.toggle` | Toggles a feature on/off and **persists** `base.enabled` to its YAML |
+| `/leeta info <id>` | `leet.admin` | Shows the feature's ID, permission node, and current status |
 
 Tab completion is provided for subcommands and feature IDs.
 
@@ -429,7 +429,7 @@ Notes:
 |---|---|
 | Plugin doesn't load on start | Server is not Paper 26.2+, or the JVM is older than Java 26. Check console for a version mismatch. |
 | Feature config changes have no effect | Feature configs are read at startup; there is **no reload command**. Restart the server. |
-| `/helper` not recognized / "unknown command" | The `helper` command permission (`helper.admin`) is `op` by default — grant it or run as op. |
+| `/leeta` not recognized / "unknown command" | The `leeta` command permission (`leet.admin`) is `op` by default — grant it or run as op. |
 | Durability whitelist warnings at startup | `Invalid material in durability whitelist:` — an entry in the on-disk `features/_durability.yml` whitelist is not a valid `Material` name (e.g. leftover `STEEL_*` or `HELMET`) and is being ignored. Remove it or use the correct enum name (see the note in [Durability](doc/features/durability.md)). |
 | `/back` cost not charged | Vault is not installed, or no economy provider is registered. Without Vault the cost feature is silently disabled. |
 | Death locations reset on restart | The `data.db` file was deleted/moved, or the SQLite connection failed to initialize (SEVERE log). |
@@ -440,7 +440,7 @@ Notes:
 
 ## Known Limitations
 
-- **No reload command** — config file changes require a restart. Only `/helper toggle` can change `base.enabled` live.
+- **No reload command** — config file changes require a restart. Only `/leeta toggle` can change `base.enabled` live.
 - **`config-version` is informational only** — the merge adds missing keys regardless of the version value; it never removes or rewrites existing keys.
 - **Vault permission provider is unused** — permission checks are Bukkit-native even with Vault installed.
 - **No admin bypass** for Back cooldown/cost/max-age.

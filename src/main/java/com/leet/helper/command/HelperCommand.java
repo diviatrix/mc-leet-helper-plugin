@@ -24,7 +24,7 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /helper <list|toggle|info> [args]"));
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info> [args]"));
             return true;
         }
 
@@ -32,13 +32,13 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
             case "list" -> handleList(sender);
             case "toggle" -> handleToggle(sender, args);
             case "info" -> handleInfo(sender, args);
-            default -> sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /helper <list|toggle|info> [args]"));
+            default -> sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info> [args]"));
         }
         return true;
     }
 
     private void handleList(CommandSender sender) {
-        if (!sender.hasPermission("helper.admin")) {
+        if (!sender.hasPermission("leet.admin")) {
             sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>No permission."));
             return;
         }
@@ -50,12 +50,12 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
     }
 
     private void handleToggle(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("helper.admin.toggle")) {
+        if (!sender.hasPermission("leet.admin.toggle")) {
             sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>No permission."));
             return;
         }
         if (args.length < 2) {
-            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /helper toggle <feature-id>"));
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta toggle <feature-id>"));
             return;
         }
         String id = args[1];
@@ -71,12 +71,12 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
     }
 
     private void handleInfo(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("helper.admin")) {
+        if (!sender.hasPermission("leet.admin")) {
             sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>No permission."));
             return;
         }
         if (args.length < 2) {
-            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /helper info <feature-id>"));
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta info <feature-id>"));
             return;
         }
         String id = args[1];

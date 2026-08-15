@@ -58,8 +58,8 @@ public class HelperPlugin extends JavaPlugin {
         featureManager.register(new XpFeature(this));
         featureManager.enableAll();
 
-        getCommand("helper").setExecutor(new HelperCommand(this));
-        getCommand("helper").setTabCompleter(new HelperCommand(this));
+        getCommand("leeta").setExecutor(new HelperCommand(this));
+        getCommand("leeta").setTabCompleter(new HelperCommand(this));
         getCommand("back").setExecutor(new BackCommand(this));
         getCommand("leet").setExecutor(new LeetCommand(this));
         getCommand("leet").setTabCompleter(new LeetCommand(this));
