@@ -1,0 +1,11 @@
+base:
+  enabled: true
+  permission: leet.feat.fall_damage
+  default-permission: false
+  worlds: []
+  cooldown: 0
+  message-type: ACTION_BAR
+
+feature: {}
+
+messages: {}
