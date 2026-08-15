@@ -1,0 +1,70 @@
+base:
+  enabled: true
+  permission: leet.feat.durability
+  default-permission: false
+  worlds: []
+  cooldown: 0
+  message-type: ACTION_BAR
+
+feature:
+  multiplier: 0.5
+  min-damage: 1
+  whitelist:
+    - WOODEN_SWORD
+    - WOODEN_SHOVEL
+    - WOODEN_PICKAXE
+    - WOODEN_AXE
+    - WOODEN_HOE
+    - STONE_SWORD
+    - STONE_SHOVEL
+    - STONE_PICKAXE
+    - STONE_AXE
+    - STONE_HOE
+    - IRON_SWORD
+    - IRON_SHOVEL
+    - IRON_PICKAXE
+    - IRON_AXE
+    - IRON_HOE
+    - GOLDEN_SWORD
+    - GOLDEN_SHOVEL
+    - GOLDEN_PICKAXE
+    - GOLDEN_AXE
+    - GOLDEN_HOE
+    - DIAMOND_SWORD
+    - DIAMOND_SHOVEL
+    - DIAMOND_PICKAXE
+    - DIAMOND_AXE
+    - DIAMOND_HOE
+    - NETHERITE_SWORD
+    - NETHERITE_SHOVEL
+    - NETHERITE_PICKAXE
+    - NETHERITE_AXE
+    - NETHERITE_HOE
+    - TRIDENT
+    - BOW
+    - CROSSBOW
+    - SHIELD
+    - LEATHER_HELMET
+    - IRON_HELMET
+    - GOLDEN_HELMET
+    - DIAMOND_HELMET
+    - NETHERITE_HELMET
+    - LEATHER_CHESTPLATE
+    - IRON_CHESTPLATE
+    - GOLDEN_CHESTPLATE
+    - DIAMOND_CHESTPLATE
+    - NETHERITE_CHESTPLATE
+    - LEATHER_LEGGINGS
+    - IRON_LEGGINGS
+    - GOLDEN_LEGGINGS
+    - DIAMOND_LEGGINGS
+    - NETHERITE_LEGGINGS
+    - LEATHER_BOOTS
+    - IRON_BOOTS
+    - GOLDEN_BOOTS
+    - DIAMOND_BOOTS
+    - NETHERITE_BOOTS
+    - TURTLE_HELMET
+    - ELYTRA
+
+messages: {}

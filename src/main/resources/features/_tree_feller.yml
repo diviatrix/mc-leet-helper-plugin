@@ -1,0 +1,24 @@
+base:
+  enabled: true
+  permission: leet.feat.tree_feller
+  default-permission: false
+  worlds: []
+  cooldown: 0
+  message-type: ACTION_BAR
+
+feature:
+  logs:
+    - OAK_LOG
+    - SPRUCE_LOG
+    - BIRCH_LOG
+    - JUNGLE_LOG
+    - ACACIA_LOG
+    - DARK_OAK_LOG
+    - MANGROVE_LOG
+    - CHERRY_LOG
+    - PALE_OAK_LOG
+    - CRIMSON_STEM
+    - WARPED_STEM
+  max-blocks: 100
+
+messages: {}

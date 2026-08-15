@@ -1,0 +1,20 @@
+base:
+  enabled: true
+  permission: leet.feat.back
+  default-permission: false
+  worlds: []
+  cooldown: 60
+  message-type: ACTION_BAR
+
+feature:
+  max-age: 300
+  cost: 0.0
+
+messages:
+  death-location-saved: "<green>Death location saved! Use /back to return."
+  teleport: "<green>Teleported to your death location."
+  cooldown-active: "<red>Cooldown active! Wait <time> seconds."
+  expired: "<red>Your death location has expired."
+  insufficient-funds: "<red>Insufficient funds! Cost: <cost>"
+  wrong-world: "<red>You must be in the same world as your death location."
+  no-location: "<red>No death location found."

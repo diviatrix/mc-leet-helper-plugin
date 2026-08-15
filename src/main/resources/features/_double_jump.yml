@@ -1,0 +1,13 @@
+base:
+  enabled: true
+  permission: leet.feat.double_jump
+  default-permission: false
+  worlds: []
+  cooldown: 1
+  message-type: ACTION_BAR
+
+feature:
+  horizontal-multiplier: 0.25  # Forward/sideways velocity multiplier
+  vertical-multiplier: 1.0     # Upward velocity
+
+messages: {}
