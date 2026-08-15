@@ -170,7 +170,24 @@ Sequential steps. Each must be completed and verified before moving to the next.
 
 ---
 
-## STEP 14: HelperCommand
+## STEP 14: XpFeature
+
+- Create `src/main/java/com/leet/helper/feature/XpFeature.java`
+- Extend `AbstractFeature`
+- `featureId()` returns `"xp"`
+- `loadFeatureConfig()`: reads `feature.mining.materials`, `feature.woodcutting.materials`, `feature.crops.materials` (Material → XP maps), `feature.fishing.amount`, `feature.building.amount`, `feature.killing.amount` (fallback), and `feature.killing.mobs` (EntityType → XP map) — invalid Material/EntityType names skipped with a warning
+- `@EventHandler onBlockBreak(BlockBreakEvent)`: check → route by broken Material (crops → woodcutting → mining) → award once
+- `@EventHandler onFish(PlayerFishEvent)`: check → only on `CAUGHT_FISH` → award fishing amount
+- `@EventHandler onPlace(BlockPlaceEvent)`: check → award building amount
+- `@EventHandler onKill(EntityDeathEvent)`: victim not a Player → `getKiller()` → check killer → award per-mob (`killing.mobs`) or `killing.amount` fallback
+- Helper `award(player, action, amount)`: skip if `amount <= 0`; `player.giveExp(amount)`; `sendMessage(player, "xp-gained", "<amount>", ..., "<action>", ...)` (empty template = silent)
+- Create `features/_xp.yml` with curated mining/woodcutting/crops material maps, fishing/building amounts, killing fallback + mobs, and an `xp-gained` message
+- Wire into HelperPlugin `onEnable()` (saveResourceIfMissing + register feature) and add `/leet xp` alias + display name in LeetCommand
+- Verify: mining stone → +1 XP; fishing → +3; killing a zombie → +3; breaking an unlisted block gives nothing; `xp-gained` shows on the action bar; `/leet xp` knocks it off per-player
+
+---
+
+## STEP 15: HelperCommand
 
 - Create `src/main/java/com/leet/helper/command/HelperCommand.java`
 - Implement `CommandExecutor` + `TabCompleter`
@@ -184,7 +201,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
 
 ---
 
-## STEP 15: BackCommand
+## STEP 16: BackCommand
 
 - Create `src/main/java/com/leet/helper/command/BackCommand.java`
 - Implement `CommandExecutor`
@@ -194,7 +211,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
 
 ---
 
-## STEP 16: Final integration test
+## STEP 17: Final integration test
 
 - Start Paper 26.2 server with plugin
 - Test all features end-to-end:
@@ -203,6 +220,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
   - AutoCrop: break mature wheat, verify radius harvest, Silk Touch
   - TreeFeller: break one log, verify whole tree fells, max-blocks cap, Silk Touch
   - FallDamage: eligibility negates fall damage; requires `leet.feat.fall_damage`, independent of Double Jump
+  - XP: mine stone → +1 XP action bar; fishing → +3; kill zombie → +3; unlisted block gives nothing; `/leet xp` toggles off
   - Back: die, get message, /back, cooldown, cross-world block, cost
 - Test admin commands: /helper list, toggle, info
 - Test tab completion

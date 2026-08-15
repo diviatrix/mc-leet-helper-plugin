@@ -1,0 +1,40 @@
+# Feature: Double Jump
+
+> Common `base:`/`messages:` config layout and control model: [README](../README.md#common-feature-config-structure) · Permissions: [permissions.md](../permissions.md) · All features: [index](README.md)
+
+Allows a mid-air double jump. Config file `features/_double_jump.yml`.
+
+**Behavior**
+1. Player on the ground → flight is enabled for them automatically.
+2. Player double-taps space (`PlayerToggleFlightEvent`) → the flight toggle is cancelled, flight disabled, and a velocity vector is applied in the player's look direction.
+   - Horizontal velocity = look direction × `horizontal-multiplier`.
+   - Vertical velocity = fixed `vertical-multiplier`.
+3. The runtime cooldown starts.
+4. When the player lands (or enters a vehicle), flight is re-enabled.
+
+**Fall damage is no longer part of Double Jump** — it has its own feature and `/leet` toggle (see [Feature: Fall Damage](fall-damage.md)).
+
+**Limits:** skipped entirely for Creative and Spectator game modes. The movement check is **block-level only** — it only re-enables flight when the player's block position changes (a performance optimization).
+
+```yaml
+base:
+  enabled: true
+  permission: leet.feat.double_jump
+  default-permission: false
+  worlds: []
+  cooldown: 1
+  message-type: ACTION_BAR
+
+feature:
+  horizontal-multiplier: 0.25  # Forward/sideways velocity multiplier
+  vertical-multiplier: 1.0     # Upward velocity
+
+messages: {}
+```
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `horizontal-multiplier` | double | `0.25` | Horizontal (look-direction) velocity multiplier |
+| `vertical-multiplier` | double | `1.0` | Fixed upward velocity on jump |
+
+**Cooldown:** runtime only (in-memory), lost on restart. Default `1` second. When on cooldown, the jump is skipped (no velocity) but the flight-toggle event is still cancelled.

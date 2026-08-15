@@ -6,11 +6,14 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
@@ -180,6 +183,22 @@ public abstract class AbstractFeature implements Listener {
         if (amount <= 0) return true;
         if (plugin.economy() == null) return true;
         return plugin.economy().withdrawPlayer(player, amount).transactionSuccess();
+    }
+
+    /**
+     * Breaks <code>block</code> as the player, but only if no protection plugin
+     * (GriefPrevention, WorldGuard, ...) would cancel the break. A plain
+     * <code>block.breakNaturally(tool)</code> fires no BlockBreakEvent, so it
+     * silently bypasses claims/regions — features that break several blocks
+     * (Tree Feller, Auto Crop) must route each block through here instead.
+     * Returns true if the block was actually broken.
+     */
+    protected boolean breakIfAllowed(Player player, Block block, ItemStack tool) {
+        BlockBreakEvent event = new BlockBreakEvent(block, player);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return false;
+        block.breakNaturally(tool);
+        return true;
     }
 
     public String id() {

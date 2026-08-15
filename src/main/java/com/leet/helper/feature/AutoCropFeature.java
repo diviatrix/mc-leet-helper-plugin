@@ -21,6 +21,7 @@ public class AutoCropFeature extends AbstractFeature {
     private boolean requireMature;
     private boolean requireHoe;
     private Set<Material> materials;
+    private boolean harvesting;
 
     public AutoCropFeature(HelperPlugin plugin) {
         super(plugin);
@@ -47,8 +48,15 @@ public class AutoCropFeature extends AbstractFeature {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBreak(BlockBreakEvent event) {
+        // Respect protection plugins: run late so a claim/region cancellation of
+        // the original break is already visible, and route each adjacent crop
+        // through breakIfAllowed (fires a BlockBreakEvent) so protected blocks
+        // inside a claim/region are skipped.
+        if (event.isCancelled()) return;
+        if (harvesting) return; // guard against the synthetic per-block events below
+
         Player player = event.getPlayer();
         if (!check(player)) return;
 
@@ -61,16 +69,21 @@ public class AutoCropFeature extends AbstractFeature {
 
         ItemStack tool = player.getInventory().getItemInMainHand();
 
-        for (int x = -radius; x <= radius; x++) {
-            for (int y = -radius; y <= radius; y++) {
-                for (int z = -radius; z <= radius; z++) {
-                    if (x == 0 && y == 0 && z == 0) continue;
-                    Block nearby = broken.getRelative(x, y, z);
-                    if (nearby.getType() != type) continue;
-                    if (requireMature && !isMature(nearby)) continue;
-                    nearby.breakNaturally(tool);
+        harvesting = true;
+        try {
+            for (int x = -radius; x <= radius; x++) {
+                for (int y = -radius; y <= radius; y++) {
+                    for (int z = -radius; z <= radius; z++) {
+                        if (x == 0 && y == 0 && z == 0) continue;
+                        Block nearby = broken.getRelative(x, y, z);
+                        if (nearby.getType() != type) continue;
+                        if (requireMature && !isMature(nearby)) continue;
+                        breakIfAllowed(player, nearby, tool);
+                    }
                 }
             }
+        } finally {
+            harvesting = false;
         }
     }
 
