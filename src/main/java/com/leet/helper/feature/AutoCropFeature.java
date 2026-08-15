@@ -71,15 +71,15 @@ public class AutoCropFeature extends AbstractFeature {
 
         harvesting = true;
         try {
+            // Square on the horizontal plane, one block high: only the same Y
+            // level as the broken crop is harvested (a plant grows one high).
             for (int x = -radius; x <= radius; x++) {
-                for (int y = -radius; y <= radius; y++) {
-                    for (int z = -radius; z <= radius; z++) {
-                        if (x == 0 && y == 0 && z == 0) continue;
-                        Block nearby = broken.getRelative(x, y, z);
-                        if (nearby.getType() != type) continue;
-                        if (requireMature && !isMature(nearby)) continue;
-                        breakIfAllowed(player, nearby, tool);
-                    }
+                for (int z = -radius; z <= radius; z++) {
+                    if (x == 0 && z == 0) continue;
+                    Block nearby = broken.getRelative(x, 0, z);
+                    if (nearby.getType() != type) continue;
+                    if (requireMature && !isMature(nearby)) continue;
+                    breakIfAllowed(player, nearby, tool);
                 }
             }
         } finally {

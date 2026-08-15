@@ -11,11 +11,11 @@ Auto-harvests nearby mature crops when a player breaks one. Config file `feature
 
 **Behavior**
 1. A player breaks a block (`BlockBreakEvent`).
-2. If the broken block is in `materials` (and, if `require-mature` is `true`, it is fully grown), the feature scans a cube.
-3. The cube spans `-radius`..`+radius` on all three axes around the broken block (excluding the source block itself).
+2. If the broken block is in `materials` (and, if `require-mature` is `true`, it is fully grown), the feature scans a horizontal square.
+3. The square spans `-radius`..`+radius` on the x and z axes around the broken block, **one block high** (same Y level as the broken crop; the source block itself is excluded).
 4. Every nearby block of the **same material** (and, if enabled, the **same maturity**) is broken with `breakNaturally(tool)`, using the player's main-hand item.
 
-If `require-hoe` is `true`, the cube scan only happens when the player is harvesting with a hoe in their hand — otherwise only the single broken crop is removed (default vanilla behavior).
+If `require-hoe` is `true`, the square scan only happens when the player is harvesting with a hoe in their hand — otherwise only the single broken crop is removed (default vanilla behavior).
 
 **Silk Touch** is respected (with a Silk Touch tool, crops drop as blocks rather than items).
 
@@ -48,11 +48,11 @@ messages: {}
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `radius` | int | `3` | Cube half-size around the broken block. Values > 5 are **clamped to 5**. |
+| `radius` | int | `3` | Square half-size (horizontal x/z) around the broken block. Values > 5 are **clamped to 5**. |
 | `require-mature` | bool | `true` | Only break fully grown crops. Maturity uses `Ageable` block data (`age == maximumAge`). |
-| `require-hoe` | bool | `false` | Only run the cube scan while the player is holding a hoe (any of wooden/stone/iron/golden/diamond/netherite). With no hoe, only the single broken crop is removed. |
+| `require-hoe` | bool | `false` | Only run the square scan while the player is holding a hoe (any of wooden/stone/iron/golden/diamond/netherite). With no hoe, only the single broken crop is removed. |
 | `materials` | list of Material names | wheat, carrots, potatoes, etc. | Crop materials to auto-harvest. Invalid names are skipped with a warning. |
 
-> Radius scans a cube `-radius`..`+radius` on each axis → `(2×radius+1)³ − 1` candidate blocks (e.g. radius 3 = 342 candidates). Lower the radius on lag-heavy worlds. The scan is performed on the server thread.
+> Radius scans a horizontal square `-radius`..`+radius` on the x/z axes at one block high → `(2×radius+1)² − 1` candidate blocks (e.g. radius 3 = 48 candidates). Lower the radius on lag-heavy worlds. The scan is performed on the server thread.
 
 **Cooldown:** none.
