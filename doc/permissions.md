@@ -35,6 +35,7 @@ Complete reference for every permission node, its default, and the rules that co
 | `leet.feat.back` | false | Death locations saved + `/back` command |
 | `leet.feat.tree_feller` | false | Player can use Tree Feller (and `/leet tree`) |
 | `leet.feat.fall_damage` | false | Player can use Fall Damage immunity (and `/leet fall`) |
+| `leet.feat.xp` | false | Player can earn bonus XP (and `/leet xp`) |
 
 - Feature defaults come from each feature's YAML (`base.default-permission`), **not** from `plugin.yml`.
 - Admin defaults are hardcoded in `plugin.yml` (`op`).
@@ -71,6 +72,7 @@ Declared **at runtime**, not in `plugin.yml`. Each is registered from its featur
 | `leet.feat.back` | `back` | false | Death location is saved on death **and** `/back` works. (Single node controls both — see [Gate order](#gate-order-what-the-plugin-actually-checks) below.) |
 | `leet.feat.tree_feller` | `tree_feller` | false | Whole-tree felling fires for the player (`BlockBreakEvent`) and `/leet tree` is available. |
 | `leet.feat.fall_damage` | `fall_damage` | false | Fall-damage immunity fires for the player (`EntityDamageEvent`, cause `FALL`) and `/leet fall` is available. |
+| `leet.feat.xp` | `xp` | false | Bonus XP is granted to the player for mining/woodcutting/crops/fishing/building/killing and `/leet xp` is available. |
 
 Feature-default → Bukkit default mapping:
 
@@ -113,7 +115,7 @@ Permissions are one of **three** independent on/off switches per feature:
 2. **`base.default-permission` / the feature permission** — who is allowed to use the feature. Admin-controlled.
 3. **`base.worlds`** — world whitelist (empty = all worlds).
 
-Plus a **fourth, player-level layer** added by the `/leet` command: a per-player off-toggle (applies to Double Jump, Auto Crop, Tree Feller, and Fall Damage).
+Plus a **fourth, player-level layer** added by the `/leet` command: a per-player off-toggle (applies to Double Jump, Auto Crop, Tree Feller, Fall Damage, and XP).
 
 ---
 
@@ -141,7 +143,7 @@ If any fails, the handler returns without acting. So a feature permission is **n
 
 - **No feature permissions at all** → `/leet` (and `/leet list`, and its tab completion) are dead: it replies `No permission.` and does nothing.
 - **Only permissioned features are offered** — the status list and tab completion include only the features whose `leet.feat.<id>` the player holds.
-- **Per-subcommand re-check** — `/leet dj` without `leet.feat.double_jump`, or `/leet crop` without `leet.feat.auto_crop` (likewise `/leet tree`, `/leet fall`), is declined with `No permission.`.
+- **Per-subcommand re-check** — `/leet dj` without `leet.feat.double_jump`, or `/leet crop` without `leet.feat.auto_crop` (likewise `/leet tree`, `/leet fall`, `/leet xp`), is declined with `No permission.`.
 
 The toggle itself is a personal **off-switch** nested under the base permission: toggling on never grants the permission, toggling only disables the feature for that player. Storage is per-player in the SQLite `kv_store` (key `user-toggle`, value `true`/`false`; absent = enabled).
 
@@ -172,7 +174,7 @@ Because every node is a standard Bukkit permission:
 | Make a feature ops-only | Set `base.default-permission: op` in `features/_<id>.yml`, restart. |
 | Disable a feature for everyone server-wide | `/helper toggle <id>` (persists `base.enabled: false`). |
 | Restrict `/leet` entirely | Not granted by default (all features default to `false`); simply grant no feature permissions. `/leet` then auto-hides/refuses for every player. |
-| Let a player turn a feature off just for themselves | Grant them `/leet` access (i.e. the feature permission) and tell them `/leet <alias>` (Double Jump `dj`, Auto Crop `crop`, Tree Feller `tree`, Fall Damage `fall`). |
+| Let a player turn a feature off just for themselves | Grant them `/leet` access (i.e. the feature permission) and tell them `/leet <alias>` (Double Jump `dj`, Auto Crop `crop`, Tree Feller `tree`, Fall Damage `fall`, XP `xp`). |
 | Block cross-world use | Set `base.worlds` to the allowed world names. |
 
 > Restart required after editing permission-related config (`plugin.yml` edits need a restart; feature YAML edits need a restart because perms register at startup).

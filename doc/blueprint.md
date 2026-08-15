@@ -17,6 +17,7 @@ plugins/HelperPlugin/
         BackFeature.java
         TreeFellerFeature.java
         FallDamageFeature.java
+        XpFeature.java
       command/
         HelperCommand.java
         BackCommand.java
@@ -34,6 +35,7 @@ plugins/HelperPlugin/
         _back.yml
         _tree_feller.yml
         _fall_damage.yml
+        _xp.yml
 ```
 
 **Package:** `com.leet.helper`
@@ -141,9 +143,10 @@ PRIMARY KEY (feature_id, key, uuid)
 
 ### AutoCrop
 
-**Logic chain:** Player breaks block → check permission + world → check if block is a crop → check maturity (if require-mature) → check hoe held (if require-hoe) → loop radius (hard cap 5) around broken block → for each nearby crop of same type + maturity → breakNaturally(tool) — respects Silk Touch.
+**Logic chain:** Player breaks block → check permission + world → check if block is a crop → check maturity (if require-mature) → check hoe held (if require-hoe) → loop radius (hard cap 5) around broken block → for each nearby crop of same type + maturity → fire per-crop BlockBreakEvent → breakNaturally(tool) — respects Silk Touch and protection plugins.
 
 **Config fields:** radius (default 3, hard cap 5), require-mature, require-hoe, materials
+**Protections:** per-crop BlockBreakEvent so GriefPrevention/WorldGuard protected crops are skipped.
 **Cooldown:** none
 **Messages:** none
 
@@ -166,6 +169,7 @@ PRIMARY KEY (feature_id, key, uuid)
 **Config fields:** logs (list of log/stem materials), max-blocks (default 100, hard cap on collected/break count)
 **Connected search:** includes trunk branches and any touching logs, capped to prevent lag on player-built log structures.
 **Silk Touch:** respected via breakNaturally(tool).
+**Protections:** MONITOR priority + per-block BlockBreakEvent (GriefPrevention/WorldGuard aware); protected/breached logs skipped.
 **Cooldown:** none
 **Messages:** none
 
@@ -177,6 +181,22 @@ PRIMARY KEY (feature_id, key, uuid)
 **Decoupled:** independent of Double Jump — own feature, own `/leet fall` toggle, own `leet.feat.fall_damage` permission.
 **Cooldown:** none
 **Messages:** none
+
+### Xp
+
+**Logic chain:** Per action → check permission + world + personal toggle → grant `player.giveExp(amount)` → send `xp-gained` message via `message-type`.
+
+Covers six actions with per-material/per-mob amounts:
+- **Mining / Woodcutting / Crops** — `BlockBreakEvent`, routed by broken `Material` to `mining`/`woodcutting`/`crops` material→XP maps (one category only, priority crops → woodcutting → mining).
+- **Fishing** — `PlayerFishEvent`, only on `CAUGHT_FISH`, flat `fishing.amount`.
+- **Building** — `BlockPlaceEvent`, flat `building.amount`.
+- **Killing** — `EntityDeathEvent` (victim not a Player), award to `getKiller()`, per-mob from `killing.mobs` else `killing.amount` fallback.
+
+**Config fields:** mining/woodcutting/crops `.materials` maps (Material → int), fishing.amount, building.amount, killing.amount + killing.mobs.
+**Vanilla XP:** uses `player.giveExp`, no custom entity/pool; respects the vanilla level curve.
+**No place-and-mine:** blocks the player placed give no break XP; `feature.placed-tracking` selects `memory` (in-memory, lost on restart) or `persistent` (SQLite, survives restarts), both bounded to ~1h.
+**Feedback:** `xp-gained` message (`<amount>`, `<action>` placeholders); empty template = silent while XP still granted.
+**Cooldown:** none (by default)
 
 ---
 
@@ -261,12 +281,13 @@ log-level: INFO  # OFF / INFO / DEBUG
 | Back cross-world | Not allowed |
 | DoubleJump perf | Block-level movement check |
 | AutoCrop + Silk Touch | Respected |
+| AutoCrop + protections | Each crop fires a BlockBreakEvent; claims/regions respected |
 | Durability + Unbreaking | After Unbreaking |
 | Tab completion | Full |
 | Logging | OFF / INFO / DEBUG |
 | bStats | None |
 | Config migration | Versioned merge |
-| Event priority | Fixed NORMAL |
+| Event priority | NORMAL (most); MONITOR for multi-block breakers (TreeFeller/AutoCrop) so claim cancellations are seen |
 | Soft dependencies | Vault |
 | Economy | Vault, Back only, cost-per-use |
 | Insufficient funds | Block + ActionBar |
@@ -276,9 +297,12 @@ log-level: INFO  # OFF / INFO / DEBUG
 | AutoCrop radius | Default 3, hard cap 5 |
 | TreeFeller search | BFS connected logs, max-blocks hard cap (100) |
 | TreeFeller + Silk Touch | Respected (breakNaturally with tool) |
+| TreeFeller + protections | Each log fires a BlockBreakEvent; claims/regions respected, breached blocks skipped |
 | DoubleJump cooldown | 1 second default |
 | DoubleJump conditions | Ground only |
 | Fall damage model | Separate FallDamage feature, own permission + /leet toggle |
+| XP model | Vanilla giveExp; six actions; per-material/per-mob amounts |
+| XP placed-tracking | `memory` (default) or `persistent` (SQLite); ~1h window |
 | World whitelists | All features |
 | Messages | MiniMessage, per-feature delivery type |
 | Admin commands | Chat |

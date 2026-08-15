@@ -1,0 +1,87 @@
+base:
+  enabled: true
+  permission: leet.feat.xp
+  default-permission: false
+  worlds: []
+  cooldown: 0
+  message-type: ACTION_BAR
+
+feature:
+  # Per-material XP amounts. Only listed materials award; edit freely.
+  # Balance: building is effortless (1 XP/block baseline); the more-effortful
+  # jobs (mining, woodcutting, fishing, killing) pay more per action.
+  mining:
+    materials:
+      STONE: 3
+      COBBLESTONE: 3
+      DEEPSLATE: 3
+      COBBLED_DEEPSLATE: 3
+      TUFF: 3
+      GRANITE: 3
+      DIORITE: 3
+      ANDESITE: 3
+      NETHERRACK: 3
+      COAL_ORE: 5
+      DEEPSLATE_COAL_ORE: 5
+      COPPER_ORE: 6
+      DEEPSLATE_COPPER_ORE: 6
+      IRON_ORE: 8
+      DEEPSLATE_IRON_ORE: 8
+      GOLD_ORE: 10
+      DEEPSLATE_GOLD_ORE: 10
+      NETHER_GOLD_ORE: 8
+      REDSTONE_ORE: 10
+      DEEPSLATE_REDSTONE_ORE: 10
+      LAPIS_ORE: 10
+      DEEPSLATE_LAPIS_ORE: 10
+      DIAMOND_ORE: 15
+      DEEPSLATE_DIAMOND_ORE: 15
+      EMERALD_ORE: 15
+      DEEPSLATE_EMERALD_ORE: 15
+      RAW_IRON_BLOCK: 10
+      RAW_COPPER_BLOCK: 10
+      RAW_GOLD_BLOCK: 14
+      ANCIENT_DEBRIS: 20
+  woodcutting:
+    materials:
+      OAK_LOG: 3
+      SPRUCE_LOG: 3
+      BIRCH_LOG: 3
+      JUNGLE_LOG: 3
+      ACACIA_LOG: 3
+      DARK_OAK_LOG: 3
+      MANGROVE_LOG: 3
+      CHERRY_LOG: 3
+      PALE_OAK_LOG: 3
+      CRIMSON_STEM: 3
+      WARPED_STEM: 3
+  crops:
+    materials:
+      WHEAT: 2
+      CARROTS: 2
+      POTATOES: 2
+      BEETROOTS: 2
+      NETHER_WART: 2
+      COCOA: 2
+      SWEET_BERRY_BUSH: 1
+  fishing:
+    amount: 8
+  building:
+    amount: 1
+  killing:
+    amount: 8
+    mobs:
+      ZOMBIE: 10
+      SKELETON: 10
+      SPIDER: 10
+      CREEPER: 12
+      ENDERMAN: 15
+      PIGLIN: 10
+      ZOMBIFIED_PIGLIN: 10
+  # How to remember blocks the player placed so a later break gives no XP.
+  # memory    - in-memory only, lost on restart (fastest, no DB growth)
+  # persistent- stored in SQLite, survives restarts (bounded to ~1 hour)
+  placed-tracking: memory
+
+messages:
+  xp-gained: "<green>+<amount> XP<reset> (<action>)"

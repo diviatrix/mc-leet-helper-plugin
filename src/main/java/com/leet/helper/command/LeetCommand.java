@@ -28,6 +28,7 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
         ALIASES.put("crop", "auto_crop");
         ALIASES.put("tree", "tree_feller");
         ALIASES.put("fall", "fall_damage");
+        ALIASES.put("xp", "xp");
     }
 
     private final HelperPlugin plugin;
@@ -52,7 +53,7 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
         }
         String featureId = ALIASES.get(args[0].toLowerCase());
         if (featureId == null) {
-            player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leet <list|dj|crop|tree|fall>"));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leet <list|dj|crop|tree|fall|xp>"));
             return true;
         }
         if (!player.hasPermission(permissionFor(featureId))) {
@@ -102,6 +103,7 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
             case "auto_crop" -> "Auto Crop";
             case "tree_feller" -> "Tree Feller";
             case "fall_damage" -> "Fall Damage";
+            case "xp" -> "XP";
             default -> "Double Jump";
         };
     }

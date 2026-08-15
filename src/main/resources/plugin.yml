@@ -1,5 +1,5 @@
 name: LeetHelper
-version: "1.0.0"
+version: "1.1.0"
 main: com.leet.helper.HelperPlugin
 api-version: "26.2"
 description: Leet Helper Plugin
@@ -17,7 +17,7 @@ commands:
     permission: leet.feat.back
   leet:
     description: Toggle features on/off for yourself
-    usage: /leet <list|dj|crop|tree|fall>
+    usage: /leet <list|dj|crop|tree|fall|xp>
     aliases: []
 
 permissions:

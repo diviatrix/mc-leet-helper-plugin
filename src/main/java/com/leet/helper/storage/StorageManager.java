@@ -120,6 +120,28 @@ public class StorageManager {
         }
     }
 
+    /**
+     * Deletes every stored value for a feature+key whose last update predates
+     * <code>olderThanMs</code>. Used to bound unbounded-growth stores such as
+     * the XP feature's persistent placed-block tracker.
+     */
+    public void prunePersistent(String featureId, String key, long olderThanMs) {
+        if (connection == null) return;
+        try (PreparedStatement ps = connection.prepareStatement(
+                "DELETE FROM kv_store WHERE feature_id=? AND key=? AND updated_at < ?")) {
+            ps.setString(1, featureId);
+            ps.setString(2, key);
+            ps.setLong(3, olderThanMs);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to prune persistent values", e);
+        }
+    }
+
+    public boolean persistentAvailable() {
+        return connection != null;
+    }
+
     public void close() {
         try {
             if (connection != null && !connection.isClosed()) {

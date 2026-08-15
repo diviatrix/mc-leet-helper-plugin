@@ -42,6 +42,7 @@ public class HelperPlugin extends JavaPlugin {
         saveResourceIfMissing("features/_back.yml");
         saveResourceIfMissing("features/_tree_feller.yml");
         saveResourceIfMissing("features/_fall_damage.yml");
+        saveResourceIfMissing("features/_xp.yml");
 
         storageManager = new StorageManager(getDataFolder(), getLogger());
 
@@ -54,6 +55,7 @@ public class HelperPlugin extends JavaPlugin {
         featureManager.register(new BackFeature(this));
         featureManager.register(new TreeFellerFeature(this));
         featureManager.register(new FallDamageFeature(this));
+        featureManager.register(new XpFeature(this));
         featureManager.enableAll();
 
         getCommand("helper").setExecutor(new HelperCommand(this));

@@ -26,12 +26,7 @@ Licensed under **CC0 1.0** (public domain) — see [LICENSE](LICENSE).
   - [/helper](#helper)
   - [/back](#back)
 - [Features](#features)
-  - [Double Jump](#feature-double-jump)
-  - [Durability](#feature-durability)
-  - [Auto Crop](#feature-auto-crop)
-  - [Back](#feature-back)
-  - [Tree Feller](#feature-tree-feller)
-  - [Fall Damage](#feature-fall-damage)
+  - [Feature docs (doc/features/)](doc/features/README.md)
 - [Storage](#storage)
 - [Vault / Economy Integration](#vault--economy-integration)
 - [Troubleshooting](#troubleshooting)
@@ -42,7 +37,7 @@ Licensed under **CC0 1.0** (public domain) — see [LICENSE](LICENSE).
 
 ## Overview
 
-LeetHelper registers six gameplay features plus one admin command.
+LeetHelper registers seven gameplay features plus one admin command.
 
 | Feature | ID | Description |
 |---|---|---|
@@ -52,6 +47,7 @@ LeetHelper registers six gameplay features plus one admin command.
 | Back | `back` | Teleport back to your death location, with optional cost and cooldown |
 | Tree Feller | `tree_feller` | Felling a log drops the whole connected tree |
 | Fall Damage | `fall_damage` | Negates all fall damage for eligible players |
+| XP | `xp` | Bonus vanilla XP for mining, woodcutting, crops, fishing, building, and killing |
 
 Admin features are managed with the `/helper` command (`list`, `toggle`, `info`).
 
@@ -71,11 +67,11 @@ Admin features are managed with the `/helper` command (`list`, `toggle`, `info`)
 
 ## Installation
 
-1. **Build or obtain the jar** — see [Building from Source](#building-from-source). The build produces `build/libs/mc-leet-helper-plugin-1.0.0.jar`.
+1. **Build or obtain the jar** — see [Building from Source](#building-from-source). The build produces `build/libs/leet-helper-1.1.0.jar`.
 2. **Copy the jar** into your server's `plugins/` folder:
 
    ```bash
-   cp build/libs/mc-leet-helper-plugin-1.0.0.jar /path/to/server/plugins/
+   cp build/libs/leet-helper-1.1.0.jar /path/to/server/plugins/
    ```
 
 3. **Start the server.** On first launch the plugin creates its data folder and writes default configuration files:
@@ -90,7 +86,8 @@ Admin features are managed with the `/helper` command (`list`, `toggle`, `info`)
        ├── _auto_crop.yml
        ├── _back.yml
        ├── _tree_feller.yml
-       └── _fall_damage.yml
+       ├── _fall_damage.yml
+       └── _xp.yml
    ```
 
 4. **Configure to taste** — edit the files inside `plugins/LeetHelper/features/`. Restart the server for changes to take effect (there is **no reload command**; `base.enabled` toggles are the only thing that can be changed live, via `/helper toggle`).
@@ -120,7 +117,7 @@ Admin features are managed with the `/helper` command (`list`, `toggle`, `info`)
 ./gradlew compileJava
 ```
 
-**Output artifact:** `build/libs/mc-leet-helper-plugin-1.0.0.jar`
+**Output artifact:** `build/libs/leet-helper-1.1.0.jar`
 
 > **First build note:** the paperweight plugin downloads and runs a Paper server JAR to produce the remapped API (~40s). Subsequent builds are cached and faster.
 
@@ -147,6 +144,7 @@ src/main/
       BackFeature.java           # Death-back teleport implementation
       TreeFellerFeature.java     # Whole-tree felling implementation
       FallDamageFeature.java     # Fall-damage immunity implementation
+      XpFeature.java             # Bonus XP for actions implementation
     command/
       HelperCommand.java         # /helper list|toggle|info (+ tab completion)
       BackCommand.java           # /back
@@ -165,6 +163,7 @@ src/main/
       _back.yml
       _tree_feller.yml
       _fall_damage.yml
+      _xp.yml
 ```
 
 ---
@@ -195,7 +194,7 @@ log-level: INFO
 
 The `log-level` is read from `config.yml`, though most feature-related messages are logged at the `INFO`/`WARNING`/`SEVERE` level regardless.
 
-> **Console prefix & color:** startup and status messages (e.g. `[LeetHelper] Initializing LeetHelper v1.0.0`, `[LeetHelper] Enabled 4/4 feature(s).`, the Vault status) are sent to the console via the console sender with a green `[LeetHelper]` prefix. These colored lines appear in the live console but color codes are stripped from `logs/latest.log`. The automatically-printed Paper line `[LeetHelper] Enabling LeetHelper v1.0.0` and the plugin-logger `[LeetHelper]` WARN/SEVERE lines come from Paper's logger and are not recolored.
+> **Console prefix & color:** startup and status messages (e.g. `[LeetHelper] Initializing LeetHelper v1.1.0`, `[LeetHelper] Enabled 4/4 feature(s).`, the Vault status) are sent to the console via the console sender with a green `[LeetHelper]` prefix. These colored lines appear in the live console but color codes are stripped from `logs/latest.log`. The automatically-printed Paper line `[LeetHelper] Enabling LeetHelper v1.1.0` and the plugin-logger `[LeetHelper]` WARN/SEVERE lines come from Paper's logger and are not recolored.
 
 > **Renaming a plugin (`name` in `plugin.yml`):** the data folder and all file paths follow the plugin's display name (now `plugins/LeetHelper/`). If you previously ran under the old name (`plugins/HelperPlugin/`), move those files across to keep existing configs and the SQLite `data.db`.
 
@@ -253,341 +252,17 @@ Every config — the global `config.yml` **and** each feature file under `featur
 
 ### Per-Feature Configs
 
-#### Feature: Double Jump
+Full per-feature behavior, config files, and key tables live in **[doc/features/](doc/features/README.md)** — one document per feature.
 
-Allows a mid-air double jump. Config file `features/_double_jump.yml`.
-
-**Behavior**
-1. Player on the ground → flight is enabled for them automatically.
-2. Player double-taps space (`PlayerToggleFlightEvent`) → the flight toggle is cancelled, flight disabled, and a velocity vector is applied in the player's look direction.
-   - Horizontal velocity = look direction × `horizontal-multiplier`.
-   - Vertical velocity = fixed `vertical-multiplier`.
-3. The runtime cooldown starts.
-4. When the player lands (or enters a vehicle), flight is re-enabled.
-
-**Fall damage is no longer part of Double Jump** — it has its own feature and `/leet` toggle (see [Feature: Fall Damage](#feature-fall-damage)).
-
-**Limits:** skipped entirely for Creative and Spectator game modes. The movement check is **block-level only** — it only re-enables flight when the player's block position changes (a performance optimization).
-
-```yaml
-base:
-  enabled: true
-  permission: leet.feat.double_jump
-  default-permission: false
-  worlds: []
-  cooldown: 1
-  message-type: ACTION_BAR
-
-feature:
-  horizontal-multiplier: 0.25  # Forward/sideways velocity multiplier
-  vertical-multiplier: 1.0     # Upward velocity
-
-messages: {}
-```
-
-| Key | Type | Default | Description |
-|---|---|---|---|
-| `horizontal-multiplier` | double | `0.25` | Horizontal (look-direction) velocity multiplier |
-| `vertical-multiplier` | double | `1.0` | Fixed upward velocity on jump |
-
-**Cooldown:** runtime only (in-memory), lost on restart. Default `1` second. When on cooldown, the jump is skipped (no velocity) but the flight-toggle event is still cancelled.
-
----
-
-#### Feature: Durability
-
-Modifies durability damage for **whitelisted** items. Config file `features/_durability.yml`.
-
-**Behavior**
-1. A held/broken item takes durability damage (`PlayerItemDamageEvent`).
-2. If the item's material is in `whitelist`, the damage is multiplied by `multiplier`, then clamped to at least `min-damage`.
-3. Non-whitelisted items are unaffected.
-
-**Ordering:** the multiplier applies **after** the Unbreaking enchantment has already reduced the damage value presented by the event (i.e. it multiplies the post-Unbreaking damage).
-
-```yaml
-base:
-  enabled: true
-  permission: leet.feat.durability
-  default-permission: false
-  worlds: []
-  cooldown: 0
-  message-type: ACTION_BAR
-
-feature:
-  multiplier: 0.5     # 0.1 – 10.0
-  min-damage: 1        # Minimum damage applied per hit
-  whitelist:
-    - WOODEN_SWORD
-    - WOODEN_SHOVEL
-    - WOODEN_PICKAXE
-    - WOODEN_AXE
-    - WOODEN_HOE
-    - STONE_SWORD
-    - STONE_SHOVEL
-    - STONE_PICKAXE
-    - STONE_AXE
-    - STONE_HOE
-    - IRON_SWORD
-    - IRON_SHOVEL
-    - IRON_PICKAXE
-    - IRON_AXE
-    - IRON_HOE
-    - GOLDEN_SWORD
-    - GOLDEN_SHOVEL
-    - GOLDEN_PICKAXE
-    - GOLDEN_AXE
-    - GOLDEN_HOE
-    - DIAMOND_SWORD
-    - DIAMOND_SHOVEL
-    - DIAMOND_PICKAXE
-    - DIAMOND_AXE
-    - DIAMOND_HOE
-    - NETHERITE_SWORD
-    - NETHERITE_SHOVEL
-    - NETHERITE_PICKAXE
-    - NETHERITE_AXE
-    - NETHERITE_HOE
-    - TRIDENT
-    - BOW
-    - CROSSBOW
-    - SHIELD
-    - LEATHER_HELMET
-    - IRON_HELMET
-    - GOLDEN_HELMET
-    - DIAMOND_HELMET
-    - NETHERITE_HELMET
-    - LEATHER_CHESTPLATE
-    - IRON_CHESTPLATE
-    - GOLDEN_CHESTPLATE
-    - DIAMOND_CHESTPLATE
-    - NETHERITE_CHESTPLATE
-    - LEATHER_LEGGINGS
-    - IRON_LEGGINGS
-    - GOLDEN_LEGGINGS
-    - DIAMOND_LEGGINGS
-    - NETHERITE_LEGGINGS
-    - LEATHER_BOOTS
-    - IRON_BOOTS
-    - GOLDEN_BOOTS
-    - DIAMOND_BOOTS
-    - NETHERITE_BOOTS
-    - TURTLE_HELMET
-    - ELYTRA
-
-messages: {}
-```
-
-| Key | Type | Default | Description |
-|---|---|---|---|
-| `multiplier` | double | `0.5` | Damage multiplier. `0.5` = half damage (items last ~2×), `1.0` = vanilla, `2.0` = double damage |
-| `min-damage` | int | `1` | Minimum damage per event (prevents 0/infinite-durability items) |
-| `whitelist` | list of Material names | all tools & equipment | Only these materials are affected |
-
-> **Note:** any entry that is not a valid Bukkit `Material` name is skipped with a `Invalid material in durability whitelist:` warning at load and has no effect. Only use exact enum names (e.g. `WOODEN_SWORD`, `DIAMOND_PICKAXE`) — generic names like `HELMET`, `CHESTPLATE`, `LEGGINGS`, `BOOTS` (unprefixed armor slots) are not valid Materials and were removed from the defaults; use the material-specific forms (`LEATHER_HELMET`, `IRON_CHESTPLATE`, etc.) instead.
-
-**Multiplier examples**
-- `0.5` — items last ~2× longer
-- `1.0` — vanilla behavior
-- `2.0` — items break ~2× faster
-
-**Cooldown:** none.
-
----
-
-#### Feature: Auto Crop
-
-Auto-harvests nearby mature crops when a player breaks one. Config file `features/_auto_crop.yml`.
-
-**Behavior**
-1. A player breaks a block (`BlockBreakEvent`).
-2. If the broken block is in `materials` (and, if `require-mature` is `true`, it is fully grown), the feature scans a cube.
-3. The cube spans `-radius`..`+radius` on all three axes around the broken block (excluding the source block itself).
-4. Every nearby block of the **same material** (and, if enabled, the **same maturity**) is broken with `breakNaturally(tool)`, using the player's main-hand item.
-
-If `require-hoe` is `true`, the cube scan only happens when the player is harvesting with a hoe in their hand — otherwise only the single broken crop is removed (default vanilla behavior).
-
-**Silk Touch** is respected (with a Silk Touch tool, crops drop as blocks rather than items).
-
-```yaml
-base:
-  enabled: true
-  permission: leet.feat.auto_crop
-  default-permission: false
-  worlds: []
-  cooldown: 0
-  message-type: ACTION_BAR
-
-feature:
-  radius: 3              # 1 – 5 (hard-capped at 5)
-  require-mature: true   # Only harvest fully grown crops
-  require-hoe: false     # Only scan/break nearby crops when holding a hoe
-  materials:
-    - WHEAT
-    - CARROTS
-    - POTATOES
-    - BEETROOTS
-    - NETHER_WART
-    - COCOA
-    - SWEET_BERRY_BUSH
-
-messages: {}
-```
-
-| Key | Type | Default | Description |
-|---|---|---|---|
-| `radius` | int | `3` | Cube half-size around the broken block. Values > 5 are **clamped to 5**. |
-| `require-mature` | bool | `true` | Only break fully grown crops. Maturity uses `Ageable` block data (`age == maximumAge`). |
-| `require-hoe` | bool | `false` | Only run the cube scan while the player is holding a hoe (any of wooden/stone/iron/golden/diamond/netherite). With no hoe, only the single broken crop is removed. |
-| `materials` | list of Material names | wheat, carrots, potatoes, etc. | Crop materials to auto-harvest. Invalid names are skipped with a warning. |
-
-> Radius scans a cube `-radius`..`+radius` on each axis → `(2×radius+1)³ − 1` candidate blocks (e.g. radius 3 = 342 candidates). Lower the radius on lag-heavy worlds. The scan is performed on the server thread.
-
-**Cooldown:** none.
-
----
-
-#### Feature: Back
-
-Teleports players to their last death location. **Persistent** via SQLite — survives server restarts. Config file `features/_back.yml`.
-
-**Behavior — on death**
-1. Player dies → `check()` (enabled + permission + world).
-2. Death location (world, x, y, z, yaw, pitch, timestamp) is serialized to JSON.
-3. Stored in SQLite.
-4. `death-location-saved` message is sent.
-
-**Behavior — on `/back`**
-1. Loads the death location from SQLite.
-2. Checks, **in order**:
-   - A saved location exists.
-   - The location has not expired (`max-age` seconds since the timestamp).
-   - Taught world matches — you **must** still be in the same world as the death location.
-   - The cooldown (persistent, SQLite) has elapsed.
-   - If `cost > 0`, the player has sufficient funds (Vault); otherwise blocked + message.
-3. If `cost > 0`, the cost is deducted via Vault.
-4. Player is teleported.
-5. Cooldown is saved to SQLite; the saved death location is deleted.
-6. `teleport` message is sent.
-
-```yaml
-base:
-  enabled: true
-  permission: leet.feat.back
-  default-permission: false
-  worlds: []
-  cooldown: 60
-  message-type: ACTION_BAR
-
-feature:
-  max-age: 300     # Seconds before a death location expires
-  cost: 0.0        # Vault economy cost per use (0.0 = free)
-
-messages:
-  death-location-saved: "<green>Death location saved! Use /back to return."
-  teleport: "<green>Teleported to your death location."
-  cooldown-active: "<red>Cooldown active! Wait <time> seconds."
-  expired: "<red>Your death location has expired."
-  insufficient-funds: "<red>Insufficient funds! Cost: <cost>"
-  wrong-world: "<red>You must be in the same world as your death location."
-  no-location: "<red>No death location found."
-```
-
-| Key | Type | Default | Description |
-|---|---|---|---|
-| `max-age` | int | `300` | Seconds before a death location expires. Expired locations are deleted. |
-| `cost` | double | `0.0` | Vault economy cost per use. `0` or any value `≤ 0` = free (cost is only applied when `> 0`). |
-
-| Message | Placeholders | Sent when |
+| Feature | Config file | Reference |
 |---|---|---|
-| `death-location-saved` | — | Death location stored |
-| `teleport` | — | Teleport succeeded |
-| `cooldown-active` | `<time>` | Cooldown still active (remaining seconds) |
-| `expired` | — | Death location older than `max-age` |
-| `insufficient-funds` | `<cost>` | Cost set and player lacks balance |
-| `wrong-world` | — | Player in a different world than death location |
-| `no-location` | — | No saved location, or permission/world blocked |
-
-**Restrictions & notes**
-- **Cross-world teleportation is not allowed** — you must be in the world where you died.
-- Cooldown is **persistent** (survives restarts) and stored in SQLite, separate from the runtime cooldown used by other features.
-- There is **no admin bypass** — cooldown, cost and `max-age` apply equally to everyone.
-- `cost` requires Vault with a running economy provider. Without Vault, cost is silently skipped (no charge, no check).
-
----
-
-#### Feature: Tree Feller
-
-Breaking one log automatically breaks the whole connected tree. Config file `features/_tree_feller.yml`.
-
-**Behavior**
-1. A player breaks a log (`BlockBreakEvent`).
-2. If the broken block's material is in `logs`, a breadth-first search collects every adjacent log block (6-directional: up/down + 4 horizontal) connected to it.
-3. Each collected log is broken with `breakNaturally(tool)`, using the player's main-hand item (so Silk Touch and the tool's drop rates apply).
-
-The connected-component search means the whole trunk **and any branch/logs touching it** come down together, not just the single broken piece. The search stops as soon as `max-blocks` logs have been collected, capping the work so a giant or player-built log structure can't trigger an unbounded chain of block breaks (anti-lag / anti-abuse).
-
-```yaml
-base:
-  enabled: true
-  permission: leet.feat.tree_feller
-  default-permission: false
-  worlds: []
-  cooldown: 0
-  message-type: ACTION_BAR
-
-feature:
-  logs:
-    - OAK_LOG
-    - SPRUCE_LOG
-    - BIRCH_LOG
-    - JUNGLE_LOG
-    - ACACIA_LOG
-    - DARK_OAK_LOG
-    - MANGROVE_LOG
-    - CHERRY_LOG
-    - PALE_OAK_LOG
-    - CRIMSON_STEM
-    - WARPED_STEM
-  max-blocks: 100
-
-messages: {}
-```
-
-| Key | Type | Default | Description |
-|---|---|---|---|
-| `logs` | list of Material names | oak/spruce/birch/jungle/acacia/dark-oak/mangrove/cherry/pale-oak logs + crimson/warped stems | Log materials treated as tree trunks. Invalid names are skipped with a warning. |
-| `max-blocks` | int | `100` | Hard cap on how many logs the search will collect/break in one tree. Prevents breaking player-built log structures or giant trees from causing lag. |
-
-**Cooldown:** none.
-
----
-
-#### Feature: Fall Damage
-
-Negates all fall damage for eligible players, as a standalone feature **independent of Double Jump**. Config file `features/_fall_damage.yml`.
-
-**Behavior**
-1. A player takes fall damage (`EntityDamageEvent`, cause `FALL`).
-2. If the player passes the feature checks (enabled + `leet.feat.fall_damage` permission + personal `/leet` toggle + world), the fall damage is cancelled entirely.
-
-There are no feature-specific config options — the feature is controlled by `base.enabled`, the `leet.feat.fall_damage` permission, and the personal `/leet fall` toggle.
-
-```yaml
-base:
-  enabled: true
-  permission: leet.feat.fall_damage
-  default-permission: false
-  worlds: []
-  cooldown: 0
-  message-type: ACTION_BAR
-
-feature: {}
-
-messages: {}
-```
-
-**Cooldown:** none.
+| Double Jump | `_double_jump.yml` | [feature-double-jump](doc/features/double-jump.md) |
+| Durability | `_durability.yml` | [feature-durability](doc/features/durability.md) |
+| Auto Crop | `_auto_crop.yml` | [feature-auto-crop](doc/features/auto-crop.md) |
+| Back | `_back.yml` | [feature-back](doc/features/back.md) |
+| Tree Feller | `_tree_feller.yml` | [feature-tree-feller](doc/features/tree-feller.md) |
+| Fall Damage | `_fall_damage.yml` | [feature-fall-damage](doc/features/fall-damage.md) |
+| XP | `_xp.yml` | [feature-xp](doc/features/xp.md) |
 
 ---
 
@@ -629,6 +304,7 @@ Feature permissions are **not** declared in `plugin.yml`. Instead, `HelperPlugin
 | `leet.feat.back` | false | Can have death locations saved and use `/back` |
 | `leet.feat.tree_feller` | false | Whole-tree felling |
 | `leet.feat.fall_damage` | false | Fall-damage immunity |
+| `leet.feat.xp` | false | Bonus XP from actions |
 
 `base.default-permission` maps to a Bukkit default:
 - `true` → `PermissionDefault.TRUE` (every player)
@@ -662,7 +338,7 @@ Tab completion is provided for subcommands and feature IDs.
 
 | Command | Permission | Description |
 |---|---|---|
-| `/back` | `leet.feat.back` | Teleports the player to their last death location (see [Feature: Back](#feature-back)) |
+| `/back` | `leet.feat.back` | Teleports the player to their last death location (see [Feature: Back](doc/features/back.md)) |
 
 This command is player-only (the console receives a "This command can only be used by players." message). On success/failure, feedback is delivered via the Back feature's `message-type`.
 
@@ -677,6 +353,7 @@ Player-side feature toggles. Each player can turn supported features **off for t
 | `/leet crop` | Toggle **Auto Crop** on/off for yourself |
 | `/leet tree` | Toggle **Tree Feller** on/off for yourself |
 | `/leet fall` | Toggle **Fall Damage** on/off for yourself |
+| `/leet xp` | Toggle **XP** on/off for yourself |
 
 **Permission model** — `/leet` is permission-gated by the underlying feature permissions:
 - The command is only available to players who have at least **one** `leet.feat.<id>` permission. If a player has **none**, `/leet` reports `No permission.` and does nothing (including `list`, and no tab completion).
@@ -690,14 +367,15 @@ Player-side feature toggles. Each player can turn supported features **off for t
 
 ## Features
 
-Detailed behavior, config keys, and limitations are documented per feature in [Configuration](#per-feature-configs) above. The section above covers each fully:
+Detailed behavior, config keys, and limitations for each feature are documented in **[doc/features/](doc/features/README.md)** — one document per feature:
 
-- [Double Jump](#feature-double-jump) — mid-air double jump
-- [Durability](#feature-durability) — durability multiplier on whitelisted items
-- [Auto Crop](#feature-auto-crop) — batch crop harvesting
-- [Back](#feature-back) — death teleportation
-- [Tree Feller](#feature-tree-feller) — whole-tree felling
-- [Fall Damage](#feature-fall-damage) — fall-damage immunity
+- [Double Jump](doc/features/double-jump.md) — mid-air double jump
+- [Durability](doc/features/durability.md) — durability multiplier on whitelisted items
+- [Auto Crop](doc/features/auto-crop.md) — batch crop harvesting
+- [Back](doc/features/back.md) — death teleportation
+- [Tree Feller](doc/features/tree-feller.md) — whole-tree felling
+- [Fall Damage](doc/features/fall-damage.md) — fall-damage immunity
+- [XP](doc/features/xp.md) — bonus XP from actions
 
 ---
 
@@ -752,7 +430,7 @@ Notes:
 | Plugin doesn't load on start | Server is not Paper 26.2+, or the JVM is older than Java 26. Check console for a version mismatch. |
 | Feature config changes have no effect | Feature configs are read at startup; there is **no reload command**. Restart the server. |
 | `/helper` not recognized / "unknown command" | The `helper` command permission (`helper.admin`) is `op` by default — grant it or run as op. |
-| Durability whitelist warnings at startup | `Invalid material in durability whitelist:` — an entry in the on-disk `features/_durability.yml` whitelist is not a valid `Material` name (e.g. leftover `STEEL_*` or `HELMET`) and is being ignored. Remove it or use the correct enum name (see the note in [Durability](#feature-durability)). |
+| Durability whitelist warnings at startup | `Invalid material in durability whitelist:` — an entry in the on-disk `features/_durability.yml` whitelist is not a valid `Material` name (e.g. leftover `STEEL_*` or `HELMET`) and is being ignored. Remove it or use the correct enum name (see the note in [Durability](doc/features/durability.md)). |
 | `/back` cost not charged | Vault is not installed, or no economy provider is registered. Without Vault the cost feature is silently disabled. |
 | Death locations reset on restart | The `data.db` file was deleted/moved, or the SQLite connection failed to initialize (SEVERE log). |
 | `data.db` not created | Check the startup logs for `Failed to initialize SQLite`. The plugin degrades gracefully (Back feature won't persist). |

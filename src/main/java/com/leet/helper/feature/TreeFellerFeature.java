@@ -23,6 +23,7 @@ public class TreeFellerFeature extends AbstractFeature {
 
     private Set<Material> logs;
     private int maxBlocks;
+    private boolean felling;
 
     public TreeFellerFeature(HelperPlugin plugin) {
         super(plugin);
@@ -46,8 +47,15 @@ public class TreeFellerFeature extends AbstractFeature {
         maxBlocks = cfg.getInt("feature.max-blocks", 100);
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBreak(BlockBreakEvent event) {
+        // Respect protection plugins: run late (MONITOR) so any claim/region
+        // cancellation is already visible, and bail if the original break was
+        // blocked. Each connected log is then broken through breakIfAllowed,
+        // which fires a BlockBreakEvent so claims/regions apply per block too.
+        if (event.isCancelled()) return;
+        if (felling) return; // guard against the synthetic per-block events below
+
         Player player = event.getPlayer();
         if (!check(player)) return;
 
@@ -58,25 +66,32 @@ public class TreeFellerFeature extends AbstractFeature {
 
         // Component search over the log blocks so the whole trunk and any
         // branches come down together, not just the single broken log. The
-        // original block is already air after the vanilla break, so calling
-        // breakNaturally on it is a no-op (no duplicate drop).
+        // origin block (already handled by the vanilla break) is excluded so it
+        // is not re-broken / re-dropped.
         Set<Block> toBreak = findConnectedLogs(broken);
 
-        for (Block block : toBreak) {
-            block.breakNaturally(tool);
+        felling = true;
+        try {
+            for (Block block : toBreak) {
+                breakIfAllowed(player, block, tool);
+            }
+        } finally {
+            felling = false;
         }
     }
 
     /**
      * Breadth-first search that collects every adjacent log block connected to
-     * the broken one (6-directional). Stops early once the configured
-     * max-blocks cap is reached so a giant tree can't trigger an unbounded
-     * chain of breakNaturally calls.
+     * the broken one (6-directional), excluding the origin. Stops early once
+     * the configured max-blocks cap is reached so a giant tree can't trigger an
+     * unbounded chain of block breaks.
      */
     private Set<Block> findConnectedLogs(Block start) {
         Set<Block> result = new HashSet<>();
+        Set<Block> visited = new HashSet<>();
         Deque<Block> queue = new ArrayDeque<>();
-        result.add(start);
+
+        visited.add(start);
         queue.add(start);
 
         while (!queue.isEmpty()) {
@@ -85,9 +100,10 @@ public class TreeFellerFeature extends AbstractFeature {
             for (int i = 0; i < 6; i++) {
                 Block neighbor = current.getRelative(DX[i], DY[i], DZ[i]);
                 if (!logs.contains(neighbor.getType())) continue;
-                if (result.add(neighbor)) {
+                if (result.size() >= maxBlocks) break;
+                if (visited.add(neighbor)) {
+                    result.add(neighbor);
                     queue.add(neighbor);
-                    if (result.size() >= maxBlocks) break;
                 }
             }
         }
