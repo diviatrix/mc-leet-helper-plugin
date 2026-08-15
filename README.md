@@ -11,8 +11,6 @@ Licensed under **CC0 1.0** (public domain) — see [LICENSE](LICENSE).
 - [Overview](#overview)
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Building from Source](#building-from-source)
-- [Project Structure](#project-structure)
 - [Configuration](#configuration)
   - [config.yml](#configyml)
   - [Common Feature Config Structure](#common-feature-config-structure)
@@ -27,8 +25,9 @@ Licensed under **CC0 1.0** (public domain) — see [LICENSE](LICENSE).
   - [/back](#back)
 - [Features](#features)
   - [Feature docs (doc/features/)](doc/features/README.md)
-- [Storage](#storage)
-- [Vault / Economy Integration](#vault--economy-integration)
+- [Development](#development)
+  - [Building & Testing](doc/BUILDING.md)
+  - [Architecture](doc/ARCHITECTURE.md)
 - [Troubleshooting](#troubleshooting)
 - [Known Limitations](#known-limitations)
 - [License](#license)
@@ -67,7 +66,7 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`).
 
 ## Installation
 
-1. **Build or obtain the jar** — see [Building from Source](#building-from-source). The build produces `build/libs/leet-helper-1.1.2.jar`.
+1. **Build or obtain the jar** — see [Building from Source](doc/BUILDING.md). The build produces `build/libs/leet-helper-1.1.2.jar`.
 2. **Copy the jar** into your server's `plugins/` folder:
 
    ```bash
@@ -96,79 +95,10 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`).
 
 ---
 
-## Building from Source
+## Development
 
-### Prerequisites
-
-- **JDK 26+** (the Gradle toolchain requires it)
-- **Gradle 9.7** (a wrapper is included — you only need to invoke `./gradlew`)
-- **Internet connection** on the first build (downloads the Paper dev bundle)
-
-### Commands
-
-```bash
-# Full build (compiles and produces the jar)
-./gradlew build
-
-# Clean + build
-./gradlew clean build
-
-# Just compile, skip packaging
-./gradlew compileJava
-```
-
-**Output artifact:** `build/libs/leet-helper-1.1.2.jar`
-
-> **Version is single-sourced:** the release version lives in **`build.gradle.kts`** (`version = "1.1.2"`). It drives both the jar filename and the `version` injected into the packaged `plugin.yml` at build time — bump it in exactly one place.
-
-> **First build note:** the paperweight plugin downloads and runs a Paper server JAR to produce the remapped API (~40s). Subsequent builds are cached and faster.
-
-**What the build does:** the `build.gradle.kts` uses `io.papermc.paperweight.userdev` (v2.0.0-beta.21) with `paperDevBundle("26.2.build.+")`. The Vault API is included as a `compileOnly` dependency (JitPack `com.github.MilkBowl:VaultAPI:1.7.1`).
-
-### Expectations & Verification
-
-There is no unit-test suite or test plugin wired into the Gradle build (`gradle.properties` enables Gradle configuration-cache only). Verification is manual on a Paper 26.2 server — see the per-feature behavior notes and [Troubleshooting](#troubleshooting).
-
----
-
-## Project Structure
-
-```
-src/main/
-  java/com/leet/helper/
-    HelperPlugin.java            # Plugin lifecycle, Vault setup, dynamic permission registration
-    feature/
-      AbstractFeature.java       # Base class: config, permissions, cooldowns, messages
-      FeatureManager.java        # Feature registry, enable/disable/toggle, toggle persistence
-      DoubleJumpFeature.java     # Double jump implementation
-      DurabilityFeature.java     # Durability multiplier implementation
-      AutoCropFeature.java       # Auto crop harvest implementation
-      BackFeature.java           # Death-back teleport implementation
-      TreeFellerFeature.java     # Whole-tree felling implementation
-      FallDamageFeature.java     # Fall-damage immunity implementation
-      XpFeature.java             # Bonus XP for actions implementation
-    command/
-      HelperCommand.java         # /leeta list|toggle|info (+ tab completion)
-      BackCommand.java           # /back
-      LeetCommand.java           # /leet player feature toggles (+ tab completion)
-    storage/
-      StorageManager.java        # Runtime (in-memory) + persistent (SQLite) storage
-    util/
-      MiniMessageUtil.java       # MiniMessage helpers
-  resources/
-    plugin.yml                   # Plugin metadata, command & admin permission declarations
-    config.yml                   # Global config
-    features/
-      _double_jump.yml
-      _durability.yml
-      _auto_crop.yml
-      _back.yml
-      _tree_feller.yml
-      _fall_damage.yml
-      _xp.yml
-```
-
----
+- **[Building & Testing](doc/BUILDING.md)** — prerequisites, Gradle commands, the output artifact, and how the version is single-sourced.
+- **[Architecture](doc/ARCHITECTURE.md)** — project structure, the feature model, config handling, storage, and the permission/Vault internals.
 
 ## Configuration
 
@@ -381,47 +311,9 @@ Detailed behavior, config keys, and limitations for each feature are documented 
 
 ---
 
-## Storage
+## Storage & Economy
 
-`StorageManager` provides two storage layers.
-
-### Runtime (in-memory)
-
-- Backed by nested map: `Map<featureId, Map<key, Map<uuid, Long>>>`.
-- **Lost on server restart.**
-- Used for **Double Jump** cooldowns.
-
-### Persistent (SQLite)
-
-- Database file: `plugins/LeetHelper/data.db`.
-- Single table:
-
-  ```
-  kv_store(feature_id TEXT, key TEXT, uuid TEXT, value TEXT, updated_at INTEGER,
-           PRIMARY KEY (feature_id, key, uuid))
-  ```
-
-- **Survives restarts.**
-- Used for **Back** death locations (JSON payloads), persistent cooldowns, and per-player `/leet` feature toggles (`feature_id` = feature, `key` = `user-toggle`, `value` = `true`/`false`; absent = enabled).
-- Uses Bukkit's bundled SQLite JDBC (`jdbc:sqlite:...`). No external driver needed.
-
-> **Backups:** `data.db` is written by the plugin. Backing it up preserves saved death locations and player toggle preferences. Deleting it clears all of that state.
-
----
-
-## Vault / Economy Integration
-
-Vault is an **optional soft dependency** (`softdepend: [Vault]`). The plugin detects it at startup and resolves the Vault `Economy` provider; it works entirely without Vault.
-
-| Area | Without Vault | With Vault (economy provider) |
-|---|---|---|
-| Economy (`feature.cost`) | Cost is silently skipped — no charges, no balance checks | Cost checked and deducted per use for any feature with `feature.cost > 0` |
-| Permissions | Uses Bukkit `player.hasPermission()` | Stills uses Bukkit `player.hasPermission()` (the Vault `Permission` provider is resolved but **not used**) |
-
-Notes:
-- Any feature can declare a per-use `feature.cost` (default `0` = free); all features except XP do.
-- `cost` is charged only when `feature.cost > 0`.
-- If the player lacks funds, the `insufficient-funds` message is shown and the use is blocked.
+The storage layers (runtime in-memory and persistent SQLite `data.db`) and the optional Vault income integration are covered in the **[Architecture](doc/ARCHITECTURE.md)** doc.
 
 ---
 
