@@ -1,6 +1,6 @@
 package com.leet.helper.feature;
 
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -11,9 +11,9 @@ import java.util.logging.Level;
 public class FeatureManager {
 
     private final Map<String, AbstractFeature> features = new LinkedHashMap<>();
-    private final HelperPlugin plugin;
+    private final Core plugin;
 
-    public FeatureManager(HelperPlugin plugin) {
+    public FeatureManager(Core plugin) {
         this.plugin = plugin;
     }
 
@@ -54,7 +54,7 @@ public class FeatureManager {
     }
 
     private void persistToggle(String id, boolean newState) {
-        File file = new File(plugin.getDataFolder(), "features/_" + id + ".yml");
+        File file = new File(plugin.getDataFolder(), "features/" + id + ".yml");
         if (!file.exists()) return;
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
         cfg.set("base.enabled", newState);

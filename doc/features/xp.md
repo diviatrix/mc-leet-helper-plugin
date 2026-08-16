@@ -2,12 +2,12 @@
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Grants bonus **vanilla** XP for various in-game actions (no custom entity or XP pool — it adds directly to the player's XP bar via `player.giveExp`). Config file `features/_xp.yml`. **Effort-based balance:** the easiest, spammable action (building) pays a baseline of 1 XP per block, while the more-effortful jobs (mining, woodcutting, fishing, killing) pay more per action — all adjustable per material/mob below.
+Grants bonus **vanilla** XP for various in-game actions (no custom entity or XP pool — it adds directly to the player's XP bar via `player.giveExp`). Config file `features/xp.yml`. **Effort-based balance:** the easiest, spammable action (building) pays a baseline of 1 XP per block, while the more-effortful jobs (mining, woodcutting, fishing, killing) pay more per action — all adjustable per material/mob below.
 
 **Permissions**
 - **Node:** `leet.feat.xp` · **default:** `false` (nobody).
 - Grant the node (e.g. LuckPerms) to earn bonus XP from actions; it also unlocks the `/leet xp` personal off-toggle. The node alone is not enough — `base.enabled`, the permission, and `base.worlds` must all pass.
-- Set `base.default-permission` in `_xp.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
+- Set `base.default-permission` in `xp.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
 
 **Behavior**
 

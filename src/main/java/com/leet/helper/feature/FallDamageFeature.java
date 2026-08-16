@@ -1,6 +1,6 @@
 package com.leet.helper.feature;
 
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,7 +14,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
  */
 public class FallDamageFeature extends AbstractFeature {
 
-    public FallDamageFeature(HelperPlugin plugin) {
+    public FallDamageFeature(Core plugin) {
         super(plugin);
     }
 

@@ -1,6 +1,6 @@
 package com.leet.helper.feature;
 
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -25,7 +25,7 @@ public class TreeFellerFeature extends AbstractFeature {
     private int maxBlocks;
     private boolean felling;
 
-    public TreeFellerFeature(HelperPlugin plugin) {
+    public TreeFellerFeature(Core plugin) {
         super(plugin);
     }
 

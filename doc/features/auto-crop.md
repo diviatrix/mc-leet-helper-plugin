@@ -2,12 +2,12 @@
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Auto-harvests nearby mature crops when a player breaks one. Config file `features/_auto_crop.yml`.
+Auto-harvests nearby mature crops when a player breaks one. Config file `features/auto_crop.yml`.
 
 **Permissions**
 - **Node:** `leet.feat.auto_crop` · **default:** `false` (nobody).
 - Grant the node (e.g. LuckPerms) to allow auto-harvesting; it also unlocks the `/leet crop` personal off-toggle. The node alone is not enough — `base.enabled`, the permission, and `base.worlds` must all pass.
-- Set `base.default-permission` in `_auto_crop.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
+- Set `base.default-permission` in `auto_crop.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
 
 **Behavior**
 1. A player breaks a block (`BlockBreakEvent`).

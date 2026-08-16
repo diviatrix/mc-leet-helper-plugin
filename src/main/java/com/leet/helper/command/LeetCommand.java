@@ -1,6 +1,6 @@
 package com.leet.helper.command;
 
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,9 +31,9 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
         ALIASES.put("xp", "xp");
     }
 
-    private final HelperPlugin plugin;
+    private final Core plugin;
 
-    public LeetCommand(HelperPlugin plugin) {
+    public LeetCommand(Core plugin) {
         this.plugin = plugin;
     }
 

@@ -1,6 +1,6 @@
 package com.leet.helper.feature;
 
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
@@ -25,7 +25,7 @@ import java.util.*;
 
 public abstract class AbstractFeature implements Listener {
 
-    protected final HelperPlugin plugin;
+    protected final Core plugin;
     protected boolean enabled;
     protected String permission;
     protected String defaultPermission;
@@ -35,7 +35,7 @@ public abstract class AbstractFeature implements Listener {
     protected String messageType;
     protected Map<String, String> messages;
 
-    protected AbstractFeature(HelperPlugin plugin) {
+    protected AbstractFeature(Core plugin) {
         this.plugin = plugin;
         this.messages = new HashMap<>();
     }
@@ -45,7 +45,7 @@ public abstract class AbstractFeature implements Listener {
     protected abstract void loadFeatureConfig(YamlConfiguration cfg);
 
     public void loadConfig() {
-        File file = new File(plugin.getDataFolder(), "features/_" + featureId() + ".yml");
+        File file = new File(plugin.getDataFolder(), "features/" + featureId() + ".yml");
         if (!file.exists()) {
             plugin.getLogger().severe("Feature config not found: " + file.getName());
             enabled = false;
@@ -90,7 +90,7 @@ public abstract class AbstractFeature implements Listener {
      * old feature configs gain new options (e.g. require-hoe) on plugin update.
      */
     private void mergeMissingKeys(YamlConfiguration cfg, File file) {
-        InputStream defaultStream = plugin.getResource("features/_" + featureId() + ".yml");
+        InputStream defaultStream = plugin.getResource("features/" + featureId() + ".yml");
         if (defaultStream == null) return;
         YamlConfiguration defaults = YamlConfiguration.loadConfiguration(
             new InputStreamReader(defaultStream, StandardCharsets.UTF_8));

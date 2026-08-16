@@ -2,12 +2,12 @@
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Allows a mid-air double jump. Config file `features/_double_jump.yml`.
+Allows a mid-air double jump. Config file `features/double_jump.yml`.
 
 **Permissions**
 - **Node:** `leet.feat.double_jump` · **default:** `false` (nobody).
 - Grant the node (e.g. LuckPerms) to allow the double jump; it also unlocks the `/leet dj` personal off-toggle. The node alone is not enough — `base.enabled`, the permission, and `base.worlds` must all pass.
-- Set `base.default-permission` in `_double_jump.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
+- Set `base.default-permission` in `double_jump.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
 
 **Behavior**
 1. Player on the ground → flight is enabled for them automatically.

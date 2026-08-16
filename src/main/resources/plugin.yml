@@ -1,6 +1,6 @@
 name: LeetHelper
 version: "${version}"
-main: com.leet.helper.HelperPlugin
+main: com.leet.helper.Core
 api-version: "26.2"
 description: Leet Helper Plugin
 author: Leet

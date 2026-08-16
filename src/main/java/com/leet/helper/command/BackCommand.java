@@ -1,6 +1,6 @@
 package com.leet.helper.command;
 
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import com.leet.helper.feature.BackFeature;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
@@ -10,9 +10,9 @@ import org.bukkit.entity.Player;
 
 public class BackCommand implements CommandExecutor {
 
-    private final HelperPlugin plugin;
+    private final Core plugin;
 
-    public BackCommand(HelperPlugin plugin) {
+    public BackCommand(Core plugin) {
         this.plugin = plugin;
     }
 

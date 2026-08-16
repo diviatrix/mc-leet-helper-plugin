@@ -1,6 +1,6 @@
 package com.leet.helper.feature;
 
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
@@ -23,7 +23,7 @@ public class AutoCropFeature extends AbstractFeature {
     private Set<Material> materials;
     private boolean harvesting;
 
-    public AutoCropFeature(HelperPlugin plugin) {
+    public AutoCropFeature(Core plugin) {
         super(plugin);
     }
 

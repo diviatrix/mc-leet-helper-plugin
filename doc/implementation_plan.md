@@ -27,9 +27,9 @@ Sequential steps. Each must be completed and verified before moving to the next.
 
 ---
 
-## STEP 3: HelperPlugin base
+## STEP 3: Core base
 
-- Create `src/main/java/com/leet/helper/HelperPlugin.java`
+- Create `src/main/java/com/leet/helper/Core.java`
 - Extend `JavaPlugin`
 - Implement `onEnable()`: saveDefaultConfig, saveResource for feature YAMLs, init StorageManager
 - Implement `onDisable()`: close StorageManager
@@ -60,7 +60,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
 ## STEP 5: FeatureManager
 
 - Create `src/main/java/com/leet/helper/feature/FeatureManager.java`
-- Fields: `Map<String, AbstractFeature>`, `HelperPlugin` reference
+- Fields: `Map<String, AbstractFeature>`, `Core` reference
 - `register(feature)` — adds to map
 - `enableAll()` — iterates, calls `enable()` on each, catches exceptions per-feature
 - `disableAll()` — iterates, calls `disable()` on each
@@ -75,7 +75,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
 ## STEP 6: Vault setup
 
 - Add `softdepend: [Vault]` to plugin.yml (already done in step 1)
-- In HelperPlugin: implement `setupVault()` — look up Economy and Permission service providers
+- In Core: implement `setupVault()` — look up Economy and Permission service providers
 - Store as nullable fields: `economy`, `vaultPermission`
 - Add getters
 - Verify: plugin loads with or without Vault present, no errors
@@ -84,7 +84,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
 
 ## STEP 7: Dynamic permission registration
 
-- In HelperPlugin `onEnable()`, after `enableAll()`: iterate features, register each permission via `Bukkit.getPluginManager().addPermission()` with PermissionDefault from config
+- In Core `onEnable()`, after `enableAll()`: iterate features, register each permission via `Bukkit.getPluginManager().addPermission()` with PermissionDefault from config
 - Verify: permissions appear in LuckPerms / PEX after startup
 
 ---
@@ -97,7 +97,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
 - `loadFeatureConfig()`: reads horizontal-multiplier, vertical-multiplier from `feature:` section
 - `@EventHandler onToggleFlight(PlayerToggleFlightEvent)`: cancel → disable flight → check → checkCooldown → apply velocity → setCooldown
 - `@EventHandler onMove(PlayerMoveEvent)`: check → block-level optimization (skip if same block) → if onSolidGround or inVehicle → setAllowFlight(true)
-- Create `features/_double_jump.yml` with base/feature/messages sections (cooldown: 1)
+- Create `features/double_jump.yml` with base/feature/messages sections (cooldown: 1)
 - Verify: on server, double jump works, cooldown enforced, ground reset works
 
 ---
@@ -109,8 +109,8 @@ Sequential steps. Each must be completed and verified before moving to the next.
 - `featureId()` returns `"fall_damage"`
 - `loadFeatureConfig()`: no feature-specific options (feature on/off + permission is the only switch)
 - `@EventHandler onFall(EntityDamageEvent)`: cast to Player → check cause is FALL → check → cancel event
-- Create `features/_fall_damage.yml` with base/feature (empty)/messages sections
-- Wire into HelperPlugin `onEnable()` (saveResourceIfMissing + register feature) and add `/leet fall` alias + display name in LeetCommand
+- Create `features/fall_damage.yml` with base/feature (empty)/messages sections
+- Wire into Core `onEnable()` (saveResourceIfMissing + register feature) and add `/leet fall` alias + display name in LeetCommand
 - Verify: eligible players take no fall damage; decoupled from Double Jump permission/toggle
 
 ---
@@ -122,7 +122,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
 - `featureId()` returns `"durability"`
 - `loadFeatureConfig()`: reads multiplier, min-damage, whitelist from `feature:` section
 - `@EventHandler onDamage(PlayerItemDamageEvent)`: check → check whitelist → apply multiplier to damage AFTER Unbreaking → set damage
-- Create `features/_durability.yml` with full tools & equipment whitelist
+- Create `features/durability.yml` with full tools & equipment whitelist
 - Verify: tools take reduced/increased damage per multiplier, only whitelisted items affected
 
 ---
@@ -136,7 +136,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
 - `@EventHandler onBreak(BlockBreakEvent)`: check → check crop type → check maturity → check hoe held (if require-hoe) → loop radius → breakNaturally(tool) for each valid nearby crop
 - Helper `isMature(block)`: checks Ageable max age
 - Helper `isHoe(item)`: checks the held item is one of the six hoe materials
-- Create `features/_auto_crop.yml` with default materials
+- Create `features/auto_crop.yml` with default materials
 - Verify: breaking one mature crop harvests nearby mature crops, radius respects cap, Silk Touch works
 
 ---
@@ -151,7 +151,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
 - Implement `deserializeLocation(String)` — parse JSON back to Location
 - `@EventHandler onDeath(PlayerDeathEvent)`: check → serialize location → store in SQLite via storage.setPersistent → sendMessage("death-location-saved")
 - `teleportBack(Player)`: check → load from SQLite → check world → check max-age → check cooldown (persistent) → check Vault balance → deduct cost → teleport → save cooldown → delete death → sendMessage("teleport")
-- Create `features/_back.yml` with messages in MiniMessage format
+- Create `features/back.yml` with messages in MiniMessage format
 - Verify: die → get message → /back → teleport works, cooldown works, cross-world blocked, cost deducted
 
 ---
@@ -164,8 +164,8 @@ Sequential steps. Each must be completed and verified before moving to the next.
 - `loadFeatureConfig()`: reads logs (list of log/stem materials), max-blocks (default 100) from `feature:` section
 - `@EventHandler onBreak(BlockBreakEvent)`: check → check broken block material is in `logs` → breadth-first search (6-directional) collecting connected log blocks → stop at max-blocks cap → breakNaturally(tool) for each collected log
 - Helper `findConnectedLogs(block)`: BFS over log blocks, `max-blocks` hard cap
-- Create `features/_tree_feller.yml` with default log/stem materials
-- Wire into HelperPlugin `onEnable()` (saveResourceIfMissing + register feature) and add `/leet tree` alias + display name in LeetCommand
+- Create `features/tree_feller.yml` with default log/stem materials
+- Wire into Core `onEnable()` (saveResourceIfMissing + register feature) and add `/leet tree` alias + display name in LeetCommand
 - Verify: breaking one log fells the whole connected tree, cap respected, Silk Touch works
 
 ---
@@ -181,8 +181,8 @@ Sequential steps. Each must be completed and verified before moving to the next.
 - `@EventHandler onPlace(BlockPlaceEvent)`: check → award building amount
 - `@EventHandler onKill(EntityDeathEvent)`: victim not a Player → `getKiller()` → check killer → award per-mob (`killing.mobs`) or `killing.amount` fallback
 - Helper `award(player, action, amount)`: skip if `amount <= 0`; `player.giveExp(amount)`; `sendMessage(player, "xp-gained", "<amount>", ..., "<action>", ...)` (empty template = silent)
-- Create `features/_xp.yml` with curated mining/woodcutting/crops material maps, fishing/building amounts, killing fallback + mobs, and an `xp-gained` message
-- Wire into HelperPlugin `onEnable()` (saveResourceIfMissing + register feature) and add `/leet xp` alias + display name in LeetCommand
+- Create `features/xp.yml` with curated mining/woodcutting/crops material maps, fishing/building amounts, killing fallback + mobs, and an `xp-gained` message
+- Wire into Core `onEnable()` (saveResourceIfMissing + register feature) and add `/leet xp` alias + display name in LeetCommand
 - Verify: mining stone → +1 XP; fishing → +3; killing a zombie → +3; breaking an unlisted block gives nothing; `xp-gained` shows on the action bar; `/leet xp` knocks it off per-player
 
 ---
@@ -196,7 +196,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
 - `handleToggle()`: permission helper.admin.toggle, call featureManager.toggle(), persist
 - `handleInfo()`: permission helper.admin, show id/permission/enabled
 - `onTabComplete()`: return subcommands, feature IDs for toggle/info
-- In HelperPlugin: register executor + tab completer for "helper" command
+- In Core: register executor + tab completer for "helper" command
 - Verify: /helper list, /helper toggle, /helper info work, tab complete works
 
 ---
@@ -206,7 +206,7 @@ Sequential steps. Each must be completed and verified before moving to the next.
 - Create `src/main/java/com/leet/helper/command/BackCommand.java`
 - Implement `CommandExecutor`
 - `onCommand()`: cast sender to Player, get BackFeature from FeatureManager, call teleportBack()
-- In HelperPlugin: register executor for "back" command
+- In Core: register executor for "back" command
 - Verify: /back triggers teleportBack, console gets no response
 
 ---

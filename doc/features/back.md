@@ -2,12 +2,12 @@
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Teleports players to their last death location. **Persistent** via SQLite — survives server restarts. Config file `features/_back.yml`.
+Teleports players to their last death location. **Persistent** via SQLite — survives server restarts. Config file `features/back.yml`.
 
 **Permissions**
 - **Node:** `leet.feat.back` · **default:** `false` (nobody).
 - Grant the node (e.g. LuckPerms) to have death locations saved **and** to use `/back` (the command is registered with `permission: leet.feat.back`). The node alone is not enough — `base.enabled`, the permission, and `base.worlds` must all pass.
-- Set `base.default-permission` in `_back.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
+- Set `base.default-permission` in `back.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
 
 **Behavior — on death**
 1. Player dies → `check()` (enabled + permission + world).

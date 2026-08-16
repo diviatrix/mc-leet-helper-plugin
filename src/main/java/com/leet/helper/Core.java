@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.logging.Level;
 
-public class HelperPlugin extends JavaPlugin {
+public class Core extends JavaPlugin {
 
     private StorageManager storageManager;
     private FeatureManager featureManager;
@@ -36,13 +36,13 @@ public class HelperPlugin extends JavaPlugin {
 
         saveDefaultConfig();
         mergeConfigDefaults();
-        saveResourceIfMissing("features/_double_jump.yml");
-        saveResourceIfMissing("features/_durability.yml");
-        saveResourceIfMissing("features/_auto_crop.yml");
-        saveResourceIfMissing("features/_back.yml");
-        saveResourceIfMissing("features/_tree_feller.yml");
-        saveResourceIfMissing("features/_fall_damage.yml");
-        saveResourceIfMissing("features/_xp.yml");
+        saveResourceIfMissing("features/double_jump.yml");
+        saveResourceIfMissing("features/durability.yml");
+        saveResourceIfMissing("features/auto_crop.yml");
+        saveResourceIfMissing("features/back.yml");
+        saveResourceIfMissing("features/tree_feller.yml");
+        saveResourceIfMissing("features/fall_damage.yml");
+        saveResourceIfMissing("features/xp.yml");
 
         storageManager = new StorageManager(getDataFolder(), getLogger());
 

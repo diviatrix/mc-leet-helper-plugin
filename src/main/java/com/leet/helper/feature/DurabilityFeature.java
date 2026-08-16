@@ -1,6 +1,6 @@
 package com.leet.helper.feature;
 
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -18,7 +18,7 @@ public class DurabilityFeature extends AbstractFeature {
     private int minDamage;
     private Set<Material> whitelist;
 
-    public DurabilityFeature(HelperPlugin plugin) {
+    public DurabilityFeature(Core plugin) {
         super(plugin);
     }
 

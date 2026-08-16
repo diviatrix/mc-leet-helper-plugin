@@ -2,12 +2,12 @@
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Breaking one log automatically breaks the whole connected tree. Config file `features/_tree_feller.yml`.
+Breaking one log automatically breaks the whole connected tree. Config file `features/tree_feller.yml`.
 
 **Permissions**
 - **Node:** `leet.feat.tree_feller` · **default:** `false` (nobody).
 - Grant the node (e.g. LuckPerms) to allow whole-tree felling; it also unlocks the `/leet tree` personal off-toggle. The node alone is not enough — `base.enabled`, the permission, and `base.worlds` must all pass.
-- Set `base.default-permission` in `_tree_feller.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
+- Set `base.default-permission` in `tree_feller.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
 
 **Behavior**
 1. A player breaks a log (`BlockBreakEvent`).

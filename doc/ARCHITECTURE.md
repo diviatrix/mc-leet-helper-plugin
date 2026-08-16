@@ -18,7 +18,7 @@ Contents:
 ```
 src/main/
   java/com/leet/helper/
-    HelperPlugin.java            # Plugin lifecycle, Vault setup, dynamic permission registration
+    Core.java            # Plugin lifecycle, Vault setup, dynamic permission registration
     feature/
       AbstractFeature.java       # Base class: config, permissions, cooldowns, messages, cost
       FeatureManager.java        # Feature registry, enable/disable/toggle, toggle persistence
@@ -41,16 +41,16 @@ src/main/
     plugin.yml                   # Plugin metadata, command & admin permission declarations
     config.yml                   # Global config
     features/
-      _double_jump.yml
-      _durability.yml
-      _auto_crop.yml
-      _back.yml
-      _tree_feller.yml
-      _fall_damage.yml
-      _xp.yml
+      double_jump.yml
+      durability.yml
+      auto_crop.yml
+      back.yml
+      tree_feller.yml
+      fall_damage.yml
+      xp.yml
 ```
 
-`HelperPlugin` boots the plugin, resolves Vault (Economy + Permission providers, both optional), and registers the feature permissions dynamically. `FeatureManager` owns the feature registry and the enable/disable/toggle lifecycle.
+`Core` boots the plugin, resolves Vault (Economy + Permission providers, both optional), and registers the feature permissions dynamically. `FeatureManager` owns the feature registry and the enable/disable/toggle lifecycle.
 
 ---
 
@@ -76,7 +76,7 @@ Every gameplay feature extends `AbstractFeature`. The base class provides the sh
 
 ### Common feature config layout
 
-Each feature config (`features/_<id>.yml`) shares the same layout:
+Each feature config (`features/<id>.yml`) shares the same layout:
 
 ```yaml
 base:
@@ -123,13 +123,13 @@ Each feature's config file and its reference doc:
 
 | Feature | Config file | Reference |
 |---|---|---|
-| Double Jump | `_double_jump.yml` | [feature-double-jump](features/double-jump.md) |
-| Durability | `_durability.yml` | [feature-durability](features/durability.md) |
-| Auto Crop | `_auto_crop.yml` | [feature-auto-crop](features/auto-crop.md) |
-| Back | `_back.yml` | [feature-back](features/back.md) |
-| Tree Feller | `_tree_feller.yml` | [feature-tree-feller](features/tree-feller.md) |
-| Fall Damage | `_fall_damage.yml` | [feature-fall-damage](features/fall-damage.md) |
-| XP | `_xp.yml` | [feature-xp](features/xp.md) |
+| Double Jump | `double_jump.yml` | [feature-double-jump](features/double-jump.md) |
+| Durability | `durability.yml` | [feature-durability](features/durability.md) |
+| Auto Crop | `auto_crop.yml` | [feature-auto-crop](features/auto-crop.md) |
+| Back | `back.yml` | [feature-back](features/back.md) |
+| Tree Feller | `tree_feller.yml` | [feature-tree-feller](features/tree-feller.md) |
+| Fall Damage | `fall_damage.yml` | [feature-fall-damage](features/fall-damage.md) |
+| XP | `xp.yml` | [feature-xp](features/xp.md) |
 
 ### Automatic config merging (backfill)
 
@@ -144,7 +144,7 @@ Every config — the global `config.yml` **and** each feature file — is merged
 ## Permission Model
 
 - **Admin permissions** (`leet.admin`, `leet.admin.list|toggle|info`) are declared statically in `plugin.yml` and gate `/leeta`.
-- **Feature permissions** (`leet.feat.<id>`) are **not** in `plugin.yml`. `HelperPlugin` registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()` using the node from `base.permission` and the default from `base.default-permission`. Hence **config changes to permissions require a restart.**
+- **Feature permissions** (`leet.feat.<id>`) are **not** in `plugin.yml`. `Core` registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()` using the node from `base.permission` and the default from `base.default-permission`. Hence **config changes to permissions require a restart.**
 - **Checks** use Bukkit's `player.hasPermission(permission)` everywhere. Even with Vault installed, the plugin does **not** route permission lookups through Vault's `Permission` provider — that provider is resolved at startup but unused.
 
 Because feature permissions are denied by default and gated by `leet.feat.<id>`, every feature needs an explicit grant (e.g. LuckPerms) before it does anything. See [Feature Permissions](../README.md#feature-permissions-dynamic) in the README for the per-feature table and `/leet` model.

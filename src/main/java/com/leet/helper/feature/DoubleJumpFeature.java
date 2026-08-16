@@ -1,6 +1,6 @@
 package com.leet.helper.feature;
 
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,7 +15,7 @@ public class DoubleJumpFeature extends AbstractFeature {
     private double horizontalMultiplier;
     private double verticalMultiplier;
 
-    public DoubleJumpFeature(HelperPlugin plugin) {
+    public DoubleJumpFeature(Core plugin) {
         super(plugin);
     }
 

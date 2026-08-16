@@ -12,11 +12,12 @@ Licensed under **CC0 1.0** (public domain) — see [LICENSE](LICENSE).
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Permissions](#permissions)
-  - [Admin Permissions](#admin-permissions-leeta)
   - [Feature Permissions](#feature-permissions-dynamic)
 - [Commands](#commands)
   - [/leeta](#leeta)
   - [/back](#back)
+  - [/leet](#leet)
+- [Storage & Economy](#storage--economy)
 - [Feature docs (doc/features/)](doc/features/)
 - [Development](#development)
   - [Building & Testing](doc/BUILDING.md)
@@ -57,11 +58,11 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`);
 
 ## Installation
 
-1. **Download the jar** from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases) page (e.g. `leet-helper-1.1.2.jar`). Building from source is optional — see [Building from Source](doc/BUILDING.md).
+1. **Download the jar** from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases) page (e.g. `leet-helper-1.1.3.jar`). Building from source is optional — see [Building from Source](doc/BUILDING.md).
 2. **Copy the jar** into your server's `plugins/` folder:
 
    ```bash
-   cp leet-helper-1.1.2.jar /path/to/server/plugins/
+   cp leet-helper-1.1.3.jar /path/to/server/plugins/
    ```
 
 3. **Start the server.** On first launch the plugin creates its data folder and writes default configuration files:
@@ -71,13 +72,13 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`);
    ├── config.yml                 # Global settings (log level, schema version)
    ├── data.db                    # SQLite database (Back feature persistence)
    └── features/
-       ├── _double_jump.yml
-       ├── _durability.yml
-       ├── _auto_crop.yml
-       ├── _back.yml
-       ├── _tree_feller.yml
-       ├── _fall_damage.yml
-       └── _xp.yml
+       ├── double_jump.yml
+       ├── durability.yml
+       ├── auto_crop.yml
+       ├── back.yml
+       ├── tree_feller.yml
+       ├── fall_damage.yml
+       └── xp.yml
    ```
 
 4. **Configure to taste** — edit the files inside `plugins/LeetHelper/features/`. Restart the server for changes to take effect (there is **no reload command**; `base.enabled` toggles are the only thing that can be changed live, via `/leeta toggle`).
@@ -86,40 +87,13 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`);
 
 ---
 
-## Development
-
-- **[Building & Testing](doc/BUILDING.md)** — prerequisites, Gradle commands, the output artifact, and how the version is single-sourced.
-- **[Architecture](doc/ARCHITECTURE.md)** — project structure, the feature model, config handling, storage, and the permission/Vault internals.
-
 ## Permissions
 
-Admin permissions for `/leeta` are in **[doc/Admin.md](doc/Admin.md)**. Each gameplay feature's `leet.feat.*` permission is documented in its own feature document (index: [doc/features/](doc/features/)).
-
-### Admin Permissions (`/leeta`)
-
-Declared statically in `plugin.yml`. They control access to the `/leeta` command. Full reference in [doc/Admin.md](doc/Admin.md).
-
-| Permission | Default | Description |
-|---|---|---|
-| `leet.admin` | op | Full admin access **to commands** (children included). |
-| `leet.admin.list` | op | Use `/leeta list` |
-| `leet.admin.toggle` | op | Use `/leeta toggle` |
-| `leet.admin.info` | op | Use `/leeta info` |
-
-`leet.admin` automatically includes the three children (`list`, `toggle`, `info`) via its `children` map.
-
-### Command-Facing Permissions
-
-Declared in `plugin.yml` on the commands themselves:
-
-| Permission | Default | Found on |
-|---|---|---|
-| `leet.admin` | op | `leeta` command (base command requires it) |
-| `leet.feat.back` | (dynamic) | `back` command |
+Admin permissions for `/leeta` (`leet.admin.*`) are declared statically in `plugin.yml` and documented in **[doc/Admin.md](doc/Admin.md)**. Each gameplay feature's `leet.feat.*` permission is documented in its own feature document (index: [doc/features/](doc/features/)).
 
 ### Feature Permissions (dynamic)
 
-Feature permissions are **not** declared in `plugin.yml`. Instead, `HelperPlugin` registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()`, using each feature's `base.permission` node and `base.default-permission`. Every feature permission follows the pattern `leet.feat.<id>` (e.g. `leet.feat.double_jump`), and all default to `false`. Each feature doc lists its exact node — see the **Permissions** section of each feature in the [feature list](#overview).
+Feature permissions are **not** declared in `plugin.yml` (unlike the admin `/leeta` permissions above). Instead, `Core` registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()`, using each feature's `base.permission` node and `base.default-permission`. Every feature permission follows the pattern `leet.feat.<id>` (e.g. `leet.feat.double_jump`), and all default to `false`.
 
 `base.default-permission` maps to a Bukkit default:
 - `true` → `PermissionDefault.TRUE` (every player)
@@ -161,14 +135,14 @@ This command is player-only (the console receives a "This command can only be us
 
 Player-side feature toggles. Each player can turn supported features **off for themselves** (it's an off-switch — it never grants or revokes access). Persisted per-player in the SQLite `kv_store`, so preferences survive restarts.
 
-| Subcommand | Description |
-|---|---|
-| `/leet` or `/leet list` | Show your current ON/OFF status for each feature you have |
-| `/leet dj` | Toggle **Double Jump** on/off for yourself |
-| `/leet crop` | Toggle **Auto Crop** on/off for yourself |
-| `/leet tree` | Toggle **Tree Feller** on/off for yourself |
-| `/leet fall` | Toggle **Fall Damage** on/off for yourself |
-| `/leet xp` | Toggle **XP** on/off for yourself |
+| Subcommand | Permission | Description |
+|---|---|---|
+| `/leet` or `/leet list` | any `leet.feat.<id>` | Show your current ON/OFF status for each feature you have |
+| `/leet dj` | `leet.feat.double_jump` | Toggle **Double Jump** on/off for yourself |
+| `/leet crop` | `leet.feat.auto_crop` | Toggle **Auto Crop** on/off for yourself |
+| `/leet tree` | `leet.feat.tree_feller` | Toggle **Tree Feller** on/off for yourself |
+| `/leet fall` | `leet.feat.fall_damage` | Toggle **Fall Damage** on/off for yourself |
+| `/leet xp` | `leet.feat.xp` | Toggle **XP** on/off for yourself |
 
 **Permission model** — `/leet` is permission-gated by the underlying feature permissions:
 - The command is only available to players who have at least **one** `leet.feat.<id>` permission. If a player has **none**, `/leet` reports `No permission.` and does nothing (including `list`, and no tab completion).
@@ -185,6 +159,12 @@ Player-side feature toggles. Each player can turn supported features **off for t
 The storage layers (runtime in-memory and persistent SQLite `data.db`) and the optional Vault income integration are covered in the **[Architecture](doc/ARCHITECTURE.md)** doc.
 
 ---
+
+## Development
+
+- **[Building & Testing](doc/BUILDING.md)** — prerequisites, Gradle commands, the output artifact, and how the version is single-sourced.
+- **[Architecture](doc/ARCHITECTURE.md)** — project structure, the feature model, config handling, storage, and the permission/Vault internals.
+
 
 ## License
 

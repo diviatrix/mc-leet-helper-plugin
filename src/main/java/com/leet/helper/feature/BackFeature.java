@@ -2,7 +2,7 @@ package com.leet.helper.feature;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,7 +17,7 @@ public class BackFeature extends AbstractFeature {
 
     private int maxAge;
 
-    public BackFeature(HelperPlugin plugin) {
+    public BackFeature(Core plugin) {
         super(plugin);
     }
 

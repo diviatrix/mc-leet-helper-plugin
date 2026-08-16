@@ -1,6 +1,6 @@
 package com.leet.helper.feature;
 
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
@@ -50,7 +50,7 @@ public class XpFeature extends AbstractFeature {
     // In-memory backend: block locations a player has placed (placement time ms).
     private final Map<Block, Long> placedBlocks = new HashMap<>();
 
-    public XpFeature(HelperPlugin plugin) {
+    public XpFeature(Core plugin) {
         super(plugin);
     }
 

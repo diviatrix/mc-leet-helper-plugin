@@ -1,6 +1,6 @@
 package com.leet.helper.command;
 
-import com.leet.helper.HelperPlugin;
+import com.leet.helper.Core;
 import com.leet.helper.feature.AbstractFeature;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
@@ -15,9 +15,9 @@ import java.util.Optional;
 
 public class HelperCommand implements CommandExecutor, TabCompleter {
 
-    private final HelperPlugin plugin;
+    private final Core plugin;
 
-    public HelperCommand(HelperPlugin plugin) {
+    public HelperCommand(Core plugin) {
         this.plugin = plugin;
     }
 
