@@ -95,6 +95,42 @@ messages:
   # key: "MiniMessage formatted string"
 ```
 
+#### Three-level control per feature
+
+Each feature has three independent on/off controls:
+
+1. **`base.enabled`** — server-wide kill switch. When `false`, the feature's event listeners are **not registered** at all.
+2. **`base.default-permission`** — the Bukkit default for the configured permission. Defaults to `false` (nobody can use the feature until you grant the node in your permission plugin, e.g. LuckPerms). `true` = everyone, `op` = ops only.
+3. **`base.worlds`** — per-world whitelist. If non-empty, the feature only works in the listed world names. Empty list = works everywhere.
+
+All three are checked by `check(player)` at the start of every relevant event or command. *All* must pass for the feature to act.
+
+### Message Delivery Types
+
+Messages are rendered with [MiniMessage](https://docs.advntr.dev/minimessage/format.html) and delivered according to `base.message-type`:
+
+| Value | Delivery |
+|---|---|
+| `ACTION_BAR` | Sent to the player's action bar (default) |
+| `CHAT` | Sent to chat |
+| `TITLE` | Shown as a title (200ms fade-in, 2s stay, 500ms fade-out) |
+
+A missing or empty message template silently produces no message.
+
+### Per-Feature Configs
+
+Each feature's config file and its reference doc:
+
+| Feature | Config file | Reference |
+|---|---|---|
+| Double Jump | `_double_jump.yml` | [feature-double-jump](features/double-jump.md) |
+| Durability | `_durability.yml` | [feature-durability](features/durability.md) |
+| Auto Crop | `_auto_crop.yml` | [feature-auto-crop](features/auto-crop.md) |
+| Back | `_back.yml` | [feature-back](features/back.md) |
+| Tree Feller | `_tree_feller.yml` | [feature-tree-feller](features/tree-feller.md) |
+| Fall Damage | `_fall_damage.yml` | [feature-fall-damage](features/fall-damage.md) |
+| XP | `_xp.yml` | [feature-xp](features/xp.md) |
+
 ### Automatic config merging (backfill)
 
 Every config — the global `config.yml` **and** each feature file — is merged against the bundled default at startup (`mergeMissingKeys`). Any default keys missing from the on-disk file are added (and the file saved), while the server admin's existing values are preserved. Consequences:
@@ -111,7 +147,7 @@ Every config — the global `config.yml` **and** each feature file — is merged
 - **Feature permissions** (`leet.feat.<id>`) are **not** in `plugin.yml`. `HelperPlugin` registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()` using the node from `base.permission` and the default from `base.default-permission`. Hence **config changes to permissions require a restart.**
 - **Checks** use Bukkit's `player.hasPermission(permission)` everywhere. Even with Vault installed, the plugin does **not** route permission lookups through Vault's `Permission` provider — that provider is resolved at startup but unused.
 
-Because feature permissions are denied by default and gated by `leet.feat.<id>`, every feature needs an explicit grant (e.g. LuckPerms) before it does anything. See [Feature Permissions](../README.md#feature-permissions) in the README for the per-feature table and `/leet` model.
+Because feature permissions are denied by default and gated by `leet.feat.<id>`, every feature needs an explicit grant (e.g. LuckPerms) before it does anything. See [Feature Permissions](../README.md#feature-permissions-dynamic) in the README for the per-feature table and `/leet` model.
 
 ---
 

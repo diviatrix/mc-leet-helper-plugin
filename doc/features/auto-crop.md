@@ -1,6 +1,6 @@
 # Feature: Auto Crop
 
-> Common `base:`/`messages:` config layout and control model: [README](../README.md#common-feature-config-structure) · Admin: [Admin.md](../Admin.md) · All features: [index](README.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
 Auto-harvests nearby mature crops when a player breaks one. Config file `features/_auto_crop.yml`.
 

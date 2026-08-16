@@ -1,6 +1,6 @@
 # Feature: Back
 
-> Common `base:`/`messages:` config layout and control model: [README](../README.md#common-feature-config-structure) · Admin: [Admin.md](../Admin.md) · All features: [index](README.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
 Teleports players to their last death location. **Persistent** via SQLite — survives server restarts. Config file `features/_back.yml`.
 

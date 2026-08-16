@@ -6,8 +6,8 @@ Sequential steps. Each must be completed and verified before moving to the next.
 
 ## STEP 1: Project scaffold
 
-- Create directory structure under `plugins/HelperPlugin/`
-- Create `build.gradle.kts` with paperweight userdev 2.0.0-beta.21, Java 26, paperDevBundle 26.2.build.+
+- Create directory structure under `plugins/LeetHelper/`
+- Create `build.gradle.kts` with paperweight userdev 2.0.0-beta.21, Java 25, paperDevBundle 26.2.build.+
 - Create `src/main/resources/plugin.yml` with commands (helper, back) and admin permissions only
 - Create `src/main/resources/config.yml` with config-version and log-level
 - Create placeholder feature YAML files under `features/` (empty base/feature/messages sections)

@@ -1,10 +1,10 @@
 # Building from Source
 
-How to compile and package LeetHelper from source.
+How to compile and package LeetHelper from source. This is **optional** — the default way to get the plugin is to download a prebuilt jar from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases) page. Building from source is only needed for contributors or for testing unreleased changes.
 
 ## Prerequisites
 
-- **JDK 26+** (the Gradle toolchain requires it)
+- **JDK 25+** (the Gradle toolchain targets Java 25); Gradle can auto-provision a matching JDK if you don't have one installed
 - **Gradle 9.7** (a wrapper is included — you only need to invoke `./gradlew`)
 - **Internet connection** on the first build (downloads the Paper dev bundle)
 
@@ -35,7 +35,7 @@ The version is injected into `plugin.yml` at build time via `tasks.processResour
 
 ## Testing
 
-There is no unit-test suite or test plugin wired into the Gradle build (`gradle.properties` enables Gradle configuration-cache only). Verification is manual on a Paper 26.2 server — see the per-feature behavior notes in [README](../README.md#troubleshooting).
+There is no unit-test suite or test plugin wired into the Gradle build (`gradle.properties` enables Gradle configuration-cache only). Verification is manual on a Paper 26.2 server — see the per-feature behavior notes and troubleshooting in [Admin.md](Admin.md#troubleshooting).
 
 ## Related docs
 

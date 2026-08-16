@@ -11,25 +11,18 @@ Licensed under **CC0 1.0** (public domain) — see [LICENSE](LICENSE).
 - [Overview](#overview)
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Configuration](#configuration)
-  - [config.yml](#configyml)
-  - [Common Feature Config Structure](#common-feature-config-structure)
-  - [Log Levels](#log-levels)
-  - [Message Delivery Types](#message-delivery-types)
-  - [Per-Feature Configs](#per-feature-configs)
 - [Permissions](#permissions)
-  - [Admin Permissions](#admin-permissions)
-  - [Feature Permissions](#feature-permissions)
+  - [Admin Permissions](#admin-permissions-leeta)
+  - [Feature Permissions](#feature-permissions-dynamic)
 - [Commands](#commands)
   - [/leeta](#leeta)
   - [/back](#back)
-- [Features](#features)
-  - [Feature docs (doc/features/)](doc/features/README.md)
+- [Feature docs (doc/features/)](doc/features/)
 - [Development](#development)
   - [Building & Testing](doc/BUILDING.md)
   - [Architecture](doc/ARCHITECTURE.md)
-- [Troubleshooting](#troubleshooting)
-- [Known Limitations](#known-limitations)
+- [Troubleshooting (Admin)](doc/Admin.md#troubleshooting)
+- [Known Limitations (Admin)](doc/Admin.md#known-limitations)
 - [License](#license)
 
 ---
@@ -40,15 +33,15 @@ LeetHelper registers seven gameplay features plus one admin command.
 
 | Feature | ID | Description |
 |---|---|---|
-| Double Jump | `double_jump` | Mid-air double jump with configurable velocity and cooldown |
-| Durability | `durability` | Configurable durability multiplier for whitelisted tools/equipment |
-| Auto Crop | `auto_crop` | Auto-harvest nearby mature crops when breaking one |
-| Back | `back` | Teleport back to your death location, with optional cost and cooldown |
-| Tree Feller | `tree_feller` | Felling a log drops the whole connected tree |
-| Fall Damage | `fall_damage` | Negates all fall damage for eligible players |
-| XP | `xp` | Bonus vanilla XP for mining, woodcutting, crops, fishing, building, and killing |
+| [Double Jump](doc/features/double-jump.md) | `double_jump` | Mid-air double jump with configurable velocity and cooldown |
+| [Durability](doc/features/durability.md) | `durability` | Configurable durability multiplier for whitelisted tools/equipment |
+| [Auto Crop](doc/features/auto-crop.md) | `auto_crop` | Auto-harvest nearby mature crops when breaking one |
+| [Back](doc/features/back.md) | `back` | Teleport back to your death location, with optional cost and cooldown |
+| [Tree Feller](doc/features/tree-feller.md) | `tree_feller` | Felling a log drops the whole connected tree |
+| [Fall Damage](doc/features/fall-damage.md) | `fall_damage` | Negates all fall damage for eligible players |
+| [XP](doc/features/xp.md) | `xp` | Bonus vanilla XP for mining, woodcutting, crops, fishing, building, and killing |
 
-Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`).
+Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`); full per-feature details (config keys, limitations, permissions) are in **[doc/features/](doc/features/)**.
 
 ---
 
@@ -57,20 +50,18 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`).
 | Requirement | Version |
 |---|---|
 | Server software | Paper **26.2**+ (Bundled API jar is compiled against `26.2`). Spigot/CraftBukkit are **not** supported. |
-| Java | **26+** (the build toolchain targets Java 26). Run your server on a JVM that supports the compiled bytecode. |
+| Java | **25+** — the JVM your server runs the plugin on. (Build/toolchain details, which also target Java 25, are in [Building from Source](doc/BUILDING.md).) |
 | Vault | Optional. Only needed for feature per-use costs. The plugin works fully without it. |
-
-> Java runtime vs. build JDK: the Gradle build uses a Java 26 toolchain, and the plugin bytecode targets Java 26. Use a Java 26 (or later) runtime on your server when running the plugin.
 
 ---
 
 ## Installation
 
-1. **Build or obtain the jar** — see [Building from Source](doc/BUILDING.md). The build produces `build/libs/leet-helper-1.1.2.jar`.
+1. **Download the jar** from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases) page (e.g. `leet-helper-1.1.2.jar`). Building from source is optional — see [Building from Source](doc/BUILDING.md).
 2. **Copy the jar** into your server's `plugins/` folder:
 
    ```bash
-   cp build/libs/leet-helper-1.1.2.jar /path/to/server/plugins/
+   cp leet-helper-1.1.2.jar /path/to/server/plugins/
    ```
 
 3. **Start the server.** On first launch the plugin creates its data folder and writes default configuration files:
@@ -100,107 +91,9 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`).
 - **[Building & Testing](doc/BUILDING.md)** — prerequisites, Gradle commands, the output artifact, and how the version is single-sourced.
 - **[Architecture](doc/ARCHITECTURE.md)** — project structure, the feature model, config handling, storage, and the permission/Vault internals.
 
-## Configuration
-
-### config.yml
-
-Global, top-level settings.
-
-```yaml
-config-version: 1
-log-level: INFO
-```
-
-| Key | Type | Description |
-|---|---|---|
-| `config-version` | integer | Schema version of `config.yml`. On startup, any keys missing from the on-disk file are auto-added from the bundled default while preserving existing values (see [Automatic config merging on update](#automatic-config-merging-on-update)) for `config.yml`). |
-| `log-level` | `OFF`, `INFO`, `DEBUG` | Logging verbosity. See [Log Levels](#log-levels). |
-
-### Log Levels
-
-| Level | What is logged |
-|---|---|
-| `OFF` | Only critical errors (SEVERE), e.g. storage failures, feature-enable exceptions |
-| `INFO` | Startup, no-Vault notice, feature enable failures, invalid-whitelist warnings, config errors |
-| `DEBUG` | Reserved for fine-grained diagnostics; currently no extra DEBUG output is emitted beyond INFO |
-
-The `log-level` is read from `config.yml`, though most feature-related messages are logged at the `INFO`/`WARNING`/`SEVERE` level regardless.
-
-> **Console prefix & color:** startup and status messages (e.g. `[LeetHelper] Initializing LeetHelper v1.1.2`, `[LeetHelper] Enabled 4/4 feature(s).`, the Vault status) are sent to the console via the console sender with a green `[LeetHelper]` prefix. These colored lines appear in the live console but color codes are stripped from `logs/latest.log`. The automatically-printed Paper line `[LeetHelper] Enabling LeetHelper v1.1.2` and the plugin-logger `[LeetHelper]` WARN/SEVERE lines come from Paper's logger and are not recolored.
-
-> **Renaming a plugin (`name` in `plugin.yml`):** the data folder and all file paths follow the plugin's display name (now `plugins/LeetHelper/`). If you previously ran under the old name (`plugins/HelperPlugin/`), move those files across to keep existing configs and the SQLite `data.db`.
-
-### Common Feature Config Structure
-
-All features use the same layout. Feature configs live in `features/_<id>.yml`.
-
-```yaml
-base:
-  enabled: true                    # Kill switch. false = feature fully off (no listeners).
-  permission: leet.feat.<id>  # Permission node controlling access
-  default-permission: false        # true | op | false  (Bukkit permission default)
-  worlds: []                       # Empty = all worlds. Non-empty = whitelist of world names.
-  cooldown: 0                      # Seconds between uses. 0 = no cooldown.
-  message-type: ACTION_BAR         # ACTION_BAR | CHAT | TITLE
-
-feature:
-  # Feature-specific settings (see per-feature sections)
-
-messages:
-  # key: "MiniMessage formatted string"
-```
-
-#### Three-level control per feature
-
-Each feature has three independent on/off controls:
-
-1. **`base.enabled`** — server-wide kill switch. When `false`, the feature's event listeners are **not registered** at all.
-2. **`base.default-permission`** — the Bukkit default for the configured permission. Defaults to `false` (nobody can use the feature until you grant the node in your permission plugin, e.g. LuckPerms). `true` = everyone, `op` = ops only.
-3. **`base.worlds`** — per-world whitelist. If non-empty, the feature only works in the listed world names. Empty list = works everywhere.
-
-All three are checked by `check(player)` at the start of every relevant event or command. *All* must pass for the feature to act.
-
-### Message Delivery Types
-
-Messages are rendered with [MiniMessage](https://docs.advntr.dev/minimessage/format.html) and delivered according to `base.message-type`:
-
-| Value | Delivery |
-|---|---|
-| `ACTION_BAR` | Sent to the player's action bar (default) |
-| `CHAT` | Sent to chat |
-| `TITLE` | Shown as a title (200ms fade-in, 2s stay, 500ms fade-out) |
-
-A missing or empty message template silently produces no message.
-
-#### Automatic config merging on update
-
-Every config — the global `config.yml` **and** each feature file under `features/` — is merged against the bundled default at startup. Any default keys that are missing from the on-disk file are added (and the file saved), while the server admin's existing values are left untouched. Consequences:
-
-- Updating the jar automatically brings new options (e.g. `require-hoe`) into existing configs.
-- Deleting a key yourself will NOT persist — it is restored from the default on the next start.
-- Removing a key is done by overriding its value (or by setting it to a value equivalent to the default), not by deleting it.
-
----
-
-### Per-Feature Configs
-
-Full per-feature behavior, config files, and key tables live in **[doc/features/](doc/features/README.md)** — one document per feature.
-
-| Feature | Config file | Reference |
-|---|---|---|
-| Double Jump | `_double_jump.yml` | [feature-double-jump](doc/features/double-jump.md) |
-| Durability | `_durability.yml` | [feature-durability](doc/features/durability.md) |
-| Auto Crop | `_auto_crop.yml` | [feature-auto-crop](doc/features/auto-crop.md) |
-| Back | `_back.yml` | [feature-back](doc/features/back.md) |
-| Tree Feller | `_tree_feller.yml` | [feature-tree-feller](doc/features/tree-feller.md) |
-| Fall Damage | `_fall_damage.yml` | [feature-fall-damage](doc/features/fall-damage.md) |
-| XP | `_xp.yml` | [feature-xp](doc/features/xp.md) |
-
----
-
 ## Permissions
 
-Admin permissions for `/leeta` are in **[doc/Admin.md](doc/Admin.md)**. Each gameplay feature's `leet.feat.*` permission is documented in its own feature document (index: [doc/features/README.md](doc/features/README.md)).
+Admin permissions for `/leeta` are in **[doc/Admin.md](doc/Admin.md)**. Each gameplay feature's `leet.feat.*` permission is documented in its own feature document (index: [doc/features/](doc/features/)).
 
 ### Admin Permissions (`/leeta`)
 
@@ -226,22 +119,12 @@ Declared in `plugin.yml` on the commands themselves:
 
 ### Feature Permissions (dynamic)
 
-Feature permissions are **not** declared in `plugin.yml`. Instead, `HelperPlugin` registers them at runtime from each feature's config: on every startup it calls `Bukkit.getPluginManager().addPermission()` with the node from `base.permission` and the default from `base.default-permission`. Each node is documented in its feature doc's **Permissions** section.
-
-| Permission | Default (from config) | Feature doc |
-|---|---|---|
-| `leet.feat.double_jump` | false | [Double Jump](doc/features/double-jump.md) |
-| `leet.feat.durability` | false | [Durability](doc/features/durability.md) |
-| `leet.feat.auto_crop` | false | [Auto Crop](doc/features/auto-crop.md) |
-| `leet.feat.back` | false | [Back](doc/features/back.md) |
-| `leet.feat.tree_feller` | false | [Tree Feller](doc/features/tree-feller.md) |
-| `leet.feat.fall_damage` | false | [Fall Damage](doc/features/fall-damage.md) |
-| `leet.feat.xp` | false | [XP](doc/features/xp.md) |
+Feature permissions are **not** declared in `plugin.yml`. Instead, `HelperPlugin` registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()`, using each feature's `base.permission` node and `base.default-permission`. Every feature permission follows the pattern `leet.feat.<id>` (e.g. `leet.feat.double_jump`), and all default to `false`. Each feature doc lists its exact node — see the **Permissions** section of each feature in the [feature list](#overview).
 
 `base.default-permission` maps to a Bukkit default:
 - `true` → `PermissionDefault.TRUE` (every player)
 - `op` → `PermissionDefault.OP` (ops only)
-- `false` → `PermissionDefault.FALSE` (nobody)
+- `false` → `PermissionDefault.FALSE` (nobody, the default)
 
 **How permission checks happen:** checks use Bukkit's `player.hasPermission(permission)` everywhere. Feature permissions are moderately standard Bukkit permission nodes, so they integrate with LuckPerms, PEX, GroupManager, etc. Even with Vault installed, the plugin does **not** route permission lookups through Vault's `Permission` provider — the Vault permission provider is resolved at startup but currently unused.
 
@@ -297,50 +180,9 @@ Player-side feature toggles. Each player can turn supported features **off for t
 
 ---
 
-## Features
-
-Detailed behavior, config keys, and limitations for each feature are documented in **[doc/features/](doc/features/README.md)** — one document per feature:
-
-- [Double Jump](doc/features/double-jump.md) — mid-air double jump
-- [Durability](doc/features/durability.md) — durability multiplier on whitelisted items
-- [Auto Crop](doc/features/auto-crop.md) — batch crop harvesting
-- [Back](doc/features/back.md) — death teleportation
-- [Tree Feller](doc/features/tree-feller.md) — whole-tree felling
-- [Fall Damage](doc/features/fall-damage.md) — fall-damage immunity
-- [XP](doc/features/xp.md) — bonus XP from actions
-
----
-
 ## Storage & Economy
 
 The storage layers (runtime in-memory and persistent SQLite `data.db`) and the optional Vault income integration are covered in the **[Architecture](doc/ARCHITECTURE.md)** doc.
-
----
-
-## Troubleshooting
-
-| Symptom | Likely cause / fix |
-|---|---|
-| Plugin doesn't load on start | Server is not Paper 26.2+, or the JVM is older than Java 26. Check console for a version mismatch. |
-| Feature config changes have no effect | Feature configs are read at startup; there is **no reload command**. Restart the server. |
-| `/leeta` not recognized / "unknown command" | The `leeta` command permission (`leet.admin`) is `op` by default — grant it or run as op. |
-| Durability whitelist warnings at startup | `Invalid material in durability whitelist:` — an entry in the on-disk `features/_durability.yml` whitelist is not a valid `Material` name (e.g. leftover `STEEL_*` or `HELMET`) and is being ignored. Remove it or use the correct enum name (see the note in [Durability](doc/features/durability.md)). |
-| Feature cost not charged | Vault is not installed, or no economy provider is registered. Without Vault the cost feature is silently disabled. |
-| Death locations reset on restart | The `data.db` file was deleted/moved, or the SQLite connection failed to initialize (SEVERE log). |
-| `data.db` not created | Check the startup logs for `Failed to initialize SQLite`. The plugin degrades gracefully (Back feature won't persist). |
-| DoubleJump not triggering | Check game mode (Creative/Spectator excluded), `double_jump` cooldown (1s default), or the permission/world whitelist. |
-
----
-
-## Known Limitations
-
-- **No reload command** — config file changes require a restart. Only `/leeta toggle` can change `base.enabled` live.
-- **`config-version` is informational only** — the merge adds missing keys regardless of the version value; it never removes or rewrites existing keys.
-- **Vault permission provider is unused** — permission checks are Bukkit-native even with Vault installed.
-- **No admin bypass** for feature cooldowns/costs (e.g. Back cooldown/cost/max-age).
-- **No bStats** — sends zero analytics/metrics telemetry.
-- **Auto Crop scan is server-thread** — large radii can be expensive on busy worlds.
-- **No unit tests** — verification is manual on a Paper server.
 
 ---
 

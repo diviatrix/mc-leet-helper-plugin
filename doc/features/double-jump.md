@@ -1,6 +1,6 @@
 # Feature: Double Jump
 
-> Common `base:`/`messages:` config layout and control model: [README](../README.md#common-feature-config-structure) · Admin: [Admin.md](../Admin.md) · All features: [index](README.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
 Allows a mid-air double jump. Config file `features/_double_jump.yml`.
 

@@ -1,6 +1,6 @@
 # Feature: XP
 
-> Common `base:`/`messages:` config layout and control model: [README](../README.md#common-feature-config-structure) · Admin: [Admin.md](../Admin.md) · All features: [index](README.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
 Grants bonus **vanilla** XP for various in-game actions (no custom entity or XP pool — it adds directly to the player's XP bar via `player.giveExp`). Config file `features/_xp.yml`. **Effort-based balance:** the easiest, spammable action (building) pays a baseline of 1 XP per block, while the more-effortful jobs (mining, woodcutting, fishing, killing) pay more per action — all adjustable per material/mob below.
 
