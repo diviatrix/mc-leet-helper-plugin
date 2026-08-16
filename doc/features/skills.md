@@ -10,9 +10,9 @@ A **skill tree** opened with `/skills`. Stamina sits at the center; the eight pa
 - Set `base.default-permission` in `skills.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
 
 **UX flow**
-- `/skills` → skill tree (Stamina centered; ring of 8 only when Stamina is maxed).
+- `/skills` → skill tree (Stamina centered; ring of 8 only when Stamina is maxed). A bottom-center **Exit** button (door) or `ESC` closes the skills menu.
 - Click a skill → detail screen (description + Level Up). Hover any skill shows name, `Level x/10`, and the XP cost of the next level.
-- Click Level Up → if you have enough total XP, an **Apply / Back** confirm screen; Apply deducts XP and advances one level. Without enough XP you get the `insufficient-xp` message and stay.
+- Click Level Up → if you have enough total XP, an **Apply / Back** confirm screen; Apply deducts XP and advances one level. When you can't afford the next level, the Level Up button shows a red **X** instead of the potion (and clicking it sends the `insufficient-xp` message and stays).
 
 **Leveling**
 - Each skill starts at 0 and maxes at `max-level` (10). Per-skill `exp` list: entry *i* = XP to go from level *i* to *i+1* (a table per skill in `skills.yml`).

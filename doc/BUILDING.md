@@ -21,9 +21,9 @@ How to compile and package LeetHelper from source. This is **optional** — the 
 ./gradlew compileJava
 ```
 
-**Output artifact:** `build/libs/leet-helper-1.1.3.jar`
+**Output artifact:** `build/libs/leet-helper-<version>.jar`
 
-> **Version is single-sourced:** the release version lives in **`build.gradle.kts`** (`version = "1.1.3"`). It drives both the jar filename and the `version` injected into the packaged `plugin.yml` at build time — bump it in exactly one place.
+> **Version is single-sourced:** the release version lives in **`build.gradle.kts`** (the `version` property). It drives both the jar filename and the `version` injected into the packaged `plugin.yml` at build time — bump it in exactly one place.
 
 > **First build note:** the paperweight plugin downloads and runs a Paper server JAR to produce the remapped API (~40s). Subsequent builds are cached and faster.
 

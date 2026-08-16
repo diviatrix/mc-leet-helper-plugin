@@ -2,10 +2,6 @@
 
 A **Paper 26.2** plugin providing modular gameplay features. Each feature has its own on-disk YAML config, its own permission node, per-world whitelisting, optional cooldowns, and an optional per-use Vault economy cost.
 
-Licensed under **CC0 1.0** (public domain) — see [LICENSE](LICENSE).
-
----
-
 ## Table of Contents
 
 - [Overview](#overview)
@@ -58,13 +54,9 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`);
 
 ## Installation
 
-1. **Download the jar** from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases) page (e.g. `leet-helper-1.1.3.jar`). Building from source is optional — see [Building from Source](doc/BUILDING.md).
-2. **Copy the jar** into your server's `plugins/` folder:
-
-   ```bash
-   cp leet-helper-1.1.3.jar /path/to/server/plugins/
-   ```
-
+1. **Download the jar** from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases).
+  Building from source is optional — see [Building from Source](doc/BUILDING.md).
+2. **Copy the jar** into your server's `plugins/` folder.
 3. **Start the server.** On first launch the plugin creates its data folder and writes default configuration files:
 
    ```
