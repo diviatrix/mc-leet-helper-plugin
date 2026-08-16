@@ -17,8 +17,12 @@ commands:
     permission: leet.feat.back
   leet:
     description: Toggle features on/off for yourself
-    usage: /leet <list|dj|crop|tree|fall|xp>
+    usage: /leet <list|dj|crop|tree|fall|xp|skills>
     aliases: []
+  skills:
+    description: Open the skill tree
+    usage: /skills
+    permission: leet.feat.skills
 
 permissions:
   leet.admin:

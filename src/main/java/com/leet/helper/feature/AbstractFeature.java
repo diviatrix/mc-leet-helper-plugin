@@ -127,6 +127,15 @@ public abstract class AbstractFeature implements Listener {
         return true;
     }
 
+    /**
+     * Public alias of {@link #check} used by other features to ask whether this
+     * feature currently applies to a player (e.g. whether the tree_feller feature
+     * would also act, so the lumberjack skill can avoid double-felling).
+     */
+    public boolean appliesTo(Player player) {
+        return check(player);
+    }
+
     public boolean checkCooldown(UUID uuid) {
         if (cooldownSeconds <= 0) return true;
         long lastUse = plugin.storageManager().getRuntime(featureId(), "cooldown", uuid, 0);

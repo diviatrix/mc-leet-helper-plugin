@@ -229,3 +229,15 @@ Sequential steps. Each must be completed and verified before moving to the next.
 - Test toggle persistence: /helper toggle → restart → verify state
 - Test with Vault absent: plugin loads, economy features gracefully disabled
 - Verify: no console errors, all features functional
+
+---
+
+## STEP 18: Skills feature
+
+- Create `src/main/java/com/leet/helper/feature/skills/` (SkillConfig, SkillState, SkillsGui) and `SkillsFeature.java` (`featureId` `"skills"`)
+- Extract shared helpers: `feature/TreeFellerUtil.java` and `feature/AutoCropUtil.java`; refactor TreeFellerFeature + AutoCropFeature to use them (skills lumberjack/farmer reuse the same protection-respecting loops)
+- `/skills` command (`SkillsCommand`) opens the skill-tree GUI: Stamina centered, 8 passive skills unlock around it once Stamina maxes; detail + Apply/Back confirm screens
+- Leveling spends **vanilla XP points** (`getTotalExperience()`/`giveExp(-cost)`); per-skill exp tables in `features/skills.yml`; levels persisted in SQLite kv_store
+- Passives: stamina (hunger drain + regen), lumberjack/miner/farmer (extra drops; L10 tree-feller/auto-crop stand down when Tree Feller/Auto Crop features are active), builder (no-consume on placement), animalist (wool/milk; L10 extra baby), fisherman (extra + quality catch), warrior (damage reduction), explorer (walk speed; L10 fall nullify)
+- Wire into Core (`saveResourceIfMissing` + register feature/command), plugin.yml, LeetCommand `/leet skills` alias
+- Verify: ./gradlew build; on server grant `leet.feat.skills`, `/skills` opens tree, leveling spends XP and persists across restart, ring unlocks at Stamina 10, each passive behaves, `/leet skills` toggles it off

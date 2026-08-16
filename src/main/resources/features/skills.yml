@@ -1,0 +1,299 @@
+base:
+  enabled: true
+  permission: leet.feat.skills
+  default-permission: false
+  worlds: []
+  cooldown: 0
+  message-type: ACTION_BAR
+
+feature:
+  gui:
+    title: "Skills"
+    # Inventory height in rows (4-9). The skill ring needs at least 4.
+    rows: 6
+
+  # Shared limits used by the level-10 unlock skills.
+  tree-feller:
+    # Cap on how many logs lumberjack level 10 may fell in one go.
+    max-blocks: 100
+  auto-crop:
+    # Radius (blocks) the farmer level-10 field harvest extends.
+    radius: 3
+    require-mature: true
+  defense:
+    # Warrior damage reduction is capped at this percent (level-gradient below).
+    max-pct: 50
+
+  # Each skill is a generic body: name/icon/max-level/exp/lore plus an
+  # `effects` list. Every effect is either a numeric "per-level" increment
+  # (current value = level x per-level) or a level-gated "unlock-at" (toggle).
+  # The skill tree shows each effect as its own icon with the current modifier.
+  skills:
+    stamina:
+      name: "Stamina"
+      icon: GOLDEN_APPLE
+      max-level: 10
+      exp: [50, 75, 110, 160, 220, 300, 400, 520, 660, 820]
+      effects:
+        hunger:
+          name: "Hunger drain slow-down"
+          icon: BREAD
+          per-level: 10     # +10%/level; level 10 = food lasts 2x longer
+        regen:
+          name: "Health regen boost"
+          icon: APPLE
+          per-level: 10     # +10%/level; level 10 = regen 2x faster
+      lore:
+        - "Reduces hunger drain"
+        - "Speeds health regeneration"
+        - "Each level is +10% effect; at level 10"
+        - "hunger lasts twice as long and"
+        - "regeneration is twice as fast."
+
+    lumberjack:
+      name: "Lumberjack"
+      icon: OAK_SAPLING
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      logs:
+        - OAK_LOG
+        - SPRUCE_LOG
+        - BIRCH_LOG
+        - JUNGLE_LOG
+        - ACACIA_LOG
+        - DARK_OAK_LOG
+        - MANGROVE_LOG
+        - CHERRY_LOG
+        - PALE_OAK_LOG
+        - CRIMSON_STEM
+        - WARPED_STEM
+      effects:
+        extra-block:
+          name: "Bonus log drop"
+          icon: OAK_LOG
+          per-level: 10     # 100% at level 10
+        apple:
+          name: "Apple drop"
+          icon: APPLE
+          per-level: 1      # 10% at level 10
+        golden-apple:
+          name: "Golden apple drop"
+          icon: GOLDEN_APPLE
+          per-level: 0.1    # 1% at level 10
+        tree-feller:
+          name: "Whole-tree feller"
+          icon: DIAMOND_AXE
+          unlock-at: 10
+      lore:
+        - "+10%/level bonus log drop"
+        - "+1%/level apple drop"
+        - "+0.1%/level golden apple drop"
+        - "Level 10: fell whole trees (unless the"
+        - "Tree Feller feature is toggled on for you)."
+
+    miner:
+      name: "Miner"
+      icon: DIAMOND
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      blocks:
+        - STONE
+        - COBBLESTONE
+        - DEEPSLATE
+        - COBBLED_DEEPSLATE
+        - TUFF
+        - GRANITE
+        - DIORITE
+        - ANDESITE
+        - NETHERRACK
+        - COAL_ORE
+        - DEEPSLATE_COAL_ORE
+        - COPPER_ORE
+        - DEEPSLATE_COPPER_ORE
+        - IRON_ORE
+        - DEEPSLATE_IRON_ORE
+        - GOLD_ORE
+        - DEEPSLATE_GOLD_ORE
+        - NETHER_GOLD_ORE
+        - REDSTONE_ORE
+        - DEEPSLATE_REDSTONE_ORE
+        - LAPIS_ORE
+        - DEEPSLATE_LAPIS_ORE
+        - DIAMOND_ORE
+        - DEEPSLATE_DIAMOND_ORE
+        - EMERALD_ORE
+        - DEEPSLATE_EMERALD_ORE
+        - ANCIENT_DEBRIS
+      effects:
+        extra-block:
+          name: "Bonus block drop"
+          icon: IRON_ORE
+          per-level: 2.5    # 25% at level 10
+      lore:
+        - "+2.5%/level chance the mined block"
+        - "drops a second block (25% at level 10)."
+
+    farmer:
+      name: "Farmer"
+      icon: WHEAT
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      crops:
+        - WHEAT
+        - CARROTS
+        - POTATOES
+        - BEETROOTS
+        - NETHER_WART
+        - COCOA
+        - SWEET_BERRY_BUSH
+      effects:
+        extra-drop:
+          name: "Extra crop drop"
+          icon: WHEAT
+          per-level: 5      # 50% at level 10
+        seed:
+          name: "Bonus seed"
+          icon: WHEAT_SEEDS
+          per-level: 1      # 10% at level 10
+        auto-crop:
+          name: "Auto-harvest field"
+          icon: GREEN_DYE
+          unlock-at: 10
+      lore:
+        - "+5%/level chance for an extra crop drop"
+        - "+1%/level chance for a bonus seed"
+        - "Level 10: auto-harvest nearby crops (unless the"
+        - "Auto Crop feature is toggled on for you)."
+
+    builder:
+      name: "Builder"
+      icon: STONE_BRICKS
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      blocks:
+        - OAK_PLANKS
+        - SPRUCE_PLANKS
+        - BIRCH_PLANKS
+        - JUNGLE_PLANKS
+        - ACACIA_PLANKS
+        - DARK_OAK_PLANKS
+        - MANGROVE_PLANKS
+        - CHERRY_PLANKS
+        - PALE_OAK_PLANKS
+        - CRIMSON_PLANKS
+        - WARPED_PLANKS
+        - COBBLESTONE
+        - COBBLED_DEEPSLATE
+        - STONE
+        - STONE_BRICKS
+      effects:
+        no-consume:
+          name: "Keep placed block"
+          icon: BRICKS
+          per-level: 2.5    # 25% at level 10
+      lore:
+        - "+2.5%/level chance a placed block is"
+        - "not consumed from your inventory"
+        - "(25% at level 10, wood & stone blocks)."
+
+    animalist:
+      name: "Animalist"
+      icon: SHEARS
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      effects:
+        extra-gather:
+          name: "Bonus gathering"
+          icon: SHEARS
+          per-level: 2.5    # 25% at level 10
+        breed:
+          name: "Extra baby on breeding"
+          icon: SHEEP_SPAWN_EGG
+          unlock-at: 10
+          unlock-value: 10  # 10% chance at level 10
+      lore:
+        - "+2.5%/level chance for bonus wool"
+        - "or milk when gathering"
+        - "Level 10: +10% chance of an extra"
+        - "baby when breeding animals."
+
+    fisherman:
+      name: "Fisherman"
+      icon: TROPICAL_FISH
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      bonus-items:
+        - COD
+        - SALMON
+        - TROPICAL_FISH
+        - PUFFERFISH
+      quality-items:
+        - BOW
+        - FISHING_ROD
+        - NAMETAG
+        - SADDLE
+        - NAUTILUS_SHELL
+        - BOOK
+      effects:
+        extra-catch:
+          name: "Bonus catch"
+          icon: COD
+          per-level: 2.5    # 25% at level 10
+        quality:
+          name: "Higher-tier catch"
+          icon: ENCHANTED_BOOK
+          per-level: 1      # 10% at level 10
+      lore:
+        - "+2.5%/level chance of an extra catch"
+        - "+1%/level chance of a higher-tier catch"
+
+    warrior:
+      name: "Warrior"
+      icon: SPIDER_EYE
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      # Damage causes that ignore the warrior reduction (environmental/self).
+      ignored-causes:
+        - FALL
+        - VOID
+        - SUICIDE
+        - CUSTOM
+        - DROWNING
+        - FIRE
+        - FIRE_TICK
+        - LAVA
+        - POISON
+        - WITHER
+        - STARVATION
+      effects:
+        damage-reduction:
+          name: "Damage reduction"
+          icon: IRON_SWORD
+          per-level: 2      # 20% at level 10 (capped by feature.defense.max-pct)
+      lore:
+        - "+2% damage taken reduced per level"
+        - "(20% at level 10, capped by feature.defense.max-pct)."
+
+    explorer:
+      name: "Explorer"
+      icon: LANTERN
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      effects:
+        speed:
+          name: "Walk speed"
+          icon: LEATHER_BOOTS
+          per-level: 2      # +20% at level 10
+        fall-nullify:
+          name: "Fall damage immunity"
+          icon: FEATHER
+          unlock-at: 10
+      lore:
+        - "+2% walk speed per level"
+        - "Level 10: nullify all fall damage."
+
+messages:
+  feature-off: "<red>Skills are currently off for you."
+  insufficient-xp: "<red>Not enough XP (need <needed>)."
+  max-level: "<green><skill> is already at max level."
+  level-up: "<green><skill> is now level <level>!<reset> (-<cost> XP)"

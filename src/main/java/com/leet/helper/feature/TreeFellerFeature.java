@@ -10,16 +10,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
 public class TreeFellerFeature extends AbstractFeature {
-
-    private static final int[] DX = {0, 0, 0, 0, 1, -1};
-    private static final int[] DY = {1, -1, 0, 0, 0, 0};
-    private static final int[] DZ = {0, 0, 1, -1, 0, 0};
 
     private Set<Material> logs;
     private int maxBlocks;
@@ -66,49 +60,14 @@ public class TreeFellerFeature extends AbstractFeature {
 
         ItemStack tool = player.getInventory().getItemInMainHand();
 
-        // Component search over the log blocks so the whole trunk and any
-        // branches come down together, not just the single broken log. The
-        // origin block (already handled by the vanilla break) is excluded so it
-        // is not re-broken / re-dropped.
-        Set<Block> toBreak = findConnectedLogs(broken);
-
+        // Fell the whole connected log cluster (shared helper). The origin
+        // block is excluded (already handled by the vanilla break) so it is not
+        // re-broken / re-dropped.
         felling = true;
         try {
-            for (Block block : toBreak) {
-                breakIfAllowed(player, block, tool);
-            }
+            TreeFellerUtil.fell(this, player, broken, logs, maxBlocks, tool);
         } finally {
             felling = false;
         }
-    }
-
-    /**
-     * Breadth-first search that collects every adjacent log block connected to
-     * the broken one (6-directional), excluding the origin. Stops early once
-     * the configured max-blocks cap is reached so a giant tree can't trigger an
-     * unbounded chain of block breaks.
-     */
-    private Set<Block> findConnectedLogs(Block start) {
-        Set<Block> result = new HashSet<>();
-        Set<Block> visited = new HashSet<>();
-        Deque<Block> queue = new ArrayDeque<>();
-
-        visited.add(start);
-        queue.add(start);
-
-        while (!queue.isEmpty()) {
-            if (result.size() >= maxBlocks) break;
-            Block current = queue.poll();
-            for (int i = 0; i < 6; i++) {
-                Block neighbor = current.getRelative(DX[i], DY[i], DZ[i]);
-                if (!logs.contains(neighbor.getType())) continue;
-                if (result.size() >= maxBlocks) break;
-                if (visited.add(neighbor)) {
-                    result.add(neighbor);
-                    queue.add(neighbor);
-                }
-            }
-        }
-        return result;
     }
 }

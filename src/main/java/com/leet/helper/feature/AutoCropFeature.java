@@ -3,7 +3,6 @@ package com.leet.helper.feature;
 import com.leet.helper.Core;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.Ageable;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -63,9 +62,9 @@ public class AutoCropFeature extends AbstractFeature {
         Block broken = event.getBlock();
         Material type = broken.getType();
         if (!materials.contains(type)) return;
-        if (requireMature && !isMature(broken)) return;
+        if (requireMature && !AutoCropUtil.isMature(broken)) return;
 
-        if (requireHoe && !isHoe(player.getInventory().getItemInMainHand())) return;
+        if (requireHoe && !AutoCropUtil.isHoe(player.getInventory().getItemInMainHand())) return;
 
         if (!chargeUse(player)) return;
 
@@ -75,30 +74,9 @@ public class AutoCropFeature extends AbstractFeature {
         try {
             // Square on the horizontal plane, one block high: only the same Y
             // level as the broken crop is harvested (a plant grows one high).
-            for (int x = -radius; x <= radius; x++) {
-                for (int z = -radius; z <= radius; z++) {
-                    if (x == 0 && z == 0) continue;
-                    Block nearby = broken.getRelative(x, 0, z);
-                    if (nearby.getType() != type) continue;
-                    if (requireMature && !isMature(nearby)) continue;
-                    breakIfAllowed(player, nearby, tool);
-                }
-            }
+            AutoCropUtil.harvestRadius(this, player, broken, type, radius, requireMature, tool);
         } finally {
             harvesting = false;
         }
-    }
-
-    private boolean isMature(Block block) {
-        if (!(block.getBlockData() instanceof Ageable ageable)) return false;
-        return ageable.getAge() == ageable.getMaximumAge();
-    }
-
-    private boolean isHoe(ItemStack item) {
-        if (item == null || !item.getType().name().endsWith("_HOE")) return false;
-        return switch (item.getType().name()) {
-            case "WOODEN_HOE", "STONE_HOE", "IRON_HOE", "GOLDEN_HOE", "DIAMOND_HOE", "NETHERITE_HOE" -> true;
-            default -> false;
-        };
     }
 }

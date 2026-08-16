@@ -3,7 +3,9 @@ package com.leet.helper;
 import com.leet.helper.command.BackCommand;
 import com.leet.helper.command.HelperCommand;
 import com.leet.helper.command.LeetCommand;
+import com.leet.helper.command.SkillsCommand;
 import com.leet.helper.feature.*;
+import com.leet.helper.feature.skills.SkillsFeature;
 import com.leet.helper.storage.StorageManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.milkbowl.vault.economy.Economy;
@@ -43,6 +45,7 @@ public class Core extends JavaPlugin {
         saveResourceIfMissing("features/tree_feller.yml");
         saveResourceIfMissing("features/fall_damage.yml");
         saveResourceIfMissing("features/xp.yml");
+        saveResourceIfMissing("features/skills.yml");
 
         storageManager = new StorageManager(getDataFolder(), getLogger());
 
@@ -56,6 +59,7 @@ public class Core extends JavaPlugin {
         featureManager.register(new TreeFellerFeature(this));
         featureManager.register(new FallDamageFeature(this));
         featureManager.register(new XpFeature(this));
+        featureManager.register(new SkillsFeature(this));
         featureManager.enableAll();
 
         getCommand("leeta").setExecutor(new HelperCommand(this));
@@ -63,6 +67,7 @@ public class Core extends JavaPlugin {
         getCommand("back").setExecutor(new BackCommand(this));
         getCommand("leet").setExecutor(new LeetCommand(this));
         getCommand("leet").setTabCompleter(new LeetCommand(this));
+        getCommand("skills").setExecutor(new SkillsCommand(this));
 
         registerFeaturePermissions();
 

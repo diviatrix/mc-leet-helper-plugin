@@ -29,10 +29,18 @@ src/main/
       TreeFellerFeature.java     # Whole-tree felling implementation
       FallDamageFeature.java     # Fall-damage immunity implementation
       XpFeature.java             # Bonus XP for actions implementation
+      SkillsFeature.java         # XP-spending skill tree with passive skills
+      TreeFellerUtil.java        # Shared whole-tree felling (Tree Feller + lumberjack)
+      AutoCropUtil.java          # Shared auto-harvest (Auto Crop + farmer)
+      skills/
+        SkillConfig.java         # Data-driven per-skill definition
+        SkillState.java          # Per-player skill-level persistence
+        SkillsGui.java           # The /skills inventory interface
     command/
       HelperCommand.java         # /leeta list|toggle|info (+ tab completion)
       BackCommand.java           # /back
       LeetCommand.java           # /leet player feature toggles (+ tab completion)
+      SkillsCommand.java         # /skills (opens the skill tree)
     storage/
       StorageManager.java        # Runtime (in-memory) + persistent (SQLite) storage
     util/
@@ -48,6 +56,7 @@ src/main/
       tree_feller.yml
       fall_damage.yml
       xp.yml
+      skills.yml
 ```
 
 `Core` boots the plugin, resolves Vault (Economy + Permission providers, both optional), and registers the feature permissions dynamically. `FeatureManager` owns the feature registry and the enable/disable/toggle lifecycle.
@@ -69,6 +78,12 @@ Every gameplay feature extends `AbstractFeature`. The base class provides the sh
 ### Multi-block breakers and protection plugins
 
 `AutoCropFeature` and `TreeFellerFeature` break many blocks per action. They run at `EventPriority.MONITOR` (so a protection plugin's cancellation of the original break is already visible) and route each additional block through `AbstractFeature.breakIfAllowed(player, block, tool)`, which fires a per-block `BlockBreakEvent` so claim/region plugins (GriefPrevention, WorldGuard, ...) are consulted per block. Protected blocks are skipped rather than force-broken.
+
+The two gather loops are extracted into `TreeFellerUtil` and `AutoCropUtil` (same package, so they can call `breakIfAllowed`) and are reused by the **lumberjack** and **farmer** skills — both features use the same helpers and the same protection-respecting `breakIfAllowed` path. Like the features, the level-10 unlock behaviours run at `MONITOR` behind a reentrancy guard (`felling` / `harvesting`) and skip their unlock when the matching standalone feature is already active for the player (`appliesTo`).
+
+### SkillsFeature is GUI-driven
+
+Unlike the other features, `SkillsFeature` does most of its player-facing work through an inventory GUI rather than a command response. `/skills` (via `SkillsCommand`) calls `SkillsFeature.openTree`, which delegates to `SkillsGui`. All skill trees/click handling live in `SkillsGui` (registered listener stays on the feature so `AbstractFeature`'s enable/disable lifecycle is respected); `SkillsFeature` implements the passive effects and the leveling (spending vanilla XP points via `player.getTotalExperience()` / `giveExp(-cost)`). A per-player `SkillState` caches levels in memory.
 
 ---
 
@@ -130,6 +145,7 @@ Each feature's config file and its reference doc:
 | Tree Feller | `tree_feller.yml` | [feature-tree-feller](features/tree-feller.md) |
 | Fall Damage | `fall_damage.yml` | [feature-fall-damage](features/fall-damage.md) |
 | XP | `xp.yml` | [feature-xp](features/xp.md) |
+| Skills | `skills.yml` | [feature-skills](features/skills.md) |
 
 ### Automatic config merging (backfill)
 
@@ -172,7 +188,7 @@ Because feature permissions are denied by default and gated by `leet.feat.<id>`,
   ```
 
 - **Survives restarts.**
-- Used for **Back** death locations (JSON payloads), persistent cooldowns, per-player `/leet` feature toggles (`feature_id` = feature, `key` = `user-toggle`, `value` = `true`/`false`; absent = enabled), and (for XP, when configured) placed-block tracking.
+- Used for **Back** death locations (JSON payloads), persistent cooldowns, per-player `/leet` feature toggles (`feature_id` = feature, `key` = `user-toggle`, `value` = `true`/`false`; absent = enabled), (for XP, when configured) placed-block tracking, and **Skills** player levels (`feature_id` = skills, `key` = `levels`, `value` = Gson map of skill id → level).
 - Uses Bukkit's bundled SQLite JDBC (`jdbc:sqlite:...`). No external driver needed.
 
 > **Backups:** `data.db` is written by the plugin. Backing it up preserves saved death locations and player toggle preferences. Deleting it clears all of that state.
