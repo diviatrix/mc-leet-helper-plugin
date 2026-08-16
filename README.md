@@ -11,8 +11,7 @@ Licensed under **CC0 1.0** (public domain) — see [LICENSE](LICENSE).
 - [Overview](#overview)
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Permissions](#permissions)
-  - [Feature Permissions](#feature-permissions-dynamic)
+- [Permissions](doc/permissions.md)
 - [Commands](#commands)
   - [/leeta](#leeta)
   - [/back](#back)
@@ -89,20 +88,7 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`);
 
 ## Permissions
 
-Admin permissions for `/leeta` (`leet.admin.*`) are declared statically in `plugin.yml` and documented in **[doc/Admin.md](doc/Admin.md)**. Each gameplay feature's `leet.feat.*` permission is documented in its own feature document (index: [doc/features/](doc/features/)).
-
-### Feature Permissions (dynamic)
-
-Feature permissions are **not** declared in `plugin.yml` (unlike the admin `/leeta` permissions above). Instead, `Core` registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()`, using each feature's `base.permission` node and `base.default-permission`. Every feature permission follows the pattern `leet.feat.<id>` (e.g. `leet.feat.double_jump`), and all default to `false`.
-
-`base.default-permission` maps to a Bukkit default:
-- `true` → `PermissionDefault.TRUE` (every player)
-- `op` → `PermissionDefault.OP` (ops only)
-- `false` → `PermissionDefault.FALSE` (nobody, the default)
-
-**How permission checks happen:** checks use Bukkit's `player.hasPermission(permission)` everywhere. Feature permissions are moderately standard Bukkit permission nodes, so they integrate with LuckPerms, PEX, GroupManager, etc. Even with Vault installed, the plugin does **not** route permission lookups through Vault's `Permission` provider — the Vault permission provider is resolved at startup but currently unused.
-
-> **Restart required for permission changes:** because feature permissions are registered once at startup, editing `base.permission` or `base.default-permission` requires a server restart (or replugin) to take effect.
+See **[doc/permissions.md](doc/permissions.md)** — the admin `/leeta` permissions (`leet.admin.*`) declared statically in `plugin.yml`, and the dynamic per-feature `leet.feat.*` permissions registered at runtime.
 
 ---
 
@@ -148,7 +134,7 @@ Player-side feature toggles. Each player can turn supported features **off for t
 - The command is only available to players who have at least **one** `leet.feat.<id>` permission. If a player has **none**, `/leet` reports `No permission.` and does nothing (including `list`, and no tab completion).
 - Tab completion and the status list only show the features the player is actually permissioned for.
 - Toggling a feature still checks that feature's permission (e.g. `leet.feat.double_jump`); without it, `/leet <sub>` is declined.
-- Because these features default to `false`, `/leet` is **not** available out of the box — a player must be granted at least one feature permission first (see [Feature Permissions](#feature-permissions-dynamic)). Grant e.g. `leet.feat.double_jump`, `leet.feat.auto_crop`, `leet.feat.tree_feller`, or `leet.feat.fall_damage` in your permission plugin to unlock the corresponding `/leet` subcommands.
+- Because these features default to `false`, `/leet` is **not** available out of the box — a player must be granted at least one feature permission first (see [Permissions](doc/permissions.md)). Grant e.g. `leet.feat.double_jump`, `leet.feat.auto_crop`, `leet.feat.tree_feller`, or `leet.feat.fall_damage` in your permission plugin to unlock the corresponding `/leet` subcommands.
 
 **How the toggle applies:** a player's off-toggle adds a layer inside `AbstractFeature.check()` (server enabled → base permission → personal toggle → world whitelist). When off, the feature stops firing for that player only; other players and the rest of the config are unaffected.
 

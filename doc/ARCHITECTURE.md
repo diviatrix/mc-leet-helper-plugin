@@ -147,7 +147,7 @@ Every config — the global `config.yml` **and** each feature file — is merged
 - **Feature permissions** (`leet.feat.<id>`) are **not** in `plugin.yml`. `Core` registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()` using the node from `base.permission` and the default from `base.default-permission`. Hence **config changes to permissions require a restart.**
 - **Checks** use Bukkit's `player.hasPermission(permission)` everywhere. Even with Vault installed, the plugin does **not** route permission lookups through Vault's `Permission` provider — that provider is resolved at startup but unused.
 
-Because feature permissions are denied by default and gated by `leet.feat.<id>`, every feature needs an explicit grant (e.g. LuckPerms) before it does anything. See [Feature Permissions](../README.md#feature-permissions-dynamic) in the README for the per-feature table and `/leet` model.
+Because feature permissions are denied by default and gated by `leet.feat.<id>`, every feature needs an explicit grant (e.g. LuckPerms) before it does anything. See [Permissions](permissions.md) for the per-feature table and `/leet` model.
 
 ---
 
