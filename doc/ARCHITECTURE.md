@@ -150,6 +150,7 @@ Each feature's config file and its reference doc:
 | Fall Damage | `fall_damage.yml` | [feature-fall-damage](features/fall-damage.md) |
 | XP | `xp.yml` | [feature-xp](features/xp.md) |
 | Skills | `skills.yml` + `skill-tree.yml` | [feature-skills](features/skills.md) |
+| Cooking | `cooking.yml` | [feature-cooking](features/cooking.md) |
 
 ### Automatic config merging (backfill)
 

@@ -36,6 +36,7 @@ tree:
     - gardener
     - swimmer
     - diver
+    - cook
 
   # Prerequisite per skill: must reach `level` of `skill` before leveling this one.
   requires:
@@ -56,3 +57,4 @@ tree:
     lucky-catch: { skill: fisherman, level: 10 }
     swimmer: { skill: explorer, level: 10 }
     diver: { skill: swimmer, level: 10 }
+    cook: { skill: farmer, level: 10 }

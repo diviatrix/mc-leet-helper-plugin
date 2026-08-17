@@ -1,0 +1,218 @@
+base:
+  enabled: true
+  permission: leet.feat.cooking
+  default-permission: false
+  worlds: []
+  cooldown: 0
+  message-type: ACTION_BAR
+
+feature:
+  # Custom items the cooking recipes produce (and, for Dough, require as an
+  # ingredient). Each item = a base Material the item is shown as + name/lore.
+  # Dish items carry hunger/saturation: on eat the plugin cancels the vanilla
+  # nutrition and applies THESE values instead (dishes restore more than their
+  # raw parts). Items without hunger/saturation are plain ingredients (Dough).
+  items:
+    dough:
+      material: WHEAT
+      name: "Dough"
+      lore:
+        - "Flour and egg, mixed and ready."
+    croissant:
+      material: BREAD
+      name: "Croissant"
+      hunger: 6
+      saturation: 8
+      lore:
+        - "Flaky, buttery bakery fresh."
+    borsh:
+      material: MUSHROOM_STEW
+      name: "Borsh"
+      hunger: 8
+      saturation: 12
+      lore:
+        - "Hearty beetroot and beef stew."
+    pelmeni:
+      material: MUSHROOM_STEW
+      name: "Pelmeni"
+      hunger: 7
+      saturation: 9
+      lore:
+        - "Dumplings stuffed with seasoned beef."
+    instant-noodle:
+      material: MUSHROOM_STEW
+      name: "Instant Noodle"
+      hunger: 5
+      saturation: 7
+      lore:
+        - "Quick noodles, ready in a bowl."
+    ramen:
+      material: MUSHROOM_STEW
+      name: "Ramen"
+      hunger: 8
+      saturation: 12
+      lore:
+        - "Rich broth, noodles and egg."
+    banh-mi:
+      material: BREAD
+      name: "Banh Mi"
+      hunger: 7
+      saturation: 10
+      lore:
+        - "A crusty baguette stuffed with chicken."
+    milk-porridge:
+      material: MUSHROOM_STEW
+      name: "Milk Porridge"
+      hunger: 6
+      saturation: 10
+      lore:
+        - "Soft, sweet grain in warm milk."
+    creamy-mushroom-soup:
+      material: MUSHROOM_STEW
+      name: "Creamy Mushroom Soup"
+      hunger: 7
+      saturation: 10
+      lore:
+        - "Silky mushrooms in cream."
+    chicken-skewers:
+      material: COOKED_CHICKEN
+      name: "Chicken Skewers"
+      hunger: 8
+      saturation: 11
+      lore:
+        - "Grilled chicken on a stick."
+    charlotte:
+      material: BREAD
+      name: "Charlotte"
+      hunger: 6
+      saturation: 8
+      lore:
+        - "A layered apple-and-sponge cake."
+
+  # Crafting recipes. Each unlocks at `cook` skill level `level` (one recipe per
+  # level). Type SHAPELESS = a flat `ingredients` list; SHAPED = a 3x3 `shape`
+  # of letters plus an `ingredients` map of letter -> item. A result is either a
+  # custom item id above (e.g. `dough`) or `material:<MATERIAL>` for a vanilla
+  # output (e.g. the second way to make bread). Shapeless ingredients are either
+  # a vanilla Material name or a custom item id (matched exactly by tag+name).
+  recipes:
+    dough:
+      type: SHAPELESS
+      level: 1
+      ingredients:
+        - WHEAT
+        - WHEAT
+        - EGG
+      result: dough
+      amount: 1
+    bread:
+      type: SHAPELESS
+      level: 2
+      ingredients:
+        - dough
+      result: material:BREAD
+      amount: 1
+    croissant:
+      type: SHAPELESS
+      level: 3
+      ingredients:
+        - dough
+        - dough
+        - SUGAR
+        - MILK_BUCKET
+      result: croissant
+      amount: 1
+    borsh:
+      type: SHAPELESS
+      level: 4
+      ingredients:
+        - COOKED_BEEF
+        - BAKED_POTATO
+        - CARROT
+        - BEETROOT
+        - ALLIUM
+        - BOWL
+      result: borsh
+      amount: 1
+    pelmeni:
+      type: SHAPELESS
+      level: 5
+      ingredients:
+        - dough
+        - COOKED_BEEF
+        - BOWL
+      result: pelmeni
+      amount: 1
+    instant-noodle:
+      type: SHAPELESS
+      level: 6
+      ingredients:
+        - dough
+        - dough
+        - WHEAT
+        - BOWL
+      result: instant-noodle
+      amount: 1
+    ramen:
+      type: SHAPELESS
+      level: 7
+      ingredients:
+        - dough
+        - COOKED_CHICKEN
+        - EGG
+        - BOWL
+      result: ramen
+      amount: 1
+    banh-mi:
+      type: SHAPELESS
+      level: 8
+      ingredients:
+        - BREAD
+        - COOKED_CHICKEN
+        - CARROT
+        - ALLIUM
+      result: banh-mi
+      amount: 1
+    milk-porridge:
+      type: SHAPELESS
+      level: 9
+      ingredients:
+        - MILK_BUCKET
+        - WHEAT
+        - SUGAR
+        - BOWL
+      result: milk-porridge
+      amount: 1
+    creamy-mushroom-soup:
+      type: SHAPELESS
+      level: 10
+      ingredients:
+        - BROWN_MUSHROOM
+        - RED_MUSHROOM
+        - MILK_BUCKET
+        - BOWL
+      result: creamy-mushroom-soup
+      amount: 1
+    chicken-skewers:
+      type: SHAPELESS
+      level: 11
+      ingredients:
+        - COOKED_CHICKEN
+        - COOKED_CHICKEN
+        - STICK
+      result: chicken-skewers
+      amount: 1
+    charlotte:
+      type: SHAPELESS
+      level: 12
+      ingredients:
+        - WHEAT
+        - WHEAT
+        - SUGAR
+        - EGG
+        - APPLE
+      result: charlotte
+      amount: 1
+
+messages:
+  recipe-locked: "<red>You need <level> Cook level to craft this."

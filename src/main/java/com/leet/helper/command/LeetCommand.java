@@ -30,6 +30,7 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
         ALIASES.put("fall", "fall_damage");
         ALIASES.put("xp", "xp");
         ALIASES.put("skills", "skills");
+        ALIASES.put("cook", "cooking");
     }
 
     private final Core plugin;
@@ -54,7 +55,7 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
         }
         String featureId = ALIASES.get(args[0].toLowerCase());
         if (featureId == null) {
-            player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leet <list|dj|crop|tree|fall|xp|skills>"));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leet <list|dj|crop|tree|fall|xp|skills|cook>"));
             return true;
         }
         if (!player.hasPermission(permissionFor(featureId))) {
@@ -106,6 +107,7 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
             case "fall_damage" -> "Fall Damage";
             case "xp" -> "XP";
             case "skills" -> "Skills";
+            case "cooking" -> "Cooking";
             default -> "Double Jump";
         };
     }

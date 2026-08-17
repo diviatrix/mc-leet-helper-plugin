@@ -47,6 +47,7 @@ public class Core extends JavaPlugin {
         saveResourceIfMissing("features/xp.yml");
         saveResourceIfMissing("features/skills.yml");
         saveResourceIfMissing("features/skill-tree.yml");
+        saveResourceIfMissing("features/cooking.yml");
 
         storageManager = new StorageManager(getDataFolder(), getLogger());
 
@@ -61,6 +62,7 @@ public class Core extends JavaPlugin {
         featureManager.register(new FallDamageFeature(this));
         featureManager.register(new XpFeature(this));
         featureManager.register(new SkillsFeature(this));
+        featureManager.register(new CookingFeature(this));
         featureManager.enableAll();
 
         getCommand("leeta").setExecutor(new HelperCommand(this));

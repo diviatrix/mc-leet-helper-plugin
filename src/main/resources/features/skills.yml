@@ -308,6 +308,18 @@ feature:
           icon: HEART_OF_THE_SEA
           per-level: 10     # +10%/level; up to 100% (2x) at level 10
 
+    # --- Cooking feature gateway: each level unlocks one cooking recipe
+    #     (features/cooking.yml). Foster by leveling Farmer to 10. Pure gating
+    #     skill with no passive, so it carries only lore (no effects).
+    cook:
+      name: "Cook"
+      icon: CAULDRON
+      max-level: 12
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 700, 810, 930]
+      lore:
+        - "Unlocks advanced cooking recipes."
+        - "Each level unlocks one new recipe."
+
 messages:
   feature-off: "<red>Skills are currently off for you."
   insufficient-xp: "<red>Not enough XP (need <needed>)."

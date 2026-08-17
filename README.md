@@ -135,6 +135,7 @@ Player-side feature toggles. Each player can turn supported features **off for t
 | `/leet fall` | `leet.feat.fall_damage` | Toggle **Fall Damage** on/off for yourself |
 | `/leet xp` | `leet.feat.xp` | Toggle **XP** on/off for yourself |
 | `/leet skills` | `leet.feat.skills` | Toggle **Skills** on/off for yourself |
+| `/leet cook` | `leet.feat.cooking` | Toggle **Cooking** on/off for yourself |
 
 **Permission model** — `/leet` is permission-gated by the underlying feature permissions:
 - The command is only available to players who have at least **one** `leet.feat.<id>` permission. If a player has **none**, `/leet` reports `No permission.` and does nothing (including `list`, and no tab completion).

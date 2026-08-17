@@ -62,14 +62,31 @@ public class SkillsFeature extends AbstractFeature {
 
     /**
      * Skills that are also granted by a standalone feature. Holding that
-     * feature's permission counts as already owning the skill.
+     * feature's permission counts as already owning the skill (it shows as
+     * acquired and the feature provides the effect/gate); without the
+     * permission the skill stays available as a normal level-up skill.
      */
     private static final Map<String, String> FEATURE_BOUND_SKILLS = Map.of(
         "tree-feller", "tree_feller",
         "auto-crop", "auto_crop",
         "fall-nullify", "fall_damage",
         "double-jump", "double_jump",
-        "smith", "durability"
+        "smith", "durability",
+        "cook", "cooking"
+    );
+
+    /**
+     * Skills whose per-player effect can be toggled on/off (from the skill's
+     * detail window). The toggle reuses the underlying standalone feature's
+     * per-player toggle store, so it works whether the skill was learned with
+     * XP or granted via the feature permission. Absent skills (e.g. smith) are
+     * always on once acquired.
+     */
+    private static final Map<String, String> TOGGLE_SKILLS = Map.of(
+        "tree-feller", "tree_feller",
+        "auto-crop", "auto_crop",
+        "fall-nullify", "fall_damage",
+        "double-jump", "double_jump"
     );
 
     private final Map<String, SkillConfig> skills = new LinkedHashMap<>();
@@ -289,6 +306,28 @@ public class SkillsFeature extends AbstractFeature {
         return skill == null ? skillId : skill.name();
     }
 
+    // --- per-player skill toggles (persisted in the player's kv store) ---
+
+    /** The standalone-feature store key backing this skill's toggle, or null if the skill has no toggle. */
+    public String toggleFeature(String skillId) {
+        return TOGGLE_SKILLS.get(skillId);
+    }
+
+    /** Whether this skill's per-player toggle is currently ON (default on for untoggled skills). */
+    public boolean skillEnabled(Player player, String skillId) {
+        String featureId = toggleFeature(skillId);
+        if (featureId == null) return true;
+        Boolean toggle = plugin.storageManager().getUserToggle(featureId, player.getUniqueId());
+        return !Boolean.FALSE.equals(toggle);
+    }
+
+    /** Flips/lets the GUI set this skill's per-player toggle. */
+    public void setSkillEnabled(Player player, String skillId, boolean on) {
+        String featureId = toggleFeature(skillId);
+        if (featureId == null) return;
+        plugin.storageManager().setUserToggle(featureId, player.getUniqueId(), on);
+    }
+
     // --- event handlers: passive engine ---
 
     /**
@@ -354,14 +393,16 @@ public class SkillsFeature extends AbstractFeature {
         // the dedicated 1-level advanced skills.
         if (!felling && !harvesting) {
             ItemStack tool = player.getInventory().getItemInMainHand();
-            if (isLog && !hasFeaturePermission(player, "tree-feller") && state.level("tree-feller") >= 1) {
+            if (isLog && skillEnabled(player, "tree-feller")
+                && !hasFeaturePermission(player, "tree-feller") && state.level("tree-feller") >= 1) {
                 felling = true;
                 try {
                     TreeFellerUtil.fell(this, player, broken, lumber.logs(), treeFellerMaxBlocks, tool);
                 } finally {
                     felling = false;
                 }
-            } else if (isCrop && !hasFeaturePermission(player, "auto-crop") && state.level("auto-crop") >= 1) {
+            } else if (isCrop && skillEnabled(player, "auto-crop")
+                && !hasFeaturePermission(player, "auto-crop") && state.level("auto-crop") >= 1) {
                 harvesting = true;
                 try {
                     // Radius grows with the skill's level: level = radius (1-3).
@@ -395,7 +436,7 @@ public class SkillsFeature extends AbstractFeature {
         if (!check(player)) return;
         if (hasFeaturePermission(player, "fall-nullify")) return; // fall damage feature provides it
         if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
-        if (getState(player).level("fall-nullify") >= 1) {
+        if (skillEnabled(player, "fall-nullify") && getState(player).level("fall-nullify") >= 1) {
             event.setCancelled(true);
         }
     }
@@ -412,6 +453,7 @@ public class SkillsFeature extends AbstractFeature {
         if (player.getGameMode() == org.bukkit.GameMode.SPECTATOR) return;
         if (!check(player)) return;
         if (hasFeaturePermission(player, "double-jump")) return; // double jump feature provides it
+        if (!skillEnabled(player, "double-jump")) return;
         if (getState(player).level("double-jump") < 1) return;
 
         event.setCancelled(true);
@@ -437,6 +479,7 @@ public class SkillsFeature extends AbstractFeature {
         if (player.getGameMode() == org.bukkit.GameMode.CREATIVE) return;
         if (player.getGameMode() == org.bukkit.GameMode.SPECTATOR) return;
         if (hasFeaturePermission(player, "double-jump")) return; // double jump feature provides it
+        if (!skillEnabled(player, "double-jump")) return;
         if (getState(player).level("double-jump") < 1) return;
 
         if (event.getFrom().getBlockX() == event.getTo().getBlockX()
