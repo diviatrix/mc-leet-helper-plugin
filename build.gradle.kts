@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.leet"
-version = "1.2.1"
+version = "1.2.2"
 
 base {
     archivesName = "leet-helper"

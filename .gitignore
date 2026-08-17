@@ -5,6 +5,9 @@
 # Agent instructions file (local, not part of the repo)
 /AGENTS.md
 
+# Local agent working data (Qwen .qwen folder)
+/.qwen/
+
 # Ignore Gradle GUI config
 gradle-app.setting
 
