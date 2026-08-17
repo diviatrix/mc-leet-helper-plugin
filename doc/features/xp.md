@@ -34,19 +34,17 @@ base:
 feature:
   mining:
     materials:
-      STONE: 3
-      DEEPSLATE: 3
-      COAL_ORE: 5
-      IRON_ORE: 8
+      COAL_ORE: 1
+      IRON_ORE: 5
       GOLD_ORE: 10
-      DIAMOND_ORE: 15
+      DIAMOND_ORE: 25
       ANCIENT_DEBRIS: 20
-      # ... (full curated list in the shipped file)
+      # ... only ores award XP (stone/stone-variants/raw-ore blocks give nothing)
   woodcutting:
     materials:
-      OAK_LOG: 3
-      SPRUCE_LOG: 3
-      BIRCH_LOG: 3
+      OAK_LOG: 1
+      SPRUCE_LOG: 1
+      BIRCH_LOG: 1
       # ... all log/stem types
   crops:
     materials:
@@ -58,15 +56,15 @@ feature:
       COCOA: 2
       SWEET_BERRY_BUSH: 1
   fishing:
-    amount: 8
+    amount: 5
   building:
-    amount: 1
+    amount: 0
   killing:
     amount: 8
     mobs:
-      ZOMBIE: 10
-      SKELETON: 10
-      SPIDER: 10
+      ZOMBIE: 5
+      SKELETON: 7
+      SPIDER: 7
       CREEPER: 12
       ENDERMAN: 15
 
@@ -76,13 +74,13 @@ messages:
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `mining.materials` | map of Material → int | stone/deepslate 3; coal 5; copper 6; iron 8; gold/redstone/lapis 10; diamond/emerald 15; ancient debris 20 | XP per mined block. Invalid names skipped with a warning. |
-| `woodcutting.materials` | map of Material → int | all logs + crimson/warped stems = 3 each | XP per felled log/stem. Invalid names skipped with a warning. |
+| `mining.materials` | map of Material → int | coal 1; copper/redstone 2; iron/lapis 5; gold/nether-gold 10; ancient debris 20; diamond/emerald 25 | XP per mined block. Only **ores** (and ancient debris) award — stone/stone-variants and raw-ore blocks give nothing. Invalid names skipped with a warning. |
+| `woodcutting.materials` | map of Material → int | all logs + crimson/warped stems = 1 each | XP per felled log/stem. Invalid names skipped with a warning. |
 | `crops.materials` | map of Material → int | wheat, carrots, potatoes, beetroots, nether wart, cocoa = 2; sweet berry 1 | XP per harvested crop. |
-| `fishing.amount` | int | `8` | XP per successful catch. |
-| `building.amount` | int | `1` | XP per block placed (the effortless baseline). |
+| `fishing.amount` | int | `5` | XP per successful catch. |
+| `building.amount` | int | `0` | XP per block placed (set to 0 to disable building XP). |
 | `killing.amount` | int | `8` | XP fallback per mob killed (used for any mob not in `mobs`). |
-| `killing.mobs` | map of EntityType → int | zombies/skeletons/spiders/piglins 10, creepers 12, endermen 15 | XP per specific mob type. |
+| `killing.mobs` | map of EntityType → int | zombies 5, skeletons/spiders 7, piglins 10, creepers 12, endermen 15 | XP per specific mob type. |
 | `placed-tracking` | string | `memory` | How to remember blocks a player placed so a later break gives no XP. `memory` = in-memory only (lost on restart). `persistent` = SQLite, survives restarts (still bounded to ~1 hour). |
 
 **Feedback:** after earning XP, the `xp-gained` message is delivered via `base.message-type` (ACTION_BAR by default). The placeholders are `<amount>` (XP gained) and `<action>` (the action label, e.g. `Mining`, `Fishing`, `Killing`). To make XP **silent**, remove/empty the `xp-gained` message template — a missing or empty template produces no message, while XP is still granted.

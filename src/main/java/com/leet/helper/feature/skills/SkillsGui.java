@@ -101,6 +101,7 @@ public final class SkillsGui {
         // skills (prerequisite-gated) sit at their fixed slots.
         setTier(player, inv, feature.ringSkillIds(), RING_SLOTS);
         setAdvancedTier(player, inv);
+        addExpIndicator(player, inv);
 
         setContext(player.getUniqueId(), inv, Screen.TREE, null, 0);
         player.openInventory(inv);
@@ -174,6 +175,8 @@ public final class SkillsGui {
             slot += 9; // move one row down on the same column
         }
 
+        addExpIndicator(player, inv);
+
         setContext(player.getUniqueId(), inv, Screen.DETAIL, skillId, 0);
         player.openInventory(inv);
     }
@@ -191,6 +194,8 @@ public final class SkillsGui {
         inv.setItem(ACTION_BOTTOM, actionIcon(Material.LIME_DYE, "<green><bold>Apply",
             "<green>Spend " + cost + " XP to reach level " + (level + 1),
             "action:apply"));
+
+        addExpIndicator(player, inv);
 
         setContext(player.getUniqueId(), inv, Screen.CONFIRM, skillId, cost);
         player.openInventory(inv);
@@ -398,6 +403,26 @@ public final class SkillsGui {
         meta.displayName(MM.deserialize(name));
         meta.lore(List.of(MM.deserialize(lore)));
         tag(meta, action);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    /**
+     * Shows the player's current XP-point balance in the bottom-left corner.
+     * Runs last (after {@code fill}) so the corner slot ends up as the icon
+     * rather than filler. No tag: clicking it is blocked but does nothing.
+     */
+    private void addExpIndicator(Player player, Inventory inv) {
+        inv.setItem((feature.rows() - 1) * 9, expIcon(player));
+    }
+
+    private ItemStack expIcon(Player player) {
+        ItemStack item = new ItemStack(Material.EXPERIENCE_BOTTLE);
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(MM.deserialize("<yellow><bold>Experience"));
+        meta.lore(List.of(
+            MM.deserialize("<aqua>" + player.getTotalExperience() + " XP points"),
+            MM.deserialize("<gray>Spent to level up skills.")));
         item.setItemMeta(meta);
         return item;
     }
