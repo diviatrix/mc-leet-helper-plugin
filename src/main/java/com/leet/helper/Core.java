@@ -46,6 +46,7 @@ public class Core extends JavaPlugin {
         saveResourceIfMissing("features/fall_damage.yml");
         saveResourceIfMissing("features/xp.yml");
         saveResourceIfMissing("features/skills.yml");
+        saveResourceIfMissing("features/skill-tree.yml");
 
         storageManager = new StorageManager(getDataFolder(), getLogger());
 

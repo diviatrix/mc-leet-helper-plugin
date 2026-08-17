@@ -1,0 +1,58 @@
+# Skill tree topology — the arrangement of the /skills tree. This is separate
+# from the skill *definitions* (features/skills.yml feature.skills.<id>), so you
+# can reshape the tree freely:
+#   - `ring` / `advanced` are ordered skill ids; Stamina always sits at the
+#     center as the root. Reorder to change the displayed order, or remove an
+#     id to take that skill out of the tree (its definition stays available in
+#     skills.yml so it can be added back or reused elsewhere).
+#   - `requires` maps a skill id to the prerequisite it needs before it can be
+#     leveled: `skill` (another skill id) at `level`. Omit a skill here to make
+#     it have no prerequisite (open) — though Stamina is expected to be the root.
+#
+# A skill that duplicates a standalone feature (see the Skills feature doc) keys
+# off that feature's permission: holding it means the skill is already acquired
+# and the feature provides the effect. Nothing extra to configure here.
+
+tree:
+  # Ring skills shown around Stamina (display order).
+  ring:
+    - lumberjack
+    - miner
+    - smith
+    - farmer
+    - animalist
+    - fisherman
+    - warrior
+    - explorer
+
+  # Advanced skills shown in the lower band (display order).
+  advanced:
+    - tree-feller
+    - auto-crop
+    - fall-nullify
+    - double-jump
+    - breeder
+    - lucky-catch
+    - gardener
+    - swimmer
+    - diver
+
+  # Prerequisite per skill: must reach `level` of `skill` before leveling this one.
+  requires:
+    lumberjack: { skill: stamina, level: 10 }
+    miner: { skill: stamina, level: 10 }
+    smith: { skill: stamina, level: 10 }
+    farmer: { skill: stamina, level: 10 }
+    animalist: { skill: stamina, level: 10 }
+    fisherman: { skill: stamina, level: 10 }
+    warrior: { skill: stamina, level: 10 }
+    explorer: { skill: stamina, level: 10 }
+    tree-feller: { skill: lumberjack, level: 10 }
+    gardener: { skill: lumberjack, level: 10 }
+    auto-crop: { skill: farmer, level: 10 }
+    fall-nullify: { skill: explorer, level: 10 }
+    double-jump: { skill: fall-nullify, level: 1 }
+    breeder: { skill: animalist, level: 10 }
+    lucky-catch: { skill: fisherman, level: 10 }
+    swimmer: { skill: explorer, level: 10 }
+    diver: { skill: swimmer, level: 10 }

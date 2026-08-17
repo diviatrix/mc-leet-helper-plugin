@@ -45,14 +45,11 @@ public abstract class AbstractFeature implements Listener {
     protected abstract void loadFeatureConfig(YamlConfiguration cfg);
 
     public void loadConfig() {
-        File file = new File(plugin.getDataFolder(), "features/" + featureId() + ".yml");
-        if (!file.exists()) {
-            plugin.getLogger().severe("Feature config not found: " + file.getName());
+        YamlConfiguration cfg = loadAndMerge(featureId() + ".yml");
+        if (cfg == null) {
             enabled = false;
             return;
         }
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-        mergeMissingKeys(cfg, file);
 
         enabled = cfg.getBoolean("base.enabled", false);
         permission = cfg.getString("base.permission", "leet.feat." + featureId());
@@ -85,12 +82,30 @@ public abstract class AbstractFeature implements Listener {
     }
 
     /**
+     * Loads a bundled {@code features/<fileName>} resource from disk, merging
+     * any keys missing from the on-disk config with the packaged defaults and
+     * returning the parsed config. Logs a severe error and returns null when the
+     * file does not exist. Reused for a feature's single config and for the
+     * skills feature's separate skill-tree config.
+     */
+    protected YamlConfiguration loadAndMerge(String fileName) {
+        File file = new File(plugin.getDataFolder(), "features/" + fileName);
+        if (!file.exists()) {
+            plugin.getLogger().severe("Feature config not found: " + file.getName());
+            return null;
+        }
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        mergeMissingKeys(cfg, file, "features/" + fileName);
+        return cfg;
+    }
+
+    /**
      * Adds any keys present in the bundled default config that are missing from
      * the on-disk config, preserving the server admin's existing values. This lets
      * old feature configs gain new options (e.g. require-hoe) on plugin update.
      */
-    private void mergeMissingKeys(YamlConfiguration cfg, File file) {
-        InputStream defaultStream = plugin.getResource("features/" + featureId() + ".yml");
+    private void mergeMissingKeys(YamlConfiguration cfg, File file, String resourcePath) {
+        InputStream defaultStream = plugin.getResource(resourcePath);
         if (defaultStream == null) return;
         YamlConfiguration defaults = YamlConfiguration.loadConfiguration(
             new InputStreamReader(defaultStream, StandardCharsets.UTF_8));

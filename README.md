@@ -36,7 +36,7 @@ LeetHelper registers eight gameplay features plus one admin command.
 | [Tree Feller](doc/features/tree-feller.md) | `tree_feller` | Felling a log drops the whole connected tree |
 | [Fall Damage](doc/features/fall-damage.md) | `fall_damage` | Negates all fall damage for eligible players |
 | [XP](doc/features/xp.md) | `xp` | Bonus vanilla XP for mining, woodcutting, crops, fishing, building, and killing |
-| [Skills](doc/features/skills.md) | `skills` | A skill tree (Stamina + 8 passive skills) leveled up by spending XP points |
+| [Skills](doc/features/skills.md) | `skills` | A skill tree (Traveler + 8 passive skills + 1-level advanced skills) leveled up by spending XP points |
 
 Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`); full per-feature details (config keys, limitations, permissions) are in **[doc/features/](doc/features/)**.
 
@@ -71,7 +71,8 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`);
        ├── tree_feller.yml
        ├── fall_damage.yml
        ├── xp.yml
-       └── skills.yml
+       ├── skills.yml
+       └── skill-tree.yml
    ```
 
 4. **Configure to taste** — edit the files inside `plugins/LeetHelper/features/`. Restart the server for changes to take effect (there is **no reload command**; `base.enabled` toggles are the only thing that can be changed live, via `/leeta toggle`).
@@ -113,7 +114,7 @@ This command is player-only (the console receives a "This command can only be us
 
 ### /skills
 
-Opens the skill-tree GUI (Stamina in the center; the eight passive skills unlock around it once Stamina reaches its max level). Leveling skills spends **vanilla XP points** (`player.getTotalExperience()`).
+Opens the skill-tree GUI (Traveler in the center; the ring skills unlock once Traveler reaches max level, and 1-level advanced skills unlock around the tree once a ring skill hits level 10). Leveling skills spends **vanilla XP points** (`player.getTotalExperience()`).
 
 | Command | Permission | Description |
 |---|---|---|

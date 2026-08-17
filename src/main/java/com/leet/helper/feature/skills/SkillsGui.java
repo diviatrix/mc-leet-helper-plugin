@@ -34,6 +34,22 @@ public final class SkillsGui {
 
     /** Slots of the 3x3 ring around the center skill (slot 22). */
     private static final int[] RING_SLOTS = {12, 13, 14, 21, 23, 30, 31, 32};
+    /**
+     * Fixed slots for each advanced skill on the tree screen (1-based x/y grid,
+     * slot = (y-1)*9+(x-1)). Only skills present in the tree's {@code advanced}
+     * list are placed; unknown ids are ignored.
+     */
+    private static final Map<String, Integer> ADVANCED_SLOTS = Map.of(
+        "tree-feller", 10,   // x2 y2
+        "auto-crop", 20,     // x3 y3
+        "swimmer", 33,       // x7 y4
+        "diver", 34,         // x8 y4
+        "breeder", 24,       // x7 y3
+        "lucky-catch", 29,   // x3 y4
+        "gardener", 11,      // x3 y2
+        "double-jump", 42,   // x7 y5
+        "fall-nullify", 43   // x8 y5
+    );
     private static final int CENTER = 22;
 
     // Detail/confirm layout on a 9x6 grid (1-based): effects stack down the
@@ -76,26 +92,46 @@ public final class SkillsGui {
         int basicLevel = feature.currentLevel(player, SkillsFeature.STAMINA);
         int basicCost = feature.nextCost(player, SkillsFeature.STAMINA);
         inv.setItem(CENTER, skillIcon(stamina, basicLevel, basicCost, true));
-        inv.setItem(8, infoPane("Unlock the surrounding skills by reaching "
-            + stamina.name() + " level " + stamina.maxLevel()));
+        inv.setItem(8, infoPane("Level 10 ring skills unlock the advanced skills "
+            + "spread around the tree. Ring skills need " + stamina.name() + " level " + stamina.maxLevel() + "."));
         inv.setItem(EXIT_BOTTOM, actionIcon(Material.OAK_DOOR, "<red><bold>\u2715 Exit",
             "<gray>Close the skills menu", "action:close"));
 
-        boolean ringUnlocked = basicLevel >= stamina.maxLevel();
-        for (int i = 0; i < RING_SLOTS.length; i++) {
-            String id = feature.ringSkillIds().get(i);
-            SkillConfig skill = feature.skill(id);
-            if (skill == null) continue;
-            if (ringUnlocked) {
-                inv.setItem(RING_SLOTS[i],
-                    skillIcon(skill, feature.currentLevel(player, id), feature.nextCost(player, id), true));
-            } else {
-                inv.setItem(RING_SLOTS[i], lockedPane(skill, stamina));
-            }
-        }
+        // Ring skills (Stamina-gated) follow the ordered ring list; advanced
+        // skills (prerequisite-gated) sit at their fixed slots.
+        setTier(player, inv, feature.ringSkillIds(), RING_SLOTS);
+        setAdvancedTier(player, inv);
 
         setContext(player.getUniqueId(), inv, Screen.TREE, null, 0);
         player.openInventory(inv);
+    }
+
+    private void setTier(Player player, Inventory inv, List<String> ids, int[] slots) {
+        for (int i = 0; i < slots.length && i < ids.size(); i++) {
+            String id = ids.get(i);
+            SkillConfig skill = feature.skill(id);
+            if (skill == null) continue;
+            if (feature.prerequisiteSatisfied(player, skill)) {
+                inv.setItem(slots[i],
+                    skillIcon(skill, feature.currentLevel(player, id), feature.nextCost(player, id), true));
+            } else {
+                inv.setItem(slots[i], lockedPane(skill));
+            }
+        }
+    }
+
+    private void setAdvancedTier(Player player, Inventory inv) {
+        for (String id : feature.advancedSkillIds()) {
+            Integer slot = ADVANCED_SLOTS.get(id);
+            SkillConfig skill = feature.skill(id);
+            if (slot == null || skill == null) continue;
+            if (feature.prerequisiteSatisfied(player, skill)) {
+                inv.setItem(slot,
+                    skillIcon(skill, feature.currentLevel(player, id), feature.nextCost(player, id), true));
+            } else {
+                inv.setItem(slot, lockedPane(skill));
+            }
+        }
     }
 
     private void openDetail(Player player, String skillId) {
@@ -110,16 +146,12 @@ public final class SkillsGui {
         inv.setItem(BACK_BOTTOM, actionIcon(Material.ARROW, "<gray><bold>\u2190 Back",
             "<gray>Return to the skill tree", "action:back"));
 
-        // Level-up button: a potion when the next level is affordable (or already
-        // maxed), or an X icon when the player doesn't have enough XP.
+        // Level-up button: a potion when the next level is affordable, or an X icon
+        // when the player doesn't have enough XP. Omitted entirely at max level.
         Material upgradeIcon;
         String upgradeName;
         String upgradeLore;
-        if (cost < 0) {
-            upgradeIcon = Material.EXPERIENCE_BOTTLE;
-            upgradeName = "<green><bold>Level Up";
-            upgradeLore = "<gray>Already max level";
-        } else if (feature.hasXp(player, cost)) {
+        if (feature.hasXp(player, cost)) {
             upgradeIcon = Material.EXPERIENCE_BOTTLE;
             upgradeName = "<green><bold>Level Up";
             upgradeLore = "<green>Cost: " + cost + " XP";
@@ -128,7 +160,11 @@ public final class SkillsGui {
             upgradeName = "<red><bold>Level Up";
             upgradeLore = "<red>Not enough XP <gray>(need " + cost + ")";
         }
-        inv.setItem(ACTION_BOTTOM, actionIcon(upgradeIcon, upgradeName, upgradeLore, "action:upgrade"));
+
+        // At max level there is nothing to level up, so no button is shown.
+        if (cost >= 0) {
+            inv.setItem(ACTION_BOTTOM, actionIcon(upgradeIcon, upgradeName, upgradeLore, "action:upgrade"));
+        }
 
         // Every effect as its own icon with the current modifier at this level,
         // stacked down the center column.
@@ -254,8 +290,15 @@ public final class SkillsGui {
             + " <gray>[ " + level + "/" + skill.maxLevel() + " ]"));
 
         List<Component> lore = new ArrayList<>();
-        for (String line : skill.lore()) {
-            lore.add(MM.deserialize("<gray>" + line));
+        List<SkillConfig.Effect> effects = skill.effects();
+        if (effects.isEmpty()) {
+            for (String line : skill.lore()) {
+                lore.add(MM.deserialize("<gray>" + line));
+            }
+        } else {
+            for (SkillConfig.Effect effect : effects) {
+                lore.add(effectLine(skill, effect, level));
+            }
         }
         if (!unlocked) {
             lore.add(MM.deserialize("<red>Locked"));
@@ -271,12 +314,36 @@ public final class SkillsGui {
         return item;
     }
 
-    private ItemStack lockedPane(SkillConfig skill, SkillConfig stamina) {
+    /** One hover line per effect: the current value plus the effect's short description. */
+    private Component effectLine(SkillConfig skill, SkillConfig.Effect effect, int level) {
+        String desc = effect.name() + ":";
+        if (effect.desc() != null && !effect.desc().isEmpty()) {
+            desc = effect.desc();
+        }
+        if (effect.perLevel() > 0) {
+            double current = skill.valueAt(effect.id(), level);
+            return MM.deserialize("<green>" + format(current) + "%<reset> <gray>" + desc);
+        }
+        if (effect.unlockAt() > 0) {
+            if (skill.unlocked(effect.id(), level)) {
+                double current = skill.valueAt(effect.id(), level);
+                return MM.deserialize("<green>" + format(current) + "%<reset> <gray>" + desc);
+            }
+            return MM.deserialize("<yellow>Lv " + effect.unlockAt() + ":<reset> <gray>" + desc);
+        }
+        return MM.deserialize("<gray>" + desc);
+    }
+
+    private ItemStack lockedPane(SkillConfig skill) {
         ItemStack item = new ItemStack(Material.EMERALD);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(MM.deserialize("<red><bold>Locked</bold> <gray>•</gray> <yellow>" + skill.name()));
+        SkillTreeConfig.Prerequisite requirement = feature.requirementFor(skill.id());
+        String unlock = requirement.isPresent()
+            ? "<gray>Reach <yellow>" + feature.nameOf(requirement.skill()) + " level " + requirement.level() + "<gray>"
+            : "<gray>Prerequisite not met";
         meta.lore(List.of(
-            MM.deserialize("<gray>Reach <yellow>" + stamina.name() + " level " + stamina.maxLevel() + "<gray>"),
+            MM.deserialize(unlock),
             MM.deserialize("<gray>to unlock this skill.")));
         meta.setEnchantmentGlintOverride(true);
         item.setItemMeta(meta);

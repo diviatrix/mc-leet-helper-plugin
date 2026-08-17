@@ -33,7 +33,8 @@ src/main/
       TreeFellerUtil.java        # Shared whole-tree felling (Tree Feller + lumberjack)
       AutoCropUtil.java          # Shared auto-harvest (Auto Crop + farmer)
       skills/
-        SkillConfig.java         # Data-driven per-skill definition
+        SkillConfig.java         # Data-driven per-skill definition (skills.yml)
+        SkillTreeConfig.java     # Tree topology: ring/advanced order + prerequisites (skill-tree.yml)
         SkillState.java          # Per-player skill-level persistence
         SkillsGui.java           # The /skills inventory interface
     command/
@@ -57,6 +58,7 @@ src/main/
       fall_damage.yml
       xp.yml
       skills.yml
+      skill-tree.yml
 ```
 
 `Core` boots the plugin, resolves Vault (Economy + Permission providers, both optional), and registers the feature permissions dynamically. `FeatureManager` owns the feature registry and the enable/disable/toggle lifecycle.
@@ -79,11 +81,13 @@ Every gameplay feature extends `AbstractFeature`. The base class provides the sh
 
 `AutoCropFeature` and `TreeFellerFeature` break many blocks per action. They run at `EventPriority.MONITOR` (so a protection plugin's cancellation of the original break is already visible) and route each additional block through `AbstractFeature.breakIfAllowed(player, block, tool)`, which fires a per-block `BlockBreakEvent` so claim/region plugins (GriefPrevention, WorldGuard, ...) are consulted per block. Protected blocks are skipped rather than force-broken.
 
-The two gather loops are extracted into `TreeFellerUtil` and `AutoCropUtil` (same package, so they can call `breakIfAllowed`) and are reused by the **lumberjack** and **farmer** skills — both features use the same helpers and the same protection-respecting `breakIfAllowed` path. Like the features, the level-10 unlock behaviours run at `MONITOR` behind a reentrancy guard (`felling` / `harvesting`) and skip their unlock when the matching standalone feature is already active for the player (`appliesTo`).
+The two gather loops are extracted into `TreeFellerUtil` and `AutoCropUtil` (same package, so they can call `breakIfAllowed`) and are reused by the advanced **tree-feller** and **auto-crop** skills — both features use the same helpers and the same protection-respecting `breakIfAllowed` path. Like the features, the advanced-skill breaks run at `MONITOR` behind a reentrancy guard (`felling` / `harvesting`). A skill that duplicates a standalone feature keys off the feature's **permission** (`hasFeaturePermission` in `SkillsFeature`): holding it counts as owning the skill, the feature supplies the effect, and the skill's own passive is suppressed — so the two never both fire.
 
 ### SkillsFeature is GUI-driven
 
 Unlike the other features, `SkillsFeature` does most of its player-facing work through an inventory GUI rather than a command response. `/skills` (via `SkillsCommand`) calls `SkillsFeature.openTree`, which delegates to `SkillsGui`. All skill trees/click handling live in `SkillsGui` (registered listener stays on the feature so `AbstractFeature`'s enable/disable lifecycle is respected); `SkillsFeature` implements the passive effects and the leveling (spending vanilla XP points via `player.getTotalExperience()` / `giveExp(-cost)`). A per-player `SkillState` caches levels in memory.
+
+The skills feature loads **two configs**: `loadFeatureConfig` reads the skill definitions from `features/skills.yml` into `SkillConfig`, then loads `features/skill-tree.yml` into a `SkillTreeConfig`. The tree config owns the topology — the ordered `ring`/`advanced` skill-id lists (drive both the GUI tiers and the tier ordering) and the `requires` map (each skill's prerequisite, enforced by `SkillsFeature.prerequisiteSatisfied` for the GUI lock and the `levelUp` guard). Definitions are pure "what a skill is"; the tree decides "where it sits and what gates it". `SkillConfig` has no notion of prerequisites or placement.
 
 ---
 
@@ -145,7 +149,7 @@ Each feature's config file and its reference doc:
 | Tree Feller | `tree_feller.yml` | [feature-tree-feller](features/tree-feller.md) |
 | Fall Damage | `fall_damage.yml` | [feature-fall-damage](features/fall-damage.md) |
 | XP | `xp.yml` | [feature-xp](features/xp.md) |
-| Skills | `skills.yml` | [feature-skills](features/skills.md) |
+| Skills | `skills.yml` + `skill-tree.yml` | [feature-skills](features/skills.md) |
 
 ### Automatic config merging (backfill)
 

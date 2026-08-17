@@ -3,7 +3,6 @@ package com.leet.helper.feature.skills;
 import com.leet.helper.Core;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,14 +22,16 @@ public final class SkillConfig {
     public static final class Effect {
         private final String id;
         private final String name;
+        private final String desc;
         private final Material icon;
         private final double perLevel;
         private final int unlockAt;
         private final double unlockValue;
 
-        Effect(String id, String name, Material icon, double perLevel, int unlockAt, double unlockValue) {
+        Effect(String id, String name, String desc, Material icon, double perLevel, int unlockAt, double unlockValue) {
             this.id = id;
             this.name = name;
+            this.desc = desc;
             this.icon = icon;
             this.perLevel = perLevel;
             this.unlockAt = unlockAt;
@@ -43,6 +44,11 @@ public final class SkillConfig {
 
         public String name() {
             return name;
+        }
+
+        /** Short, value-free phrase describing the effect (shown with its current % on the tree). */
+        public String desc() {
+            return desc;
         }
 
         public Material icon() {
@@ -76,12 +82,8 @@ public final class SkillConfig {
     private final Set<Material> logs;
     private final Set<Material> minerBlocks;
     private final Set<Material> crops;
-    private final Set<Material> builderBlocks;
     private final List<Material> bonusItems;
     private final List<Material> qualityItems;
-
-    // --- damage causes the warrior skill leaves alone ---
-    private final Set<EntityDamageEvent.DamageCause> ignoredCauses;
 
     private SkillConfig(Core plugin, String id, ConfigurationSection s) {
         this.id = id;
@@ -98,18 +100,8 @@ public final class SkillConfig {
         this.logs = readMaterials(plugin, s, "logs", id);
         this.minerBlocks = readMaterials(plugin, s, "blocks", id);
         this.crops = readMaterials(plugin, s, "crops", id);
-        this.builderBlocks = readMaterials(plugin, s, "blocks", id);
         this.bonusItems = readMaterialsList(plugin, s, "bonus-items", id);
         this.qualityItems = readMaterialsList(plugin, s, "quality-items", id);
-
-        this.ignoredCauses = new HashSet<>();
-        for (String cause : s.getStringList("ignored-causes")) {
-            try {
-                this.ignoredCauses.add(EntityDamageEvent.DamageCause.valueOf(cause));
-            } catch (IllegalArgumentException e) {
-                plugin.getLogger().warning("Invalid damage cause in skills." + id + ".ignored-causes: " + cause);
-            }
-        }
     }
 
     public static SkillConfig read(Core plugin, ConfigurationSection section) {
@@ -124,12 +116,13 @@ public final class SkillConfig {
             ConfigurationSection e = section.getConfigurationSection(effectId);
             if (e == null) continue;
             String name = e.getString("name", effectId);
+            String desc = e.getString("desc", name);
             Material icon = parseMaterial(plugin, e.getString("icon", "STONE"), id,
                 "effects." + effectId + ".icon", Material.STONE);
             double perLevel = e.getDouble("per-level", 0);
             int unlockAt = e.getInt("unlock-at", 0);
             double unlockValue = e.getDouble("unlock-value", 0);
-            list.add(new Effect(effectId, name, icon, perLevel, unlockAt, unlockValue));
+            list.add(new Effect(effectId, name, desc, icon, perLevel, unlockAt, unlockValue));
         }
         return list;
     }
@@ -242,19 +235,11 @@ public final class SkillConfig {
         return crops;
     }
 
-    public Set<Material> builderBlocks() {
-        return builderBlocks;
-    }
-
     public List<Material> bonusItems() {
         return bonusItems;
     }
 
     public List<Material> qualityItems() {
         return qualityItems;
-    }
-
-    public Set<EntityDamageEvent.DamageCause> ignoredCauses() {
-        return ignoredCauses;
     }
 }
