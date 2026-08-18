@@ -1,8 +1,6 @@
 package com.leet.helper.feature.skills;
 
 import com.leet.helper.Core;
-import com.leet.helper.feature.AbstractFeature;
-import com.leet.helper.feature.CookingFeature;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -50,8 +48,7 @@ public final class SkillsGui {
         "lucky-catch", 29,   // x3 y4
         "gardener", 11,      // x3 y2
         "double-jump", 42,   // x7 y5
-        "fall-nullify", 43,  // x8 y5
-        "cook", 19           // x2 y3
+        "fall-nullify", 43   // x8 y5
     );
     private static final int CENTER = 22;
 
@@ -178,10 +175,6 @@ public final class SkillsGui {
             inv.setItem(slot, effectIcon(skill, effect, level));
             slot += 9; // move one row down on the same column
         }
-
-        // The Cook skill gates cooking recipes, so its window lists them all as
-        // icons whose hover shows the ingredients and the required Cook level.
-        renderCookRecipes(player, inv, skillId);
 
         // Tree Feller / Double Jump / Auto Crop / Fall Nullify can be toggled
         // on/off once acquired (learned or granted by the feature permission).
@@ -330,57 +323,6 @@ public final class SkillsGui {
         }
         meta.lore(lore);
         tag(meta, "skill:" + skill.id());
-        item.setItemMeta(meta);
-        return item;
-    }
-
-    /**
-     * For the Cook skill, fill the detail window with every cooking recipe as an
-     * icon. Each icon's hover lists the recipe's ingredients and the Cook level
-     * required, marking recipes the player hasn't unlocked yet. Non-cook skills
-     * are untouched (their center column stays for passive effects).
-     */
-    private void renderCookRecipes(Player player, Inventory inv, String skillId) {
-        if (!CookingFeature.COOK_SKILL.equalsIgnoreCase(skillId)) return;
-        AbstractFeature cooking = plugin.featureManager().get("cooking").orElse(null);
-        if (!(cooking instanceof CookingFeature cookingFeature)) return;
-
-        // Start at the center column and place each recipe at the next slot.
-        int slot = EFFECT_COL_START;
-        for (CookingFeature.RecipeView view : cookingFeature.recipeViews()) {
-            if (slot >= inv.getSize()) break;
-            inv.setItem(slot, recipeViewIcon(player, view));
-            slot++;
-        }
-    }
-
-    /** A recipe rendered as its result item: learnt status shown first, and its
-     *  ingredients + effect (hunger/saturation) revealed only once learnt. */
-    private ItemStack recipeViewIcon(Player player, CookingFeature.RecipeView view) {
-        ItemStack item = view.result().clone();
-        ItemMeta meta = item.getItemMeta();
-
-        List<Component> lore = new ArrayList<>();
-        boolean learnt = feature.currentLevel(player, CookingFeature.COOK_SKILL) >= view.level();
-        lore.add(MM.deserialize(learnt
-            ? "<green>Learnt"
-            : "<red>Not learnt</red> <gray>\u2014 reach Cook level " + view.level()));
-
-        if (learnt) {
-            lore.add(Component.empty());
-            lore.add(MM.deserialize("<gray>Ingredients:"));
-            for (String ing : view.ingredients()) {
-                lore.add(MM.deserialize("<aqua>\u271a <white>" + ing));
-            }
-            if (view.hunger() > 0) {
-                lore.add(Component.empty());
-                lore.add(MM.deserialize("<gray>Effect:"));
-                lore.add(MM.deserialize("<green>+" + view.hunger() + " hunger <gray>\u00b7 <green>+"
-                    + view.saturation() + " saturation"));
-            }
-        }
-
-        meta.lore(lore);
         item.setItemMeta(meta);
         return item;
     }

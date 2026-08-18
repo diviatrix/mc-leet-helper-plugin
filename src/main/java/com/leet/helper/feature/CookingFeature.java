@@ -1,7 +1,6 @@
 package com.leet.helper.feature;
 
 import com.leet.helper.Core;
-import com.leet.helper.feature.skills.SkillsFeature;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
@@ -31,15 +30,15 @@ import java.util.Map;
 
 /**
  * The cooking feature: a set of custom food items and the crafting recipes that
- * produce them, plus a "second" way to make vanilla bread. Every recipe is
- * gated per-player by the {@code cook} skill's level (each Cook level unlocks
- * exactly one recipe), so a recipe only crafts once the player has leveled the
- * skill. Dish items are placed on an edible base material and reapply custom
- * hunger/saturation when eaten (they restore more than their raw parts).
+ * produce them, plus a "second" way to make vanilla bread. Recipes are available
+ * to any player the cooking feature applies to — no skill is required. Dish
+ * items are placed on an edible base material and reapply custom hunger/
+ * saturation when eaten (they restore more than their raw parts).
  *
  * Recipes are registered as {@link Recipe}s so they appear in the vanilla
  * recipe book; {@link PrepareItemCraftEvent}/{@link CraftItemEvent} blank/cancel
- * them for players whose Cook level (or the cooking permission) is insufficient.
+ * them for players the feature does not apply to (permission, /leet toggle, or
+ * world list).
  */
 public final class CookingFeature extends AbstractFeature {
 
@@ -50,15 +49,10 @@ public final class CookingFeature extends AbstractFeature {
         }
     }
 
-    /** A parsed recipe awaiting registration: level gate + crafting definition. */
+    /** A parsed recipe awaiting registration: crafting definition. */
     private record RecipeDef(
-        String id, int level, int amount, ItemStack result,
-        List<RecipeChoice> shapeless, String[] shape, Map<Character, RecipeChoice> shaped,
-        List<String> ingredients) {
-    }
-
-    /** Read-only view of a recipe for the skill GUI (result icon + ingredient names + dish effect). */
-    public record RecipeView(int level, ItemStack result, List<String> ingredients, int hunger, int saturation) {
+        String id, int amount, ItemStack result,
+        List<RecipeChoice> shapeless, String[] shape, Map<Character, RecipeChoice> shaped) {
     }
 
     private static final MiniMessage MM = MiniMessage.miniMessage();
@@ -70,9 +64,6 @@ public final class CookingFeature extends AbstractFeature {
     private final List<NamespacedKey> registeredKeys = new ArrayList<>();
 
     private final NamespacedKey ciKey; // custom-item id tag on every crafted food/ingredient
-
-    /** The skill id whose level gates each recipe (defined in the skills feature). */
-    public static final String COOK_SKILL = "cook";
 
     public CookingFeature(Core plugin) {
         super(plugin);
@@ -118,7 +109,6 @@ public final class CookingFeature extends AbstractFeature {
     }
 
     private RecipeDef readRecipe(String recipeId, ConfigurationSection s) {
-        int level = Math.max(1, s.getInt("level", 1));
         int amount = Math.max(1, s.getInt("amount", 1));
         ItemStack result = parseResult(s.getString("result"), amount);
         String type = s.getString("type", "SHAPELESS").toUpperCase();
@@ -136,7 +126,6 @@ public final class CookingFeature extends AbstractFeature {
             }
             String[] shape = new String[3];
             Map<Character, RecipeChoice> shaped = new HashMap<>();
-            List<String> ingredientLabels = new ArrayList<>();
             for (int r = 0; r < 3; r++) {
                 String row = shapeRows.get(r);
                 if (row.length() != 3) {
@@ -154,16 +143,14 @@ public final class CookingFeature extends AbstractFeature {
                         return null;
                     }
                     shaped.put(key, choice);
-                    ingredientLabels.add(ingredientLabel(raw));
                 }
             }
             if (result == null) return null;
-            return new RecipeDef(recipeId.toLowerCase(), level, amount, result, null, shape, shaped, ingredientLabels);
+            return new RecipeDef(recipeId.toLowerCase(), amount, result, null, shape, shaped);
         }
 
         // SHAPELESS
         List<RecipeChoice> shapeless = new ArrayList<>();
-        List<String> ingredientLabels = new ArrayList<>();
         for (String raw : s.getStringList("ingredients")) {
             RecipeChoice choice = spec(raw);
             if (choice == null) {
@@ -171,57 +158,9 @@ public final class CookingFeature extends AbstractFeature {
                 return null;
             }
             shapeless.add(choice);
-            ingredientLabels.add(ingredientLabel(raw));
         }
         if (shapeless.isEmpty() || result == null) return null;
-        return new RecipeDef(recipeId.toLowerCase(), level, amount, result, shapeless, null, null, ingredientLabels);
-    }
-
-    /** Human-readable name of an ingredient: a vanilla material or a custom item. */
-    private String ingredientLabel(String raw) {
-        if (raw == null || raw.isEmpty()) return raw;
-        try {
-            return friendly(Material.valueOf(raw.toUpperCase()));
-        } catch (IllegalArgumentException ignored) {
-            // fall through to custom item name
-        }
-        ItemDef item = items.get(raw.toLowerCase());
-        return item != null ? item.name() : raw;
-    }
-
-    /** "COOKED_BEEF" -> "Cooked Beef" (for ingredient hover lines). */
-    private static String friendly(Material material) {
-        String[] words = material.name().toLowerCase().split("_");
-        StringBuilder sb = new StringBuilder();
-        for (String word : words) {
-            sb.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1)).append(' ');
-        }
-        return sb.toString().trim();
-    }
-
-    /** One view per recipe, in config order, for the Cook skill's detail screen. */
-    public List<RecipeView> recipeViews() {
-        List<RecipeView> views = new ArrayList<>();
-        for (RecipeDef def : recipes.values()) {
-            int hunger = 0;
-            int saturation = 0;
-            // Custom dish results carry their item id in the PDC tag; pull the
-            // configured effect so the GUI can show it once the recipe is learnt.
-            ItemMeta resultMeta = def.result().getItemMeta();
-            if (resultMeta != null) {
-                String itemId = resultMeta.getPersistentDataContainer().get(ciKey, PersistentDataType.STRING);
-                if (itemId != null) {
-                    ItemDef itemDef = items.get(itemId);
-                    if (itemDef != null) {
-                        hunger = itemDef.hunger();
-                        saturation = itemDef.saturation();
-                    }
-                }
-            }
-            views.add(new RecipeView(def.level(), def.result().clone(), List.copyOf(def.ingredients()),
-                hunger, saturation));
-        }
-        return views;
+        return new RecipeDef(recipeId.toLowerCase(), amount, result, shapeless, null, null);
     }
 
     /** A single crafting ingredient: a vanilla Material, or a custom item id (ExactChoice). */
@@ -329,39 +268,39 @@ public final class CookingFeature extends AbstractFeature {
         recipesByKey.clear();
     }
 
-    // --- per-player gating: a recipe only crafts at / above its Cook level ---
+    // --- gating: recipes craft whenever the feature is enabled (no permission) ---
 
-    /** The player's current "cook" skill level (0 when the skills feature is absent). */
-    private int cookLevel(Player player) {
-        AbstractFeature skills = plugin.featureManager().get("skills").orElse(null);
-        return skills instanceof SkillsFeature skillsFeature ? skillsFeature.currentLevel(player, COOK_SKILL) : 0;
-    }
-
-    /** True when this player may craft the given recipe (permission + Cook level). */
-    private boolean canCraft(Player player, RecipeDef def) {
-        if (!check(player)) return false;
-        return cookLevel(player) >= def.level();
+    /**
+     * Cooking is open to every player: recipes and custom dish nutrition apply
+     * whenever the feature is enabled (and the world whitelist passes). There is
+     * no permission requirement and no per-player /leet toggle.
+     */
+    @Override
+    protected boolean check(Player player) {
+        if (!enabled) return false;
+        if (worlds != null && !worlds.isEmpty()) {
+            String worldName = player.getWorld().getName();
+            if (!worlds.contains(worldName)) return false;
+        }
+        return true;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPrepare(PrepareItemCraftEvent event) {
-        Recipe recipe = event.getRecipe();
-        RecipeDef def = recipeDef(recipe);
-        if (def == null) return;
+        if (recipeDef(event.getRecipe()) == null) return;
         if (!(event.getView().getPlayer() instanceof Player player)) return;
-        if (!canCraft(player, def)) {
-            event.getInventory().setResult(null); // recipe shows as "no result"/uncraftable until unlocked
+        if (!check(player)) {
+            event.getInventory().setResult(null); // recipe shows as "no result" unless the feature applies
         }
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onCraft(CraftItemEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
-        RecipeDef def = recipeDef(event.getRecipe());
-        if (def == null) return;
-        if (canCraft(player, def)) return;
+        if (recipeDef(event.getRecipe()) == null) return;
+        if (check(player)) return;
         event.setCancelled(true);
-        sendMessage(player, "recipe-locked", "<level>", String.valueOf(def.level()));
+        sendMessage(player, "feature-off");
     }
 
     private RecipeDef recipeDef(Recipe recipe) {

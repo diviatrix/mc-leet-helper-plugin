@@ -5,7 +5,7 @@ The standalone `doublejump`, `fall damage`, `autocrop`, `tree feller`, `durabili
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-A **skill tree** opened with `/skills`. **Traveler** sits at the center. Around it are the eight **ring skills** (**lumberjack, miner, smith, farmer, animalist, fisherman, warrior, explorer**), each unlocked once Traveler reaches its max level (10). Around the tree are the **advanced skills** in a lower tier, each unlocked once its ring skill reaches level 10 (three are 1-level — Tree Feller, Fall Nullify, Double Jump; **Auto Crop** spans 3 — its radius equals its level; **Gardener**, **Breeder**, **Lucky Catch**, **Swimmer** and **Diver** span 10; **Cook** spans 12 and gates cooking recipes). Players spend **vanilla XP points** (`player.getTotalExperience()` / `giveExp(-cost)`) to level skills up.
+A **skill tree** opened with `/skills`. **Traveler** sits at the center. Around it are the eight **ring skills** (**lumberjack, miner, smith, farmer, animalist, fisherman, warrior, explorer**), each unlocked once Traveler reaches its max level (10). Around the tree are the **advanced skills** in a lower tier, each unlocked once its ring skill reaches level 10 (three are 1-level — Tree Feller, Fall Nullify, Double Jump; **Auto Crop** spans 3 — its radius equals its level; **Gardener**, **Breeder**, **Lucky Catch**, **Swimmer** and **Diver** span 10). Players spend **vanilla XP points** (`player.getTotalExperience()` / `giveExp(-cost)`) to level skills up.
 
 The feature is split across **two config files**:
 - `features/skills.yml` — the **skill definitions**: each skill's name, icon, `max-level`, `exp` costs, effects, and materials.
@@ -82,7 +82,6 @@ Advanced skills are `max-level: 1`; buying them costs its single `exp` entry and
 | **Diver** | swimmer level 10 | Hold your breath longer underwater (10 → 100% at 10, i.e. 2×) |
 | **Breeder** | animalist level 10 | Chance an extra baby drops when breeding (2.5 → 25%) |
 | **Lucky Catch** | fisherman level 10 | Chance a catch is upgraded to a higher-tier item (1 → 10%) |
-| **Cook** | farmer level 10 | Unlocks the [cooking recipes](cooking.md): each level unlocks one new recipe (12 levels, no passive — pure recipe gate) |
 
 **Generic effect model** — every ring skill is a named body of `effects`, so the skill tree and the passive engine share the same data. Each effect is either:
 - a **numeric** `per-level` increment: current value at level N = `N × per-level` (shown on the detail screen as `+N×x%`); or
@@ -91,7 +90,7 @@ Advanced skills are `max-level: 1`; buying them costs its single `exp` entry and
 The detail screen renders every effect as its own icon with its current modifier; the tree hover shows each effect's **current value + `desc`** (e.g. Smith at level 10 → `50% chance a tool takes no durability damage`). Locked skills show a glinting emerald lock.
 
 ### Skills vs. the standalone features
-Skills that duplicate a standalone feature (**Smith**↔`durability`, **Tree Feller**↔`tree_feller`, **Auto Crop**↔`auto_crop`, **Fall Nullify**↔`fall_damage`, **Double Jump**↔`double_jump`, **Cook**↔`cooking`) ignore the feature's `base.enabled` entirely and key off the feature's **permission**:
+Skills that duplicate a standalone feature (**Smith**↔`durability`, **Tree Feller**↔`tree_feller`, **Auto Crop**↔`auto_crop`, **Fall Nullify**↔`fall_damage`, **Double Jump**↔`double_jump`) ignore the feature's `base.enabled` entirely and key off the feature's **permission**:
 - If the player holds `leet.feat.<feature>`, the skill is shown as **already acquired** (maxed, not purchasable) and the feature is the single provider of the effect — the skill's own passive does not fire for that player.
 - Otherwise the skill is a normal purchasable skill: level it with XP and the skill itself provides the effect.
 

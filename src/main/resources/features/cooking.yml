@@ -1,7 +1,9 @@
 base:
-  enabled: true
-  permission: leet.feat.cooking
-  default-permission: false
+  enabled: true       # server-level switch: ON = recipes available to every player
+  # Cooking needs NO permission and no per-player toggle: recipes and custom dish
+  # nutrition apply to everyone whenever the feature is enabled (plus the world
+  # whitelist below). The `permission`/`default-permission` keys are intentionally
+  # omitted — there is no node to grant.
   worlds: []
   cooldown: 0
   message-type: ACTION_BAR
@@ -89,16 +91,14 @@ feature:
       lore:
         - "A layered apple-and-sponge cake."
 
-  # Crafting recipes. Each unlocks at `cook` skill level `level` (one recipe per
-  # level). Type SHAPELESS = a flat `ingredients` list; SHAPED = a 3x3 `shape`
-  # of letters plus an `ingredients` map of letter -> item. A result is either a
-  # custom item id above (e.g. `dough`) or `material:<MATERIAL>` for a vanilla
-  # output (e.g. the second way to make bread). Shapeless ingredients are either
-  # a vanilla Material name or a custom item id (matched exactly by tag+name).
+  # Crafting recipes. Type SHAPELESS = a flat `ingredients` list; SHAPED = a 3x3
+  # `shape` of letters plus an `ingredients` map of letter -> item. A result is
+  # either a custom item id above (e.g. `dough`) or `material:<MATERIAL>` for a
+  # vanilla output (e.g. the second way to make bread). Shapeless ingredients are
+  # either a vanilla Material name or a custom item id (matched exactly by tag+name).
   recipes:
     dough:
       type: SHAPELESS
-      level: 1
       ingredients:
         - WHEAT
         - WHEAT
@@ -107,14 +107,12 @@ feature:
       amount: 1
     bread:
       type: SHAPELESS
-      level: 2
       ingredients:
         - dough
       result: material:BREAD
       amount: 1
     croissant:
       type: SHAPELESS
-      level: 3
       ingredients:
         - dough
         - dough
@@ -124,7 +122,6 @@ feature:
       amount: 1
     borsh:
       type: SHAPELESS
-      level: 4
       ingredients:
         - COOKED_BEEF
         - BAKED_POTATO
@@ -136,7 +133,6 @@ feature:
       amount: 1
     pelmeni:
       type: SHAPELESS
-      level: 5
       ingredients:
         - dough
         - COOKED_BEEF
@@ -145,7 +141,6 @@ feature:
       amount: 1
     instant-noodle:
       type: SHAPELESS
-      level: 6
       ingredients:
         - dough
         - dough
@@ -155,7 +150,6 @@ feature:
       amount: 1
     ramen:
       type: SHAPELESS
-      level: 7
       ingredients:
         - dough
         - COOKED_CHICKEN
@@ -165,7 +159,6 @@ feature:
       amount: 1
     banh-mi:
       type: SHAPELESS
-      level: 8
       ingredients:
         - BREAD
         - COOKED_CHICKEN
@@ -175,7 +168,6 @@ feature:
       amount: 1
     milk-porridge:
       type: SHAPELESS
-      level: 9
       ingredients:
         - MILK_BUCKET
         - WHEAT
@@ -185,7 +177,6 @@ feature:
       amount: 1
     creamy-mushroom-soup:
       type: SHAPELESS
-      level: 10
       ingredients:
         - BROWN_MUSHROOM
         - RED_MUSHROOM
@@ -195,7 +186,6 @@ feature:
       amount: 1
     chicken-skewers:
       type: SHAPELESS
-      level: 11
       ingredients:
         - COOKED_CHICKEN
         - COOKED_CHICKEN
@@ -204,7 +194,6 @@ feature:
       amount: 1
     charlotte:
       type: SHAPELESS
-      level: 12
       ingredients:
         - WHEAT
         - WHEAT
@@ -215,4 +204,4 @@ feature:
       amount: 1
 
 messages:
-  recipe-locked: "<red>You need <level> Cook level to craft this."
+  feature-off: "<red>Cooking is currently off for you."

@@ -71,8 +71,7 @@ public class SkillsFeature extends AbstractFeature {
         "auto-crop", "auto_crop",
         "fall-nullify", "fall_damage",
         "double-jump", "double_jump",
-        "smith", "durability",
-        "cook", "cooking"
+        "smith", "durability"
     );
 
     /**

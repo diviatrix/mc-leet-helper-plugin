@@ -124,7 +124,7 @@ In the tree, click a skill to see its description and a Level Up button; confirm
 
 ### /leet
 
-Player-side feature toggles. Each player can turn supported features **off for themselves** (it's an off-switch — it never grants or revokes access). Persisted per-player in the SQLite `kv_store`, so preferences survive restarts.
+Player-side feature control. Each player can turn supported features **off for themselves** (an off-switch — it never grants or revokes access). Persisted per-player in the SQLite `kv_store`, so preferences survive restarts. A few server-level features have **no** per-player toggle and only offer info (e.g. Cooking).
 
 | Subcommand | Permission | Description |
 |---|---|---|
@@ -135,15 +135,15 @@ Player-side feature toggles. Each player can turn supported features **off for t
 | `/leet fall` | `leet.feat.fall_damage` | Toggle **Fall Damage** on/off for yourself |
 | `/leet xp` | `leet.feat.xp` | Toggle **XP** on/off for yourself |
 | `/leet skills` | `leet.feat.skills` | Toggle **Skills** on/off for yourself |
-| `/leet cook` | `leet.feat.cooking` | Toggle **Cooking** on/off for yourself |
+| `/leet cook` | *(none — server-enabled)* | Show **Cooking** info; recipes enable for the whole server (`base.enabled`) |
 
 **Permission model** — `/leet` is permission-gated by the underlying feature permissions:
-- The command is only available to players who have at least **one** `leet.feat.<id>` permission. If a player has **none**, `/leet` reports `No permission.` and does nothing (including `list`, and no tab completion).
-- Tab completion and the status list only show the features the player is actually permissioned for.
+- The command is only available to players who have at least **one** `leet.feat.<id>` permission **or** an enabled server-level info feature. If a player has **none**, `/leet` reports `No permission.` and does nothing (including `list`, and no tab completion).
+- Tab completion and the status list only show the features the player is actually permissioned for (plus server-level info features like Cooking).
 - Toggling a feature still checks that feature's permission (e.g. `leet.feat.double_jump`); without it, `/leet <sub>` is declined.
-- Because these features default to `false`, `/leet` is **not** available out of the box — a player must be granted at least one feature permission first (see [Permissions](doc/permissions.md)). Grant e.g. `leet.feat.double_jump`, `leet.feat.auto_crop`, `leet.feat.tree_feller`, or `leet.feat.fall_damage` in your permission plugin to unlock the corresponding `/leet` subcommands.
+- Because these toggle features default to `false`, their `/leet` subcommands need a granted permission — but **Cooking needs no permission**: it is controlled at the server level by `base.enabled` (see [Feature: Cooking](doc/features/cooking.md)).
 
-**How the toggle applies:** a player's off-toggle adds a layer inside `AbstractFeature.check()` (server enabled → base permission → personal toggle → world whitelist). When off, the feature stops firing for that player only; other players and the rest of the config are unaffected.
+**How the toggle applies:** a player's off-toggle adds a layer inside `AbstractFeature.check()` (server enabled → base permission → personal toggle → world whitelist). When off, the feature stops firing for that player only; other players and the rest of the config are unaffected. Cooking is the exception — it bypasses the permission/toggle layers and enables for the whole server.
 
 ---
 
