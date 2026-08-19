@@ -1,0 +1,257 @@
+{
+  "recipes": [
+    {
+      "recipe": "smelt beef",
+      "ingredients": "beef",
+      "ing_input_hunger": 3,
+      "ing_input_sat": 0.9,
+      "result_per_item_hunger": 8.0,
+      "result_per_item_sat": 6.4,
+      "hunger_ratio_result_per_input": 2.667,
+      "sat_ratio_result_per_input": 7.111,
+      "note": ""
+    },
+    {
+      "recipe": "smelt porkchop",
+      "ingredients": "porkchop",
+      "ing_input_hunger": 3,
+      "ing_input_sat": 0.9,
+      "result_per_item_hunger": 8.0,
+      "result_per_item_sat": 6.4,
+      "hunger_ratio_result_per_input": 2.667,
+      "sat_ratio_result_per_input": 7.111,
+      "note": ""
+    },
+    {
+      "recipe": "smelt chicken",
+      "ingredients": "chicken",
+      "ing_input_hunger": 2,
+      "ing_input_sat": 0.6,
+      "result_per_item_hunger": 6.0,
+      "result_per_item_sat": 3.6,
+      "hunger_ratio_result_per_input": 3.0,
+      "sat_ratio_result_per_input": 6.0,
+      "note": ""
+    },
+    {
+      "recipe": "smelt cod",
+      "ingredients": "cod",
+      "ing_input_hunger": 2,
+      "ing_input_sat": 0.2,
+      "result_per_item_hunger": 5.0,
+      "result_per_item_sat": 3.0,
+      "hunger_ratio_result_per_input": 2.5,
+      "sat_ratio_result_per_input": 15.0,
+      "note": ""
+    },
+    {
+      "recipe": "smelt salmon",
+      "ingredients": "salmon",
+      "ing_input_hunger": 2,
+      "ing_input_sat": 0.2,
+      "result_per_item_hunger": 6.0,
+      "result_per_item_sat": 4.8,
+      "hunger_ratio_result_per_input": 3.0,
+      "sat_ratio_result_per_input": 24.0,
+      "note": ""
+    },
+    {
+      "recipe": "smelt mutton",
+      "ingredients": "mutton",
+      "ing_input_hunger": 2,
+      "ing_input_sat": 0.6,
+      "result_per_item_hunger": 6.0,
+      "result_per_item_sat": 4.8,
+      "hunger_ratio_result_per_input": 3.0,
+      "sat_ratio_result_per_input": 8.0,
+      "note": ""
+    },
+    {
+      "recipe": "smelt rabbit",
+      "ingredients": "rabbit",
+      "ing_input_hunger": 3,
+      "ing_input_sat": 0.9,
+      "result_per_item_hunger": 5.0,
+      "result_per_item_sat": 3.0,
+      "hunger_ratio_result_per_input": 1.667,
+      "sat_ratio_result_per_input": 3.333,
+      "note": ""
+    },
+    {
+      "recipe": "smelt potato",
+      "ingredients": "potato",
+      "ing_input_hunger": 1,
+      "ing_input_sat": 0.3,
+      "result_per_item_hunger": 5.0,
+      "result_per_item_sat": 3.0,
+      "hunger_ratio_result_per_input": 5.0,
+      "sat_ratio_result_per_input": 10.0,
+      "note": ""
+    },
+    {
+      "recipe": "smelt kelp",
+      "ingredients": "kelp",
+      "ing_input_hunger": 0,
+      "ing_input_sat": 0.0,
+      "result_per_item_hunger": 1.0,
+      "result_per_item_sat": 0.3,
+      "hunger_ratio_result_per_input": null,
+      "sat_ratio_result_per_input": null,
+      "note": "<-- all input 0-value, result has food: vanilla grants baseline"
+    },
+    {
+      "recipe": "bread (wheat x3)",
+      "ingredients": "wheatx3",
+      "ing_input_hunger": 0,
+      "ing_input_sat": 0.0,
+      "result_per_item_hunger": 5.0,
+      "result_per_item_sat": 3.0,
+      "hunger_ratio_result_per_input": null,
+      "sat_ratio_result_per_input": null,
+      "note": "<-- all input 0-value, result has food: vanilla grants baseline"
+    },
+    {
+      "recipe": "cookie",
+      "ingredients": "wheatx2 + cocoa_beans + egg",
+      "ing_input_hunger": 0,
+      "ing_input_sat": 0.0,
+      "result_per_item_hunger": 0.25,
+      "result_per_item_sat": 0.025,
+      "hunger_ratio_result_per_input": null,
+      "sat_ratio_result_per_input": null,
+      "note": "<-- all input 0-value, result has food: vanilla grants baseline"
+    },
+    {
+      "recipe": "mushroom stew",
+      "ingredients": "brown_mushroom + red_mushroom + bowl",
+      "ing_input_hunger": 0,
+      "ing_input_sat": 0.0,
+      "result_per_item_hunger": 6.0,
+      "result_per_item_sat": 3.6,
+      "hunger_ratio_result_per_input": null,
+      "sat_ratio_result_per_input": null,
+      "note": "<-- all input 0-value, result has food: vanilla grants baseline"
+    },
+    {
+      "recipe": "beetroot soup",
+      "ingredients": "beetrootx6 + bowl",
+      "ing_input_hunger": 6,
+      "ing_input_sat": 3.6,
+      "result_per_item_hunger": 6.0,
+      "result_per_item_sat": 3.6,
+      "hunger_ratio_result_per_input": 1.0,
+      "sat_ratio_result_per_input": 1.0,
+      "note": ""
+    },
+    {
+      "recipe": "rabbit stew",
+      "ingredients": "cooked_rabbit + carrot + baked_potato + brown_mushroom + bowl",
+      "ing_input_hunger": 13,
+      "ing_input_sat": 7.8,
+      "result_per_item_hunger": 10.0,
+      "result_per_item_sat": 6.0,
+      "hunger_ratio_result_per_input": 0.769,
+      "sat_ratio_result_per_input": 0.769,
+      "note": ""
+    },
+    {
+      "recipe": "pumpkin pie",
+      "ingredients": "pumpkin + sugar + egg",
+      "ing_input_hunger": 0,
+      "ing_input_sat": 0.0,
+      "result_per_item_hunger": 8.0,
+      "result_per_item_sat": 2.4,
+      "hunger_ratio_result_per_input": null,
+      "sat_ratio_result_per_input": null,
+      "note": "<-- all input 0-value, result has food: vanilla grants baseline"
+    },
+    {
+      "recipe": "golden carrot",
+      "ingredients": "carrot + gold_nuggetx8",
+      "ing_input_hunger": 3,
+      "ing_input_sat": 1.8,
+      "result_per_item_hunger": 6.0,
+      "result_per_item_sat": 7.2,
+      "hunger_ratio_result_per_input": 2.0,
+      "sat_ratio_result_per_input": 4.0,
+      "note": ""
+    },
+    {
+      "recipe": "golden apple",
+      "ingredients": "apple + gold_ingotx8",
+      "ing_input_hunger": 4,
+      "ing_input_sat": 1.2,
+      "result_per_item_hunger": 4.0,
+      "result_per_item_sat": 4.8,
+      "hunger_ratio_result_per_input": 1.0,
+      "sat_ratio_result_per_input": 4.0,
+      "note": ""
+    },
+    {
+      "recipe": "suspicious/mushroom",
+      "ingredients": "brown_mushroom + red_mushroom + bowl",
+      "ing_input_hunger": 0,
+      "ing_input_sat": 0.0,
+      "result_per_item_hunger": 6.0,
+      "result_per_item_sat": 3.6,
+      "hunger_ratio_result_per_input": null,
+      "sat_ratio_result_per_input": null,
+      "note": "<-- all input 0-value, result has food: vanilla grants baseline"
+    },
+    {
+      "recipe": "melon (block->4 slices)",
+      "ingredients": "melon",
+      "ing_input_hunger": 0,
+      "ing_input_sat": 0.0,
+      "result_per_item_hunger": 0.5,
+      "result_per_item_sat": 0.15,
+      "hunger_ratio_result_per_input": null,
+      "sat_ratio_result_per_input": null,
+      "note": "<-- all input 0-value, result has food: vanilla grants baseline"
+    },
+    {
+      "recipe": "honey (bottle drink)",
+      "ingredients": "honey_combx3",
+      "ing_input_hunger": 0,
+      "ing_input_sat": 0.0,
+      "result_per_item_hunger": 6.0,
+      "result_per_item_sat": 0.6,
+      "hunger_ratio_result_per_input": null,
+      "sat_ratio_result_per_input": null,
+      "note": "<-- all input 0-value, result has food: vanilla grants baseline"
+    },
+    {
+      "recipe": "chorus fruit (drop)",
+      "ingredients": "chorus_plant",
+      "ing_input_hunger": 0,
+      "ing_input_sat": 0.0,
+      "result_per_item_hunger": 4.0,
+      "result_per_item_sat": 1.2,
+      "hunger_ratio_result_per_input": null,
+      "sat_ratio_result_per_input": null,
+      "note": "<-- all input 0-value, result has food: vanilla grants baseline"
+    },
+    {
+      "recipe": "rotten flesh (zombie)",
+      "ingredients": "zombie_drop",
+      "ing_input_hunger": 0,
+      "ing_input_sat": 0.0,
+      "result_per_item_hunger": 4.0,
+      "result_per_item_sat": 0.4,
+      "hunger_ratio_result_per_input": null,
+      "sat_ratio_result_per_input": null,
+      "note": "<-- all input 0-value, result has food: vanilla grants baseline"
+    }
+  ],
+  "average_ratio": {
+    "hunger": 2.3558,
+    "saturation": 7.527,
+    "finite_rows": 12,
+    "total_rows": 22
+  },
+  "null_ratio_average_per_item": {
+    "hunger": 4.075,
+    "saturation": 1.5275,
+    "null_rows": 10
+  }
+}

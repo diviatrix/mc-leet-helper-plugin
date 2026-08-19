@@ -30,18 +30,26 @@ src/main/
       FallDamageFeature.java     # Fall-damage immunity implementation
       XpFeature.java             # Bonus XP for actions implementation
       SkillsFeature.java         # XP-spending skill tree with passive skills
+      CookingFeature.java        # Custom foods: items + recipes (SHAPED/SHAPELESS/SMELT)
+      CraftingFeature.java       # Non-food custom items (condiments, e.g. Salt)
       TreeFellerUtil.java        # Shared whole-tree felling (Tree Feller + lumberjack)
       AutoCropUtil.java          # Shared auto-harvest (Auto Crop + farmer)
+      craft/
+        LeetItem.java            # A single custom item (id, material, name/lore, food, leet:item model)
+        LeetItemRegistry.java    # Shared custom-item registry (all features collapse into one map)
+        LeetRecipeRegistry.java  # Generic SHAPED/SHAPELESS/SMELT recipe parse + register/gate
       skills/
         SkillConfig.java         # Data-driven per-skill definition (skills.yml)
         SkillTreeConfig.java     # Tree topology: ring/advanced order + prerequisites (skill-tree.yml)
         SkillState.java          # Per-player skill-level persistence
         SkillsGui.java           # The /skills inventory interface
     command/
-      HelperCommand.java         # /leeta list|toggle|info (+ tab completion)
+      HelperCommand.java         # /leeta list|toggle|info|give (+ tab completion)
       BackCommand.java           # /back
       LeetCommand.java           # /leet player feature toggles (+ tab completion)
       SkillsCommand.java         # /skills (opens the skill tree)
+    resource/
+      ResourcePackService.java   # Builds + serves the additive item-texture resource pack
     storage/
       StorageManager.java        # Runtime (in-memory) + persistent (SQLite) storage
     util/
@@ -59,9 +67,21 @@ src/main/
       xp.yml
       skills.yml
       skill-tree.yml
+      cooking.yml
+      crafting.yml
+    resource_pack/               # Additive asset pack (leet: item models + textures + index)
 ```
 
-`Core` boots the plugin, resolves Vault (Economy + Permission providers, both optional), and registers the feature permissions dynamically. `FeatureManager` owns the feature registry and the enable/disable/toggle lifecycle.
+`Core` boots the plugin, resolves Vault (Economy + Permission providers, both optional), registers the feature permissions dynamically, and owns the **shared** `LeetItemRegistry` and `ResourcePackService`. `FeatureManager` owns the feature registry and the enable/disable/toggle lifecycle.
+
+### Shared crafting engines
+
+Cooking and Crafting both build their items and recipes from the same generic machinery in `com.leet.helper.craft`:
+
+- **`LeetItemRegistry`** — one `id → item` map shared by every crafting feature. Each feature's `feature.items` section is loaded into it, so any recipe in any feature can reference any item id (e.g. Cooking can use Crafting's `salt`). The `ci` PersistentData tag + `leet:item/<id>` item model are set here. Because registration is shared and cumulative, features that *produce* ingredients enable **before** the features whose recipes *consume* them (Crafting is registered before Cooking in `Core`).
+- **`LeetRecipeRegistry`** — parses a `feature.recipes` section into Bukkit recipes. Supports **SHAPELESS** (a flat list), **SHAPED** (3 rows of 3 + a letter→ingredient map), and **SMELT** (a single furnace `ingredient` → `result`, with optional `experience`/`cooking-time`). Results are a custom item id or `material:<MATERIAL>`.
+- **`ResourcePackService`** — one instance owned by `Core`, builds and serves the additive `leet:` item pack (nothing in `assets/minecraft` is overridden).
+
 
 ---
 
@@ -151,6 +171,7 @@ Each feature's config file and its reference doc:
 | XP | `xp.yml` | [feature-xp](features/xp.md) |
 | Skills | `skills.yml` + `skill-tree.yml` | [feature-skills](features/skills.md) |
 | Cooking | `cooking.yml` | [feature-cooking](features/cooking.md) |
+| Crafting | `crafting.yml` | [feature-crafting](features/crafting.md) |
 
 ### Automatic config merging (backfill)
 

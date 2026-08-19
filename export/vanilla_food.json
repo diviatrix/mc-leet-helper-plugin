@@ -1,0 +1,202 @@
+{
+  "APPLE": {
+    "nutrition": 4,
+    "saturation": 1.2,
+    "saturation_modifier": 0.3
+  },
+  "BAKED_POTATO": {
+    "nutrition": 5,
+    "saturation": 3.0,
+    "saturation_modifier": 0.6
+  },
+  "BEEF": {
+    "nutrition": 3,
+    "saturation": 0.9,
+    "saturation_modifier": 0.3
+  },
+  "BEETROOT": {
+    "nutrition": 1,
+    "saturation": 0.6,
+    "saturation_modifier": 0.6
+  },
+  "BREAD": {
+    "nutrition": 5,
+    "saturation": 3.0,
+    "saturation_modifier": 0.6
+  },
+  "CARROT": {
+    "nutrition": 3,
+    "saturation": 1.8,
+    "saturation_modifier": 0.6
+  },
+  "CHICKEN": {
+    "nutrition": 2,
+    "saturation": 0.6,
+    "saturation_modifier": 0.3
+  },
+  "CHORUS_FRUIT": {
+    "nutrition": 4,
+    "saturation": 1.2,
+    "saturation_modifier": 0.3
+  },
+  "COD": {
+    "nutrition": 2,
+    "saturation": 0.2,
+    "saturation_modifier": 0.1
+  },
+  "COOKED_BEEF": {
+    "nutrition": 8,
+    "saturation": 6.4,
+    "saturation_modifier": 0.8
+  },
+  "COOKED_CHICKEN": {
+    "nutrition": 6,
+    "saturation": 3.6,
+    "saturation_modifier": 0.6
+  },
+  "COOKED_COD": {
+    "nutrition": 5,
+    "saturation": 3.0,
+    "saturation_modifier": 0.6
+  },
+  "COOKED_MUTTON": {
+    "nutrition": 6,
+    "saturation": 4.8,
+    "saturation_modifier": 0.8
+  },
+  "COOKED_PORKCHOP": {
+    "nutrition": 8,
+    "saturation": 6.4,
+    "saturation_modifier": 0.8
+  },
+  "COOKED_RABBIT": {
+    "nutrition": 5,
+    "saturation": 3.0,
+    "saturation_modifier": 0.6
+  },
+  "COOKED_SALMON": {
+    "nutrition": 6,
+    "saturation": 4.8,
+    "saturation_modifier": 0.8
+  },
+  "COOKIE": {
+    "nutrition": 2,
+    "saturation": 0.2,
+    "saturation_modifier": 0.1
+  },
+  "DRIED_KELP": {
+    "nutrition": 1,
+    "saturation": 0.3,
+    "saturation_modifier": 0.3
+  },
+  "ENCHANTED_GOLDEN_APPLE": {
+    "nutrition": 4,
+    "saturation": 4.8,
+    "saturation_modifier": 1.2
+  },
+  "GOLDEN_APPLE": {
+    "nutrition": 4,
+    "saturation": 4.8,
+    "saturation_modifier": 1.2
+  },
+  "GOLDEN_CARROT": {
+    "nutrition": 6,
+    "saturation": 7.2,
+    "saturation_modifier": 1.2
+  },
+  "HONEY_BOTTLE": {
+    "nutrition": 6,
+    "saturation": 0.6,
+    "saturation_modifier": 0.1
+  },
+  "MELON_SLICE": {
+    "nutrition": 2,
+    "saturation": 0.6,
+    "saturation_modifier": 0.3
+  },
+  "MUTTON": {
+    "nutrition": 2,
+    "saturation": 0.6,
+    "saturation_modifier": 0.3
+  },
+  "POISONOUS_POTATO": {
+    "nutrition": 2,
+    "saturation": 0.6,
+    "saturation_modifier": 0.3
+  },
+  "PORKCHOP": {
+    "nutrition": 3,
+    "saturation": 0.9,
+    "saturation_modifier": 0.3
+  },
+  "POTATO": {
+    "nutrition": 1,
+    "saturation": 0.3,
+    "saturation_modifier": 0.3
+  },
+  "PUFFERFISH": {
+    "nutrition": 1,
+    "saturation": 0.1,
+    "saturation_modifier": 0.1
+  },
+  "PUMPKIN_PIE": {
+    "nutrition": 8,
+    "saturation": 2.4,
+    "saturation_modifier": 0.3
+  },
+  "RABBIT": {
+    "nutrition": 3,
+    "saturation": 0.9,
+    "saturation_modifier": 0.3
+  },
+  "ROTTEN_FLESH": {
+    "nutrition": 4,
+    "saturation": 0.4,
+    "saturation_modifier": 0.1
+  },
+  "SALMON": {
+    "nutrition": 2,
+    "saturation": 0.2,
+    "saturation_modifier": 0.1
+  },
+  "SPIDER_EYE": {
+    "nutrition": 2,
+    "saturation": 1.6,
+    "saturation_modifier": 0.8
+  },
+  "SWEET_BERRIES": {
+    "nutrition": 2,
+    "saturation": 0.2,
+    "saturation_modifier": 0.1
+  },
+  "GLOW_BERRIES": {
+    "nutrition": 2,
+    "saturation": 0.2,
+    "saturation_modifier": 0.1
+  },
+  "TROPICAL_FISH": {
+    "nutrition": 1,
+    "saturation": 0.1,
+    "saturation_modifier": 0.1
+  },
+  "BEETROOT_SOUP": {
+    "nutrition": 6,
+    "saturation": 3.6,
+    "saturation_modifier": 0.6
+  },
+  "MUSHROOM_STEW": {
+    "nutrition": 6,
+    "saturation": 3.6,
+    "saturation_modifier": 0.6
+  },
+  "RABBIT_STEW": {
+    "nutrition": 10,
+    "saturation": 6.0,
+    "saturation_modifier": 0.6
+  },
+  "SUSPICIOUS_STEW": {
+    "nutrition": 6,
+    "saturation": 3.6,
+    "saturation_modifier": 0.6
+  }
+}

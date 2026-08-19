@@ -75,9 +75,11 @@ public class Core extends JavaPlugin {
         featureManager.register(new FallDamageFeature(this));
         featureManager.register(new XpFeature(this));
         featureManager.register(new SkillsFeature(this));
-        featureManager.register(new CookingFeature(this, itemRegistry));
+        // CraftingFeature loads Salt into the shared item registry before Cooking,
+        // so Cooking recipes may reference custom crafting items (e.g. salt).
         craftingFeature = new CraftingFeature(this, itemRegistry);
         featureManager.register(craftingFeature);
+        featureManager.register(new CookingFeature(this, itemRegistry));
         featureManager.enableAll();
 
         // One shared server: distribute the item-texture pack regardless of

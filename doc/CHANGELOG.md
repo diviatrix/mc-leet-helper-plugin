@@ -2,6 +2,39 @@
 
 All notable changes to **LeetHelper**. Entries are newest first.
 
+## 1.4.0 — Custom foods, crafting engine, item give
+
+**Added**
+- **Cooking** grew from the original dishes into a 20-item food set with 21
+  recipes, including salted foods: **Pretzel**, **Beef Jerky**, **Chicken Jerky**,
+  **Jamón**, **Potato Chips**, **Dry Salmon**, **Dry Cod**, and **Chocolate Bar**
+  / **Chocolate Piece** (bar shaped `CCC/SMS/CCC`, breaks into 8 pieces).
+- **Crafting feature** (`crafting.yml`): a non-food custom-item domain, starting
+  with **Salt** (smelt a water bucket). Its items join a shared custom-item
+  registry that Cooking recipes reference.
+- **Generic crafting engines** (`com.leet.helper.craft`): `LeetItem`,
+  `LeetItemRegistry`, `LeetRecipeRegistry` — shared by Cooking and Crafting, with
+  **SHAPED** / **SHAPELESS** / **SMELT** recipe support. `ResourcePackService`
+  moved to a single Core-owned server that serves the additive `leet:` item pack.
+- **`/leeta give <item-id> [amount] [player]`** — admin command to hand out any
+  registered custom item (the supported way to obtain custom items, since a plain
+  vanilla `/give` won't produce the tagged items).
+- Recipe tweaks: Creamy Mushroom Soup yields ×3; Instant Noodle no longer needs a
+  bowl.
+
+**Changed**
+- Custom-food `hunger`/`saturation` values and recipe `amount` yields were
+  rebalanced from the server's **real vanilla food data** (values exported from
+  the running server's `Foods` registry), using the vanilla cooking multiplier
+  instead of arbitrary tuning. Crafted `amount` spreads large totals into several
+  pieces.
+
+**Removed**
+- The experimental custom **crop** feature (soy crop + soy seed/oil/sauce) and its
+  config. There are no custom plants; only items and food remain.
+
+---
+
 ## 1.2.2 — Skill tree overhaul
 
 The `/skills` tree was rebuilt into a full two-tier skill tree (Traveler at the

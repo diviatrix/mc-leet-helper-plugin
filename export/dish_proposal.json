@@ -1,0 +1,97 @@
+{
+  "croissant": {
+    "hunger": 2,
+    "saturation": 2,
+    "amount": 6
+  },
+  "borsh": {
+    "hunger": 6,
+    "saturation": 9,
+    "amount": 6
+  },
+  "pelmeni": {
+    "hunger": 3,
+    "saturation": 4,
+    "amount": 8
+  },
+  "instant-noodle": {
+    "hunger": 2,
+    "saturation": 1,
+    "amount": 3
+  },
+  "ramen": {
+    "hunger": 4,
+    "saturation": 6,
+    "amount": 8
+  },
+  "banh-mi": {
+    "hunger": 4,
+    "saturation": 6,
+    "amount": 6
+  },
+  "milk-porridge": {
+    "hunger": 4,
+    "saturation": 6,
+    "amount": 4
+  },
+  "creamy-mushroom-soup": {
+    "hunger": 4,
+    "saturation": 6,
+    "amount": 4
+  },
+  "chicken-skewers": {
+    "hunger": 4,
+    "saturation": 4,
+    "amount": 4
+  },
+  "charlotte": {
+    "hunger": 6,
+    "saturation": 6,
+    "amount": 2
+  },
+  "pretzel": {
+    "hunger": 3,
+    "saturation": 3,
+    "amount": 2
+  },
+  "beef-jerky": {
+    "hunger": 5,
+    "saturation": 5,
+    "amount": 3
+  },
+  "chicken-jerky": {
+    "hunger": 4,
+    "saturation": 4,
+    "amount": 3
+  },
+  "hamon": {
+    "hunger": 4,
+    "saturation": 6,
+    "amount": 8
+  },
+  "potato-chips": {
+    "hunger": 3,
+    "saturation": 2,
+    "amount": 4
+  },
+  "dry-salmon": {
+    "hunger": 5,
+    "saturation": 2,
+    "amount": 4
+  },
+  "dry-cod": {
+    "hunger": 4,
+    "saturation": 2,
+    "amount": 4
+  },
+  "chocolate-bar": {
+    "hunger": 16,
+    "saturation": 16,
+    "amount": 1
+  },
+  "chocolate-piece": {
+    "hunger": 2,
+    "saturation": 2,
+    "amount": 1
+  }
+}

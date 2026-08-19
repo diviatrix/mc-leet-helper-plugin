@@ -25,7 +25,7 @@ A **Paper 26.2** plugin providing modular gameplay features. Each feature has it
 
 ## Overview
 
-LeetHelper registers nine gameplay features plus one admin command.
+LeetHelper registers ten gameplay features plus one admin command.
 
 | Feature | ID | Description |
 |---|---|---|
@@ -37,9 +37,10 @@ LeetHelper registers nine gameplay features plus one admin command.
 | [Fall Damage](doc/features/fall-damage.md) | `fall_damage` | Negates all fall damage for eligible players |
 | [XP](doc/features/xp.md) | `xp` | Bonus vanilla XP for mining, woodcutting, crops, fishing, building, and killing |
 | [Skills](doc/features/skills.md) | `skills` | A skill tree (Traveler + 8 passive skills + 1-level advanced skills) leveled up by spending XP points |
-| [Cooking](doc/features/cooking.md) | `cooking` | Server-wide custom food recipes and dishes, each with a client icon from a bundled dish-only resource pack |
+| [Cooking](doc/features/cooking.md) | `cooking` | Server-wide custom food recipes and dishes (SHAPED/SHAPELESS/SMELT), each with a client icon from a bundled additive resource pack |
+| [Crafting](doc/features/crafting.md) | `crafting` | Server-wide custom **non-food** items (condiments), e.g. Salt (smelt a water bucket); its items are usable in Cooking recipes |
 
-Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`); full per-feature details (config keys, limitations, permissions) are in **[doc/features/](doc/features/)**.
+Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, `give`); full per-feature details (config keys, limitations, permissions) are in **[doc/features/](doc/features/)**.
 
 ---
 
@@ -73,7 +74,9 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`);
        ├── fall_damage.yml
        ├── xp.yml
        ├── skills.yml
-       └── skill-tree.yml
+       ├── skill-tree.yml
+       ├── cooking.yml
+       └── crafting.yml
    ```
 
 4. **Configure to taste** — edit the files inside `plugins/LeetHelper/features/`. Restart the server for changes to take effect (there is **no reload command**; `base.enabled` toggles are the only thing that can be changed live, via `/leeta toggle`).
@@ -92,16 +95,17 @@ See **[doc/permissions.md](doc/permissions.md)** — the admin `/leeta` permissi
 
 ### /leeta
 
-Admin command for managing features. Requires the `leeta` command permission (`leet.admin`, op by default). Full reference in [doc/Admin.md](doc/Admin.md).
+Admin command for managing features and giving custom items. Requires the `leeta` command permission (`leet.admin`, op by default). Full reference in [doc/Admin.md](doc/Admin.md).
 
 | Subcommand | Permission | Description |
 |---|---|---|
-| `/leeta` | (base command) | Prints usage: `/leeta <list\|toggle\|info>` |
+| `/leeta` | (base command) | Prints usage: `/leeta <list\|toggle\|info\|give>` |
 | `/leeta list` | `leet.admin` | Lists all features with ON/OFF status |
 | `/leeta toggle <id>` | `leet.admin.toggle` | Toggles a feature on/off and **persists** `base.enabled` to its YAML |
 | `/leeta info <id>` | `leet.admin` | Shows the feature's ID, permission node, and current status |
+| `/leeta give <item-id> [amount] [player]` | `leet.admin` | Gives a registered **custom item** (built from the shared custom-item registry, so it carries the correct `ci` tag + `leet:item/<id>` texture) |
 
-Tab completion is provided for subcommands and feature IDs.
+Tab completion is provided for subcommands, feature IDs, and item IDs.
 
 **On toggle:** `FeatureManager.toggle()` disables the feature (unregisters listeners), re-enables it if it was off, and writes the new state back to `base.enabled` in the feature's YAML file — so the toggle survives a restart. A toggle does **not** reload the rest of the config; config file edits still need a restart.
 

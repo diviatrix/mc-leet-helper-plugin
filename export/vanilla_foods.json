@@ -1,0 +1,212 @@
+{
+  "foods": {
+    "APPLE": {
+      "nutrition": 4,
+      "saturation": 1.2
+    },
+    "BAKED_POTATO": {
+      "nutrition": 5,
+      "saturation": 3.0
+    },
+    "BEEF": {
+      "nutrition": 3,
+      "saturation": 0.9
+    },
+    "BEETROOT": {
+      "nutrition": 1,
+      "saturation": 0.6
+    },
+    "BEETROOT_SOUP": {
+      "nutrition": 6,
+      "saturation": 3.6
+    },
+    "BREAD": {
+      "nutrition": 5,
+      "saturation": 3.0
+    },
+    "CARROT": {
+      "nutrition": 3,
+      "saturation": 1.8
+    },
+    "CHICKEN": {
+      "nutrition": 2,
+      "saturation": 0.6
+    },
+    "CHORUS_FRUIT": {
+      "nutrition": 4,
+      "saturation": 1.2
+    },
+    "COD": {
+      "nutrition": 2,
+      "saturation": 0.2
+    },
+    "COOKED_BEEF": {
+      "nutrition": 8,
+      "saturation": 6.4
+    },
+    "COOKED_CHICKEN": {
+      "nutrition": 6,
+      "saturation": 3.6
+    },
+    "COOKED_COD": {
+      "nutrition": 5,
+      "saturation": 3.0
+    },
+    "COOKED_MUTTON": {
+      "nutrition": 6,
+      "saturation": 4.8
+    },
+    "COOKED_PORKCHOP": {
+      "nutrition": 8,
+      "saturation": 6.4
+    },
+    "COOKED_RABBIT": {
+      "nutrition": 5,
+      "saturation": 3.0
+    },
+    "COOKED_SALMON": {
+      "nutrition": 6,
+      "saturation": 4.8
+    },
+    "COOKIE": {
+      "nutrition": 2,
+      "saturation": 0.2
+    },
+    "DRIED_KELP": {
+      "nutrition": 1,
+      "saturation": 0.3
+    },
+    "ENCHANTED_GOLDEN_APPLE": {
+      "nutrition": 4,
+      "saturation": 4.8
+    },
+    "GLOW_BERRIES": {
+      "nutrition": 2,
+      "saturation": 0.2
+    },
+    "GOLDEN_APPLE": {
+      "nutrition": 4,
+      "saturation": 4.8
+    },
+    "GOLDEN_CARROT": {
+      "nutrition": 6,
+      "saturation": 7.2
+    },
+    "HONEY_BOTTLE": {
+      "nutrition": 6,
+      "saturation": 0.6
+    },
+    "MELON_SLICE": {
+      "nutrition": 2,
+      "saturation": 0.6
+    },
+    "MUSHROOM_STEW": {
+      "nutrition": 6,
+      "saturation": 3.6
+    },
+    "MUTTON": {
+      "nutrition": 2,
+      "saturation": 0.6
+    },
+    "POISONOUS_POTATO": {
+      "nutrition": 2,
+      "saturation": 0.6
+    },
+    "PORKCHOP": {
+      "nutrition": 3,
+      "saturation": 0.9
+    },
+    "POTATO": {
+      "nutrition": 1,
+      "saturation": 0.3
+    },
+    "PUFFERFISH": {
+      "nutrition": 1,
+      "saturation": 0.1
+    },
+    "PUMPKIN_PIE": {
+      "nutrition": 8,
+      "saturation": 2.4
+    },
+    "RABBIT": {
+      "nutrition": 3,
+      "saturation": 0.9
+    },
+    "RABBIT_STEW": {
+      "nutrition": 10,
+      "saturation": 6.0
+    },
+    "ROTTEN_FLESH": {
+      "nutrition": 4,
+      "saturation": 0.4
+    },
+    "SALMON": {
+      "nutrition": 2,
+      "saturation": 0.2
+    },
+    "SPIDER_EYE": {
+      "nutrition": 2,
+      "saturation": 1.6
+    },
+    "SUSPICIOUS_STEW": {
+      "nutrition": 6,
+      "saturation": 3.6
+    },
+    "SWEET_BERRIES": {
+      "nutrition": 2,
+      "saturation": 0.2,
+      "saturation_modifier": 0.1
+    },
+    "SWEET_BERRY_BUSH": {
+      "nutrition": 2,
+      "saturation": 0.2
+    },
+    "TROPICAL_FISH": {
+      "nutrition": 1,
+      "saturation": 0.1
+    }
+  },
+  "all_food_materials": [
+    "APPLE",
+    "BAKED_POTATO",
+    "BEEF",
+    "BEETROOT",
+    "BEETROOT_SOUP",
+    "BREAD",
+    "CARROT",
+    "CHICKEN",
+    "CHORUS_FRUIT",
+    "COD",
+    "COOKED_BEEF",
+    "COOKED_CHICKEN",
+    "COOKED_COD",
+    "COOKED_MUTTON",
+    "COOKED_PORKCHOP",
+    "COOKED_RABBIT",
+    "COOKED_SALMON",
+    "COOKIE",
+    "DRIED_KELP",
+    "ENCHANTED_GOLDEN_APPLE",
+    "GLOW_BERRIES",
+    "GOLDEN_APPLE",
+    "GOLDEN_CARROT",
+    "HONEY_BOTTLE",
+    "MELON_SLICE",
+    "MUSHROOM_STEW",
+    "MUTTON",
+    "POISONOUS_POTATO",
+    "PORKCHOP",
+    "POTATO",
+    "PUFFERFISH",
+    "PUMPKIN_PIE",
+    "RABBIT",
+    "RABBIT_STEW",
+    "ROTTEN_FLESH",
+    "SALMON",
+    "SPIDER_EYE",
+    "SUSPICIOUS_STEW",
+    "SWEET_BERRIES",
+    "SWEET_BERRY_BUSH",
+    "TROPICAL_FISH"
+  ]
+}

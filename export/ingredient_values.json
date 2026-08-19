@@ -1,0 +1,212 @@
+{
+  "APPLE": {
+    "hunger": 4,
+    "saturation": 1.2
+  },
+  "BAKED_POTATO": {
+    "hunger": 5,
+    "saturation": 3.0
+  },
+  "BEEF": {
+    "hunger": 3,
+    "saturation": 0.9
+  },
+  "BEETROOT": {
+    "hunger": 1,
+    "saturation": 0.6
+  },
+  "BREAD": {
+    "hunger": 5,
+    "saturation": 3.0
+  },
+  "CARROT": {
+    "hunger": 3,
+    "saturation": 1.8
+  },
+  "CHICKEN": {
+    "hunger": 2,
+    "saturation": 0.6
+  },
+  "CHORUS_FRUIT": {
+    "hunger": 4,
+    "saturation": 1.2
+  },
+  "COD": {
+    "hunger": 2,
+    "saturation": 0.2
+  },
+  "COOKED_BEEF": {
+    "hunger": 8,
+    "saturation": 6.4
+  },
+  "COOKED_CHICKEN": {
+    "hunger": 6,
+    "saturation": 3.6
+  },
+  "COOKED_COD": {
+    "hunger": 5,
+    "saturation": 3.0
+  },
+  "COOKED_MUTTON": {
+    "hunger": 6,
+    "saturation": 4.8
+  },
+  "COOKED_PORKCHOP": {
+    "hunger": 8,
+    "saturation": 6.4
+  },
+  "COOKED_RABBIT": {
+    "hunger": 5,
+    "saturation": 3.0
+  },
+  "COOKED_SALMON": {
+    "hunger": 6,
+    "saturation": 4.8
+  },
+  "COOKIE": {
+    "hunger": 2,
+    "saturation": 0.2
+  },
+  "DRIED_KELP": {
+    "hunger": 1,
+    "saturation": 0.3
+  },
+  "ENCHANTED_GOLDEN_APPLE": {
+    "hunger": 4,
+    "saturation": 4.8
+  },
+  "GOLDEN_APPLE": {
+    "hunger": 4,
+    "saturation": 4.8
+  },
+  "GOLDEN_CARROT": {
+    "hunger": 6,
+    "saturation": 7.2
+  },
+  "HONEY_BOTTLE": {
+    "hunger": 6,
+    "saturation": 0.6
+  },
+  "MELON_SLICE": {
+    "hunger": 2,
+    "saturation": 0.6
+  },
+  "MUTTON": {
+    "hunger": 2,
+    "saturation": 0.6
+  },
+  "POISONOUS_POTATO": {
+    "hunger": 2,
+    "saturation": 0.6
+  },
+  "PORKCHOP": {
+    "hunger": 3,
+    "saturation": 0.9
+  },
+  "POTATO": {
+    "hunger": 1,
+    "saturation": 0.3
+  },
+  "PUFFERFISH": {
+    "hunger": 1,
+    "saturation": 0.1
+  },
+  "PUMPKIN_PIE": {
+    "hunger": 8,
+    "saturation": 2.4
+  },
+  "RABBIT": {
+    "hunger": 3,
+    "saturation": 0.9
+  },
+  "ROTTEN_FLESH": {
+    "hunger": 4,
+    "saturation": 0.4
+  },
+  "SALMON": {
+    "hunger": 2,
+    "saturation": 0.2
+  },
+  "SPIDER_EYE": {
+    "hunger": 2,
+    "saturation": 1.6
+  },
+  "SWEET_BERRIES": {
+    "hunger": 2,
+    "saturation": 0.2
+  },
+  "GLOW_BERRIES": {
+    "hunger": 2,
+    "saturation": 0.2
+  },
+  "TROPICAL_FISH": {
+    "hunger": 1,
+    "saturation": 0.1
+  },
+  "BEETROOT_SOUP": {
+    "hunger": 6,
+    "saturation": 3.6
+  },
+  "MUSHROOM_STEW": {
+    "hunger": 6,
+    "saturation": 3.6
+  },
+  "RABBIT_STEW": {
+    "hunger": 10,
+    "saturation": 6.0
+  },
+  "SUSPICIOUS_STEW": {
+    "hunger": 6,
+    "saturation": 3.6
+  },
+  "KELP": {
+    "hunger": 1.0,
+    "saturation": 0.3,
+    "derived_from": "non-edible product avg"
+  },
+  "WHEAT": {
+    "hunger": 0.8646,
+    "saturation": 0.5031,
+    "derived_from": "non-edible product avg"
+  },
+  "COCOA_BEANS": {
+    "hunger": 0.0625,
+    "saturation": 0.0063,
+    "derived_from": "non-edible product avg"
+  },
+  "EGG": {
+    "hunger": 1.3646,
+    "saturation": 0.4031,
+    "derived_from": "non-edible product avg"
+  },
+  "BROWN_MUSHROOM": {
+    "hunger": 2.0,
+    "saturation": 1.2,
+    "derived_from": "non-edible product avg"
+  },
+  "RED_MUSHROOM": {
+    "hunger": 2.0,
+    "saturation": 1.2,
+    "derived_from": "non-edible product avg"
+  },
+  "BOWL": {
+    "hunger": 4.0,
+    "saturation": 2.4,
+    "derived_from": "non-edible product avg"
+  },
+  "PUMPKIN": {
+    "hunger": 2.6667,
+    "saturation": 0.8,
+    "derived_from": "non-edible product avg"
+  },
+  "SUGAR": {
+    "hunger": 2.6667,
+    "saturation": 0.8,
+    "derived_from": "non-edible product avg"
+  },
+  "MELON": {
+    "hunger": 0.5,
+    "saturation": 0.15,
+    "derived_from": "non-edible product avg"
+  }
+}

@@ -1,0 +1,437 @@
+Compiled from "Foods.java"
+public class net.minecraft.world.food.Foods {
+  public static final net.minecraft.world.food.FoodProperties APPLE;
+
+  public static final net.minecraft.world.food.FoodProperties BAKED_POTATO;
+
+  public static final net.minecraft.world.food.FoodProperties BEEF;
+
+  public static final net.minecraft.world.food.FoodProperties BEETROOT;
+
+  public static final net.minecraft.world.food.FoodProperties BEETROOT_SOUP;
+
+  public static final net.minecraft.world.food.FoodProperties BREAD;
+
+  public static final net.minecraft.world.food.FoodProperties CARROT;
+
+  public static final net.minecraft.world.food.FoodProperties CHICKEN;
+
+  public static final net.minecraft.world.food.FoodProperties CHORUS_FRUIT;
+
+  public static final net.minecraft.world.food.FoodProperties COD;
+
+  public static final net.minecraft.world.food.FoodProperties COOKED_BEEF;
+
+  public static final net.minecraft.world.food.FoodProperties COOKED_CHICKEN;
+
+  public static final net.minecraft.world.food.FoodProperties COOKED_COD;
+
+  public static final net.minecraft.world.food.FoodProperties COOKED_MUTTON;
+
+  public static final net.minecraft.world.food.FoodProperties COOKED_PORKCHOP;
+
+  public static final net.minecraft.world.food.FoodProperties COOKED_RABBIT;
+
+  public static final net.minecraft.world.food.FoodProperties COOKED_SALMON;
+
+  public static final net.minecraft.world.food.FoodProperties COOKIE;
+
+  public static final net.minecraft.world.food.FoodProperties DRIED_KELP;
+
+  public static final net.minecraft.world.food.FoodProperties ENCHANTED_GOLDEN_APPLE;
+
+  public static final net.minecraft.world.food.FoodProperties GOLDEN_APPLE;
+
+  public static final net.minecraft.world.food.FoodProperties GOLDEN_CARROT;
+
+  public static final net.minecraft.world.food.FoodProperties HONEY_BOTTLE;
+
+  public static final net.minecraft.world.food.FoodProperties MELON_SLICE;
+
+  public static final net.minecraft.world.food.FoodProperties MUSHROOM_STEW;
+
+  public static final net.minecraft.world.food.FoodProperties MUTTON;
+
+  public static final net.minecraft.world.food.FoodProperties POISONOUS_POTATO;
+
+  public static final net.minecraft.world.food.FoodProperties PORKCHOP;
+
+  public static final net.minecraft.world.food.FoodProperties POTATO;
+
+  public static final net.minecraft.world.food.FoodProperties PUFFERFISH;
+
+  public static final net.minecraft.world.food.FoodProperties PUMPKIN_PIE;
+
+  public static final net.minecraft.world.food.FoodProperties RABBIT;
+
+  public static final net.minecraft.world.food.FoodProperties RABBIT_STEW;
+
+  public static final net.minecraft.world.food.FoodProperties ROTTEN_FLESH;
+
+  public static final net.minecraft.world.food.FoodProperties SALMON;
+
+  public static final net.minecraft.world.food.FoodProperties SPIDER_EYE;
+
+  public static final net.minecraft.world.food.FoodProperties SUSPICIOUS_STEW;
+
+  public static final net.minecraft.world.food.FoodProperties SWEET_BERRIES;
+
+  public static final net.minecraft.world.food.FoodProperties GLOW_BERRIES;
+
+  public static final net.minecraft.world.food.FoodProperties TROPICAL_FISH;
+
+  public net.minecraft.world.food.Foods();
+    Code:
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+
+  static {};
+    Code:
+         0: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+         3: dup
+         4: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+         7: iconst_4
+         8: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+        11: ldc           #21                 // float 0.3f
+        13: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+        16: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+        19: putstatic     #26                 // Field APPLE:Lnet/minecraft/world/food/FoodProperties;
+        22: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+        25: dup
+        26: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+        29: iconst_5
+        30: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+        33: ldc           #16                 // float 0.6f
+        35: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+        38: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+        41: putstatic     #32                 // Field BAKED_POTATO:Lnet/minecraft/world/food/FoodProperties;
+        44: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+        47: dup
+        48: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+        51: iconst_3
+        52: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+        55: ldc           #21                 // float 0.3f
+        57: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+        60: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+        63: putstatic     #35                 // Field BEEF:Lnet/minecraft/world/food/FoodProperties;
+        66: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+        69: dup
+        70: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+        73: iconst_1
+        74: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+        77: ldc           #16                 // float 0.6f
+        79: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+        82: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+        85: putstatic     #38                 // Field BEETROOT:Lnet/minecraft/world/food/FoodProperties;
+        88: bipush        6
+        90: invokestatic  #41                 // Method stew:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+        93: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+        96: putstatic     #44                 // Field BEETROOT_SOUP:Lnet/minecraft/world/food/FoodProperties;
+        99: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       102: dup
+       103: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       106: iconst_5
+       107: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       110: ldc           #16                 // float 0.6f
+       112: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       115: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       118: putstatic     #47                 // Field BREAD:Lnet/minecraft/world/food/FoodProperties;
+       121: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       124: dup
+       125: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       128: iconst_3
+       129: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       132: ldc           #16                 // float 0.6f
+       134: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       137: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       140: putstatic     #50                 // Field CARROT:Lnet/minecraft/world/food/FoodProperties;
+       143: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       146: dup
+       147: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       150: iconst_2
+       151: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       154: ldc           #21                 // float 0.3f
+       156: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       159: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       162: putstatic     #53                 // Field CHICKEN:Lnet/minecraft/world/food/FoodProperties;
+       165: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       168: dup
+       169: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       172: iconst_4
+       173: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       176: ldc           #21                 // float 0.3f
+       178: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       181: invokevirtual #56                 // Method net/minecraft/world/food/FoodProperties$Builder.alwaysEdible:()Lnet/minecraft/world/food/FoodProperties$Builder;
+       184: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       187: putstatic     #60                 // Field CHORUS_FRUIT:Lnet/minecraft/world/food/FoodProperties;
+       190: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       193: dup
+       194: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       197: iconst_2
+       198: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       201: ldc           #63                 // float 0.1f
+       203: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       206: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       209: putstatic     #64                 // Field COD:Lnet/minecraft/world/food/FoodProperties;
+       212: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       215: dup
+       216: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       219: bipush        8
+       221: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       224: ldc           #67                 // float 0.8f
+       226: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       229: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       232: putstatic     #68                 // Field COOKED_BEEF:Lnet/minecraft/world/food/FoodProperties;
+       235: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       238: dup
+       239: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       242: bipush        6
+       244: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       247: ldc           #16                 // float 0.6f
+       249: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       252: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       255: putstatic     #71                 // Field COOKED_CHICKEN:Lnet/minecraft/world/food/FoodProperties;
+       258: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       261: dup
+       262: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       265: iconst_5
+       266: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       269: ldc           #16                 // float 0.6f
+       271: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       274: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       277: putstatic     #74                 // Field COOKED_COD:Lnet/minecraft/world/food/FoodProperties;
+       280: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       283: dup
+       284: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       287: bipush        6
+       289: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       292: ldc           #67                 // float 0.8f
+       294: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       297: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       300: putstatic     #77                 // Field COOKED_MUTTON:Lnet/minecraft/world/food/FoodProperties;
+       303: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       306: dup
+       307: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       310: bipush        8
+       312: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       315: ldc           #67                 // float 0.8f
+       317: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       320: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       323: putstatic     #80                 // Field COOKED_PORKCHOP:Lnet/minecraft/world/food/FoodProperties;
+       326: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       329: dup
+       330: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       333: iconst_5
+       334: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       337: ldc           #16                 // float 0.6f
+       339: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       342: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       345: putstatic     #83                 // Field COOKED_RABBIT:Lnet/minecraft/world/food/FoodProperties;
+       348: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       351: dup
+       352: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       355: bipush        6
+       357: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       360: ldc           #67                 // float 0.8f
+       362: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       365: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       368: putstatic     #86                 // Field COOKED_SALMON:Lnet/minecraft/world/food/FoodProperties;
+       371: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       374: dup
+       375: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       378: iconst_2
+       379: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       382: ldc           #63                 // float 0.1f
+       384: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       387: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       390: putstatic     #89                 // Field COOKIE:Lnet/minecraft/world/food/FoodProperties;
+       393: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       396: dup
+       397: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       400: iconst_1
+       401: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       404: ldc           #21                 // float 0.3f
+       406: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       409: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       412: putstatic     #92                 // Field DRIED_KELP:Lnet/minecraft/world/food/FoodProperties;
+       415: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       418: dup
+       419: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       422: iconst_4
+       423: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       426: ldc           #95                 // float 1.2f
+       428: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       431: invokevirtual #56                 // Method net/minecraft/world/food/FoodProperties$Builder.alwaysEdible:()Lnet/minecraft/world/food/FoodProperties$Builder;
+       434: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       437: putstatic     #96                 // Field ENCHANTED_GOLDEN_APPLE:Lnet/minecraft/world/food/FoodProperties;
+       440: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       443: dup
+       444: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       447: iconst_4
+       448: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       451: ldc           #95                 // float 1.2f
+       453: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       456: invokevirtual #56                 // Method net/minecraft/world/food/FoodProperties$Builder.alwaysEdible:()Lnet/minecraft/world/food/FoodProperties$Builder;
+       459: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       462: putstatic     #99                 // Field GOLDEN_APPLE:Lnet/minecraft/world/food/FoodProperties;
+       465: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       468: dup
+       469: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       472: bipush        6
+       474: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       477: ldc           #95                 // float 1.2f
+       479: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       482: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       485: putstatic     #102                // Field GOLDEN_CARROT:Lnet/minecraft/world/food/FoodProperties;
+       488: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       491: dup
+       492: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       495: bipush        6
+       497: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       500: ldc           #63                 // float 0.1f
+       502: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       505: invokevirtual #56                 // Method net/minecraft/world/food/FoodProperties$Builder.alwaysEdible:()Lnet/minecraft/world/food/FoodProperties$Builder;
+       508: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       511: putstatic     #105                // Field HONEY_BOTTLE:Lnet/minecraft/world/food/FoodProperties;
+       514: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       517: dup
+       518: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       521: iconst_2
+       522: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       525: ldc           #21                 // float 0.3f
+       527: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       530: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       533: putstatic     #108                // Field MELON_SLICE:Lnet/minecraft/world/food/FoodProperties;
+       536: bipush        6
+       538: invokestatic  #41                 // Method stew:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       541: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       544: putstatic     #111                // Field MUSHROOM_STEW:Lnet/minecraft/world/food/FoodProperties;
+       547: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       550: dup
+       551: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       554: iconst_2
+       555: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       558: ldc           #21                 // float 0.3f
+       560: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       563: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       566: putstatic     #114                // Field MUTTON:Lnet/minecraft/world/food/FoodProperties;
+       569: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       572: dup
+       573: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       576: iconst_2
+       577: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       580: ldc           #21                 // float 0.3f
+       582: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       585: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       588: putstatic     #117                // Field POISONOUS_POTATO:Lnet/minecraft/world/food/FoodProperties;
+       591: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       594: dup
+       595: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       598: iconst_3
+       599: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       602: ldc           #21                 // float 0.3f
+       604: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       607: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       610: putstatic     #120                // Field PORKCHOP:Lnet/minecraft/world/food/FoodProperties;
+       613: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       616: dup
+       617: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       620: iconst_1
+       621: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       624: ldc           #21                 // float 0.3f
+       626: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       629: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       632: putstatic     #123                // Field POTATO:Lnet/minecraft/world/food/FoodProperties;
+       635: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       638: dup
+       639: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       642: iconst_1
+       643: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       646: ldc           #63                 // float 0.1f
+       648: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       651: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       654: putstatic     #126                // Field PUFFERFISH:Lnet/minecraft/world/food/FoodProperties;
+       657: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       660: dup
+       661: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       664: bipush        8
+       666: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       669: ldc           #21                 // float 0.3f
+       671: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       674: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       677: putstatic     #129                // Field PUMPKIN_PIE:Lnet/minecraft/world/food/FoodProperties;
+       680: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       683: dup
+       684: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       687: iconst_3
+       688: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       691: ldc           #21                 // float 0.3f
+       693: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       696: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       699: putstatic     #132                // Field RABBIT:Lnet/minecraft/world/food/FoodProperties;
+       702: bipush        10
+       704: invokestatic  #41                 // Method stew:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       707: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       710: putstatic     #135                // Field RABBIT_STEW:Lnet/minecraft/world/food/FoodProperties;
+       713: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       716: dup
+       717: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       720: iconst_4
+       721: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       724: ldc           #63                 // float 0.1f
+       726: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       729: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       732: putstatic     #138                // Field ROTTEN_FLESH:Lnet/minecraft/world/food/FoodProperties;
+       735: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       738: dup
+       739: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       742: iconst_2
+       743: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       746: ldc           #63                 // float 0.1f
+       748: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       751: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       754: putstatic     #141                // Field SALMON:Lnet/minecraft/world/food/FoodProperties;
+       757: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       760: dup
+       761: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       764: iconst_2
+       765: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       768: ldc           #67                 // float 0.8f
+       770: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       773: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       776: putstatic     #144                // Field SPIDER_EYE:Lnet/minecraft/world/food/FoodProperties;
+       779: bipush        6
+       781: invokestatic  #41                 // Method stew:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       784: invokevirtual #56                 // Method net/minecraft/world/food/FoodProperties$Builder.alwaysEdible:()Lnet/minecraft/world/food/FoodProperties$Builder;
+       787: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       790: putstatic     #147                // Field SUSPICIOUS_STEW:Lnet/minecraft/world/food/FoodProperties;
+       793: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       796: dup
+       797: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       800: iconst_2
+       801: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       804: ldc           #63                 // float 0.1f
+       806: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       809: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       812: putstatic     #150                // Field SWEET_BERRIES:Lnet/minecraft/world/food/FoodProperties;
+       815: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       818: dup
+       819: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       822: iconst_2
+       823: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       826: ldc           #63                 // float 0.1f
+       828: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       831: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       834: putstatic     #153                // Field GLOW_BERRIES:Lnet/minecraft/world/food/FoodProperties;
+       837: new           #7                  // class net/minecraft/world/food/FoodProperties$Builder
+       840: dup
+       841: invokespecial #9                  // Method net/minecraft/world/food/FoodProperties$Builder."<init>":()V
+       844: iconst_1
+       845: invokevirtual #10                 // Method net/minecraft/world/food/FoodProperties$Builder.nutrition:(I)Lnet/minecraft/world/food/FoodProperties$Builder;
+       848: ldc           #63                 // float 0.1f
+       850: invokevirtual #17                 // Method net/minecraft/world/food/FoodProperties$Builder.saturationModifier:(F)Lnet/minecraft/world/food/FoodProperties$Builder;
+       853: invokevirtual #22                 // Method net/minecraft/world/food/FoodProperties$Builder.build:()Lnet/minecraft/world/food/FoodProperties;
+       856: putstatic     #156                // Field TROPICAL_FISH:Lnet/minecraft/world/food/FoodProperties;
+       859: return
+}

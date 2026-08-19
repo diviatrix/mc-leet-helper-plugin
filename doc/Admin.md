@@ -9,20 +9,27 @@ The `/leeta` admin command and the `leet.admin.*` permission nodes that gate it.
 
 ## /leeta
 
-The admin command for managing features. Entry point for `list`, `toggle`, and `info`
-subcommands, with tab completion for subcommands and feature IDs.
+The admin command for managing features and giving custom items. Entry point for
+`list`, `toggle`, `info`, and `give` subcommands, with tab completion for
+subcommands, feature IDs, and item IDs.
 
 | Subcommand | Permission | Description |
 |---|---|---|
-| `/leeta` | (base command) | Prints usage: `/leeta <list\|toggle\|info>` |
+| `/leeta` | (base command) | Prints usage: `/leeta <list\|toggle\|info\|give>` |
 | `/leeta list` | `leet.admin` | Lists all features with ON/OFF status |
 | `/leeta toggle <id>` | `leet.admin.toggle` | Toggles a feature on/off and **persists** `base.enabled` to its YAML |
 | `/leeta info <id>` | `leet.admin` | Shows the feature's ID, permission node, and current status |
+| `/leeta give <item-id> [amount] [player]` | `leet.admin` | Gives a **custom item** (built from the shared custom-item registry, so it carries the correct `ci` tag + `leet:item/<id>` texture). Defaults to the sender if a player, stacked to 64 |
 
 **On toggle:** `FeatureManager.toggle()` disables the feature (unregisters listeners),
 re-enables it if it was off, and writes the new state back to `base.enabled` in the
 feature's YAML — so the toggle survives a restart. A toggle does **not** reload the rest
 of the config; config-file edits still need a restart.
+
+**On give:** `/leeta give` hands out any registered custom item (e.g. `salt`, `dough`,
+`croissant`). This is the supported way to obtain custom items for testing — a plain
+vanilla `/give` will not produce them, because they only exist as tagged custom items
+inside the plugin's registry.
 
 ---
 
@@ -35,7 +42,7 @@ enough for an operator.
 
 | Permission | Default | Description |
 |---|---|---|
-| `leet.admin` | op | Full admin access to `/leeta`. Automatically inherits `leet.admin.list`, `leet.admin.toggle`, and `leet.admin.info` via its `children` block. |
+| `leet.admin` | op | Full admin access to `/leeta`. Automatically inherits `leet.admin.list`, `leet.admin.toggle`, and `leet.admin.info` via its `children` block. Also unlocks `/leeta give`. |
 | `leet.admin.list` | op | Use `/leeta list`. |
 | `leet.admin.toggle` | op | Use `/leeta toggle <id>`. |
 | `leet.admin.info` | op | Use `/leeta info <id>`. |
