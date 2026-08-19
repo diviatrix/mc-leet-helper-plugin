@@ -217,10 +217,11 @@ public final class CookingFeature extends AbstractFeature {
 
     /**
      * Builds the item the player actually holds: base material + name/lore + custom-id PDC tag.
-     * The dish is a true new item: its {@code minecraft:item_model} points at the pack's
-     * {@code leet:item/<id>} definition (custom model/texture) and it carries a real
-     * {@code minecraft:food} component (edible natively), so vanilla item definitions are never
-     * overridden. The base material only decides stacking; we use a stackable base for 64-stacks.
+     * The dish icon is routed via {@code CustomModelData}: the resource pack overrides the base
+     * material's item definition to dispatch the value to {@code leet:item/<id>}. The item also
+     * carries a real {@code minecraft:food} component (via Paper's FOOD data component) so the dish
+     * is edible server-side regardless of the pack; the base material decides stacking (stackable
+     * base = 64-stackable dishes).
      */
     private ItemStack item(ItemDef def) {
         ItemStack stack = new ItemStack(def.material());
