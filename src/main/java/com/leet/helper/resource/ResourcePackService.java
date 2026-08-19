@@ -84,10 +84,14 @@ public final class ResourcePackService implements Listener {
             plugin.getLogger().warning("Failed to build cooking resource pack; dish icons will not be distributed.");
             return;
         }
+        // Always start the embedded HTTP server — the pack is served from here
+        // regardless of how the client reaches it (direct or proxied).
+        startEmbeddedServer();
         if (urlOverride != null && !urlOverride.isBlank()) {
+            // The client-facing URL is overridden (e.g. a proxy address like
+            // selfed.top:8043); use that for ResourcePackInfo so clients
+            // download from the external address.
             servedUrl = urlOverride;
-        } else {
-            startEmbeddedServer();
         }
         if (servedUrl == null) {
             plugin.getLogger().warning("No resource-pack URL available. Set resource-pack.url in config.yml.");

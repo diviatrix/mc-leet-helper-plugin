@@ -22,7 +22,7 @@ feature:
       type: SMELT
       ingredient: WATER_BUCKET
       result: salt
-      amount: 1
+      amount: 9
       experience: 0.35
       # smelting a water bucket yields salt; Minecraft returns the empty bucket
 
