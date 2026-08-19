@@ -7,7 +7,7 @@ base:
   message-type: ACTION_BAR
 
 feature:
-  max-age: 300
+  max-age: 3600
   cost: 0.0
 
 messages:

@@ -1,11 +1,13 @@
 package com.leet.helper.feature;
 
 import com.leet.helper.Core;
+import com.leet.helper.resource.ResourcePackService;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -64,6 +66,7 @@ public final class CookingFeature extends AbstractFeature {
     private final List<NamespacedKey> registeredKeys = new ArrayList<>();
 
     private final NamespacedKey ciKey; // custom-item id tag on every crafted food/ingredient
+    private ResourcePackService resourcePackService;
 
     public CookingFeature(Core plugin) {
         super(plugin);
@@ -167,13 +170,20 @@ public final class CookingFeature extends AbstractFeature {
     private RecipeChoice spec(String raw) {
         if (raw == null || raw.isEmpty()) return null;
         try {
-            return new RecipeChoice.MaterialChoice(Material.valueOf(raw.toUpperCase()));
+            Material mat = Material.valueOf(raw.toUpperCase());
+            Tag<Material> tag = MATERIAL_TAGS.get(mat);
+            return tag != null ? new RecipeChoice.MaterialChoice(tag) : new RecipeChoice.MaterialChoice(mat);
         } catch (IllegalArgumentException ignored) {
             // not a vanilla material -> fall through to custom item lookup
         }
         ItemDef item = items.get(raw.toLowerCase());
         return item == null ? null : new RecipeChoice.ExactChoice(item(item));
     }
+
+    /** Materials that should match a broader tag instead of the exact material. */
+    private static final Map<Material, Tag<Material>> MATERIAL_TAGS = Map.of(
+        Material.EGG, Tag.ITEMS_EGGS
+    );
 
     /** A recipe result: `material:<MATERIAL>` for vanilla output, otherwise a custom item id. */
     private ItemStack parseResult(String raw, int amount) {
@@ -206,7 +216,11 @@ public final class CookingFeature extends AbstractFeature {
         }
     }
 
-    /** Builds the item the player actually holds: base material + name/lore + custom-id PDC tag. */
+    /**
+     * Builds the item the player actually holds: base material + name/lore + custom-id PDC tag.
+     * The custom icon is driven by {@code CustomModelData}: the resource pack overrides the base
+     * material's item definition to route this value to {@code leet:item/<id>} (Vane-style).
+     */
     private ItemStack item(ItemDef def) {
         ItemStack stack = new ItemStack(def.material());
         ItemMeta meta = stack.getItemMeta();
@@ -215,6 +229,7 @@ public final class CookingFeature extends AbstractFeature {
             meta.lore(def.lore().stream().map(l -> MM.deserialize("<gray>" + l)).toList());
         }
         meta.getPersistentDataContainer().set(ciKey, PersistentDataType.STRING, def.id());
+        meta.setCustomModelData(ResourcePackService.customModelData(def.id()));
         stack.setItemMeta(meta);
         return stack;
     }
@@ -224,12 +239,42 @@ public final class CookingFeature extends AbstractFeature {
         super.enable();
         if (enabled) {
             registerRecipes();
+            resourcePackService = new ResourcePackService(plugin);
+            resourcePackService.setCustomItemModels(itemPackEntries());
+            resourcePackService.start();
         }
+    }
+
+    /**
+     * Groups every cooking item by its base material so the resource pack can override each base
+     * material's item definition to route its {@code CustomModelData} value to the dish icon.
+     */
+    private Map<String, List<ResourcePackService.CustomItemModel>> itemPackEntries() {
+        Map<String, List<ResourcePackService.CustomItemModel>> byMaterial = new LinkedHashMap<>();
+        for (ItemDef def : items.values()) {
+            byMaterial
+                .computeIfAbsent(def.material().name().toLowerCase(), k -> new ArrayList<>())
+                .add(new ResourcePackService.CustomItemModel(
+                    def.id(), ResourcePackService.customModelData(def.id())));
+        }
+        return byMaterial;
+    }
+
+    /** Debug helper: the cooking item ids whose base material matches the given material. */
+    public List<String> itemIdsForBaseMaterial(Material material) {
+        return items.values().stream()
+            .filter(def -> def.material() == material)
+            .map(ItemDef::id)
+            .toList();
     }
 
     @Override
     public void disable() {
         unregisterRecipes();
+        if (resourcePackService != null) {
+            resourcePackService.stop();
+            resourcePackService = null;
+        }
         super.disable();
     }
 

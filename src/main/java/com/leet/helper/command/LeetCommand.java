@@ -63,6 +63,10 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         String alias = args[0].toLowerCase();
+        if (alias.equals("debugcmd")) {
+            showHeldCmd(player);
+            return true;
+        }
         String infoFeatureId = INFO_ALIASES.get(alias);
         if (infoFeatureId != null) {
             showInfo(player, infoFeatureId);
@@ -70,7 +74,7 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
         }
         String featureId = ALIASES.get(alias);
         if (featureId == null) {
-            player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leet <list|dj|crop|tree|fall|xp|skills|cook>"));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leet <list|dj|crop|tree|fall|xp|skills|cook|debugcmd>"));
             return true;
         }
         if (!player.hasPermission(permissionFor(featureId))) {
@@ -79,6 +83,39 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
         }
         toggle(player, featureId);
         return true;
+    }
+
+    /**
+     * Debug: prints the held item's {@code minecraft:custom_model_data} (and what the cooking pack
+     * expects) so we can confirm the dish icon routing value is actually present on the item.
+     */
+    private void showHeldCmd(Player player) {
+        var stack = player.getInventory().getItemInMainHand();
+        if (stack.getType().isAir()) {
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Hold a cooking dish/item in your main hand."));
+            return;
+        }
+        var meta = stack.getItemMeta();
+        int legacy = meta != null && meta.hasCustomModelData() ? meta.getCustomModelData() : 0;
+        List<Float> floats = meta != null && meta.hasCustomModelDataComponent()
+            ? meta.getCustomModelDataComponent().getFloats() : List.of();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<gray>Item: <white>").append(stack.getType()).append("\n");
+        sb.append("<gray>custom_model_data floats: <white>");
+        if (floats.isEmpty()) sb.append("(none)");
+        else for (Float f : floats) sb.append(f).append(" ");
+        sb.append("\n<gray>getCustomModelData() (int): <white>").append(legacy);
+        sb.append("\n<gray>pack expects for this base: <white>");
+        var expected = new java.util.TreeMap<Integer, String>();
+        if (plugin.featureManager().get("cooking").orElse(null) instanceof com.leet.helper.feature.CookingFeature c) {
+            for (var id : c.itemIdsForBaseMaterial(stack.getType())) {
+                expected.put(com.leet.helper.resource.ResourcePackService.customModelData(id), id);
+            }
+        }
+        if (expected.isEmpty()) sb.append("(no cooking dish uses base ").append(stack.getType()).append(")");
+        else for (var e : expected.entrySet()) sb.append(e.getValue()).append("=").append(e.getKey()).append("  ");
+        player.sendMessage(MiniMessage.miniMessage().deserialize(sb.toString()));
     }
 
     private void toggle(Player player, String featureId) {
@@ -168,6 +205,7 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
             List<String> options = new ArrayList<>();
             if (sender instanceof Player player && hasAnyPermission(player)) {
                 options.add("list");
+                options.add("debugcmd");
                 for (String featureId : ALIASES.values()) {
                     if (player.hasPermission(permissionFor(featureId))) {
                         options.add(aliasFor(featureId));

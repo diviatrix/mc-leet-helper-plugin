@@ -25,7 +25,7 @@ A **Paper 26.2** plugin providing modular gameplay features. Each feature has it
 
 ## Overview
 
-LeetHelper registers eight gameplay features plus one admin command.
+LeetHelper registers nine gameplay features plus one admin command.
 
 | Feature | ID | Description |
 |---|---|---|
@@ -37,6 +37,7 @@ LeetHelper registers eight gameplay features plus one admin command.
 | [Fall Damage](doc/features/fall-damage.md) | `fall_damage` | Negates all fall damage for eligible players |
 | [XP](doc/features/xp.md) | `xp` | Bonus vanilla XP for mining, woodcutting, crops, fishing, building, and killing |
 | [Skills](doc/features/skills.md) | `skills` | A skill tree (Traveler + 8 passive skills + 1-level advanced skills) leveled up by spending XP points |
+| [Cooking](doc/features/cooking.md) | `cooking` | Server-wide custom food recipes and dishes, each with a client icon from a bundled dish-only resource pack |
 
 Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`); full per-feature details (config keys, limitations, permissions) are in **[doc/features/](doc/features/)**.
 

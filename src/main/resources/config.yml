@@ -1,2 +1,10 @@
 config-version: 1
 log-level: INFO
+
+# Cooking dish-icons resource pack distribution.
+resource-pack:
+  enabled: true
+  port: 8043             # embedded HTTP server port
+  url: ""                # optional: external URL hosting the pack (skip embedded server)
+  prompt: ""             # optional text shown when the client is asked to install the pack
+  require: false         # false = optional

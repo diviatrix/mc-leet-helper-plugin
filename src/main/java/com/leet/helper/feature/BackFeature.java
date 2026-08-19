@@ -28,7 +28,7 @@ public class BackFeature extends AbstractFeature {
 
     @Override
     protected void loadFeatureConfig(YamlConfiguration cfg) {
-        maxAge = cfg.getInt("feature.max-age", 300);
+        maxAge = cfg.getInt("feature.max-age", 3600);
     }
 
     @EventHandler(priority = EventPriority.NORMAL)

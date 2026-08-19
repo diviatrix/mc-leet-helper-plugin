@@ -1,0 +1,1 @@
+{"model": {"type": "minecraft:model", "model": "leet:item/chicken-skewers"}, "components": {"minecraft:food": {"nutrition": 8, "saturation": 11.0, "can_always_eat": false}}}

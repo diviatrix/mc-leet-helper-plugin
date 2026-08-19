@@ -13,6 +13,7 @@ Adds advanced **crafting recipes** for custom food items. Config file `features/
 - Recipes are registered as vanilla **crafting** recipes, so they show up in the recipe book like any other recipe.
 - While the feature is enabled the recipe crafts for anyone; when it is disabled (or a world is excluded), the recipe simply shows **no result** in the crafting matrix — it is uncraftable.
 - Dish items carry a plugin tag that the feature reads on eat: vanilla consumption is cancelled and the configured `hunger`/`saturation` are applied instead (base materials are chosen to be edible so the item can be eaten at all).
+- Each dish shows a **custom icon** on the client from a tiny dish-only resource pack the plugin serves additively (see [Dish icons & resource pack](#dish-icons--resource-pack) below).
 
 ## Config layout
 
@@ -66,7 +67,7 @@ A recipe ingredient is either a vanilla `Material` name (matched by material) or
 | Croissant | BREAD | DOUGH + DOUGH + SUGAR + MILK_BUCKET | 6 / 8 |
 | Borsh | MUSHROOM_STEW | COOKED_BEEF + BAKED_POTATO + CARROT + BEETROOT + ALLIUM + BOWL | 8 / 12 |
 | Pelmeni | MUSHROOM_STEW | DOUGH + COOKED_BEEF + BOWL | 7 / 9 |
-| Instant Noodle | MUSHROOM_STEW | DOUGH + DOUGH + WHEAT + BOWL | 5 / 7 |
+| Instant Noodle | MUSHROOM_STEW | DOUGH ×3 + BOWL | 5 / 7 |
 | Ramen | MUSHROOM_STEW | DOUGH + COOKED_CHICKEN + EGG + BOWL | 8 / 12 |
 | Banh Mi | BREAD | BREAD + COOKED_CHICKEN + CARROT + ALLIUM | 7 / 10 |
 | Milk Porridge | MUSHROOM_STEW | MILK_BUCKET + WHEAT + SUGAR + BOWL | 6 / 10 |
@@ -87,6 +88,25 @@ A recipe ingredient is either a vanilla `Material` name (matched by material) or
 | `recipes.<id>.ingredients` | list / map | — | SHAPELESS: a flat list of materials/custom ids; SHAPED: a `shape` (3 rows of 3) plus a letter→ingredient map. |
 | `recipes.<id>.result` | id or `material:<M>` | — | Custom item id to output, or a vanilla material for a vanilla output. |
 | `recipes.<id>.amount` | int | `1` | How many of `result` the recipe yields. |
+
+## Dish icons & resource pack
+
+Each dish item carries a client-side **icon** driven by a `CustomModelData` value on the item. The icon comes from a tiny, **dish-only** resource pack generated at build time and bundled with the plugin. For each base material a cooking dish uses, the plugin overrides that material's item definition (`assets/minecraft/items/<base>.json`) with a `range_dispatch` on `custom_model_data` that routes the dish's value to the matching `leet:item/<id>` model/texture (`assets/leet/...`). This is the same approach Vane uses and is more reliable across client versions than a custom `item_model`. If a player declines the pack, the item falls back to its base material look.
+
+Distribution is configured in **`config.yml`** (global):
+
+```yaml
+resource-pack:
+  enabled: true   # master switch for distributing the dish icons
+  port: 8043      # internal HTTP port, used when `url` is empty
+  url: ""         # optional: host the bundled zip yourself and point here (no embedded server)
+  prompt: ""      # optional text shown when the client is asked to install the pack
+  require: false  # false = optional; declining leaves everyone else's textures intact
+```
+
+- With `url` set, the embedded server is skipped and `addResourcePack` points straight at your hosted copy.
+- With `url` empty, the plugin runs a small internal HTTP endpoint. It derives the client-reachable address from the server's configured IP; when none is set it logs that `resource-pack.url` should be configured (e.g. the box can't expose a port, or the server is behind a proxy/port-forward).
+- `require: true` makes the pack mandatory (players who decline are not allowed to join); leave it `false` to keep the pack optional and additive.
 
 ## Notes & limits
 - Custom items are identified by a plugin tag (`ci`): the feature needs to recognize them for both crafting (ExactChoice ingredients like Dough) and eating. Manually-copied items that lose the tag/name won't be treated as custom.

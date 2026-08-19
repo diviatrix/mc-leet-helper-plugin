@@ -1,0 +1,1 @@
+{"model": {"type": "minecraft:model", "model": "leet:item/instant-noodle"}, "components": {"minecraft:food": {"nutrition": 5, "saturation": 7.0, "can_always_eat": false}}}

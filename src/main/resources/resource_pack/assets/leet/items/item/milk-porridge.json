@@ -1,0 +1,1 @@
+{"model": {"type": "minecraft:model", "model": "leet:item/milk-porridge"}, "components": {"minecraft:food": {"nutrition": 6, "saturation": 10.0, "can_always_eat": false}}}
