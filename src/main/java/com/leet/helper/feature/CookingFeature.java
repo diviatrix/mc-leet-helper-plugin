@@ -15,7 +15,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
@@ -138,7 +137,7 @@ public final class CookingFeature extends AbstractFeature {
                 shape[r] = row;
                 for (int c = 0; c < 3; c++) {
                     char key = row.charAt(c);
-                    if (key == ' ' || shaped.containsKey(key)) continue;
+                    if (key == ' ' || key == '.' || shaped.containsKey(key)) continue;
                     String raw = ing.getString(String.valueOf(key));
                     RecipeChoice choice = spec(raw);
                     if (choice == null) {
@@ -218,8 +217,10 @@ public final class CookingFeature extends AbstractFeature {
 
     /**
      * Builds the item the player actually holds: base material + name/lore + custom-id PDC tag.
-     * The custom icon is driven by {@code CustomModelData}: the resource pack overrides the base
-     * material's item definition to route this value to {@code leet:item/<id>} (Vane-style).
+     * The dish is a true new item: its {@code minecraft:item_model} points at the pack's
+     * {@code leet:item/<id>} definition (custom model/texture) and it carries a real
+     * {@code minecraft:food} component (edible natively), so vanilla item definitions are never
+     * overridden. The base material only decides stacking; we use a stackable base for 64-stacks.
      */
     private ItemStack item(ItemDef def) {
         ItemStack stack = new ItemStack(def.material());
@@ -229,8 +230,15 @@ public final class CookingFeature extends AbstractFeature {
             meta.lore(def.lore().stream().map(l -> MM.deserialize("<gray>" + l)).toList());
         }
         meta.getPersistentDataContainer().set(ciKey, PersistentDataType.STRING, def.id());
-        meta.setCustomModelData(ResourcePackService.customModelData(def.id()));
+        meta.setItemModel(new NamespacedKey("leet", "item/" + def.id()));
         stack.setItemMeta(meta);
+        if (def.isFood()) {
+            stack.setData(io.papermc.paper.datacomponent.DataComponentTypes.FOOD,
+                io.papermc.paper.datacomponent.item.FoodProperties.food()
+                    .nutrition(def.hunger())
+                    .saturation((float) def.saturation())
+                    .build());
+        }
         return stack;
     }
 
@@ -240,32 +248,8 @@ public final class CookingFeature extends AbstractFeature {
         if (enabled) {
             registerRecipes();
             resourcePackService = new ResourcePackService(plugin);
-            resourcePackService.setCustomItemModels(itemPackEntries());
             resourcePackService.start();
         }
-    }
-
-    /**
-     * Groups every cooking item by its base material so the resource pack can override each base
-     * material's item definition to route its {@code CustomModelData} value to the dish icon.
-     */
-    private Map<String, List<ResourcePackService.CustomItemModel>> itemPackEntries() {
-        Map<String, List<ResourcePackService.CustomItemModel>> byMaterial = new LinkedHashMap<>();
-        for (ItemDef def : items.values()) {
-            byMaterial
-                .computeIfAbsent(def.material().name().toLowerCase(), k -> new ArrayList<>())
-                .add(new ResourcePackService.CustomItemModel(
-                    def.id(), ResourcePackService.customModelData(def.id())));
-        }
-        return byMaterial;
-    }
-
-    /** Debug helper: the cooking item ids whose base material matches the given material. */
-    public List<String> itemIdsForBaseMaterial(Material material) {
-        return items.values().stream()
-            .filter(def -> def.material() == material)
-            .map(ItemDef::id)
-            .toList();
     }
 
     @Override
@@ -353,39 +337,5 @@ public final class CookingFeature extends AbstractFeature {
             return recipesByKey.get(keyed.getKey());
         }
         return null;
-    }
-
-    // --- custom nutrition on eat: dishes restore more than their raw parts ---
-
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onConsume(PlayerItemConsumeEvent event) {
-        Player player = event.getPlayer();
-        if (!check(player)) return;
-        ItemStack item = event.getItem();
-        if (item.getType() == Material.AIR) return;
-        String meta = item.getItemMeta() == null ? null
-            : item.getItemMeta().getPersistentDataContainer().get(ciKey, PersistentDataType.STRING);
-        if (meta == null) return;
-        ItemDef def = items.get(meta);
-        if (def == null || !def.isFood()) return;
-
-        // Cancel the base material's own nutrition and apply the dish's values.
-        event.setCancelled(true);
-        player.setFoodLevel(Math.min(20, player.getFoodLevel() + def.hunger()));
-        player.setSaturation(Math.min(20, player.getSaturation() + def.saturation()));
-
-        // Consume one matching item from the player's inventory.
-        for (var entry : player.getInventory().all(item.getType()).entrySet()) {
-            ItemStack held = entry.getValue();
-            if (held.isSimilar(item)) {
-                int amount = held.getAmount();
-                if (amount <= 1) {
-                    player.getInventory().setItem(entry.getKey(), null);
-                } else {
-                    held.setAmount(amount - 1);
-                }
-                break;
-            }
-        }
     }
 }

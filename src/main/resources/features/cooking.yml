@@ -28,28 +28,28 @@ feature:
       lore:
         - "Flaky, buttery bakery fresh."
     borsh:
-      material: MUSHROOM_STEW
+      material: BREAD
       name: "Borsh"
       hunger: 8
       saturation: 12
       lore:
         - "Hearty beetroot and beef stew."
     pelmeni:
-      material: MUSHROOM_STEW
+      material: BREAD
       name: "Pelmeni"
       hunger: 7
       saturation: 9
       lore:
         - "Dumplings stuffed with seasoned beef."
     instant-noodle:
-      material: MUSHROOM_STEW
+      material: BREAD
       name: "Instant Noodle"
       hunger: 5
       saturation: 7
       lore:
         - "Quick noodles, ready in a bowl."
     ramen:
-      material: MUSHROOM_STEW
+      material: BREAD
       name: "Ramen"
       hunger: 8
       saturation: 12
@@ -63,14 +63,14 @@ feature:
       lore:
         - "A crusty baguette stuffed with chicken."
     milk-porridge:
-      material: MUSHROOM_STEW
+      material: BREAD
       name: "Milk Porridge"
       hunger: 6
       saturation: 10
       lore:
         - "Soft, sweet grain in warm milk."
     creamy-mushroom-soup:
-      material: MUSHROOM_STEW
+      material: BREAD
       name: "Creamy Mushroom Soup"
       hunger: 7
       saturation: 10
@@ -112,94 +112,132 @@ feature:
       result: material:BREAD
       amount: 1
     croissant:
-      type: SHAPELESS
+      type: SHAPED
+      shape:
+        - "DDD"
+        - "SMS"
+        - "..."
       ingredients:
-        - dough
-        - dough
-        - SUGAR
-        - MILK_BUCKET
+        D: dough
+        S: SUGAR
+        M: MILK_BUCKET
       result: croissant
-      amount: 1
+      amount: 3
     borsh:
-      type: SHAPELESS
+      type: SHAPED
+      shape:
+        - "BRB"
+        - "PPP"
+        - "CWA"
       ingredients:
-        - COOKED_BEEF
-        - BAKED_POTATO
-        - CARROT
-        - BEETROOT
-        - ALLIUM
-        - BOWL
+        B: BEEF
+        R: BEETROOT
+        P: POTATO
+        C: CARROT
+        W: BOWL
+        A: ALLIUM
       result: borsh
-      amount: 1
+      amount: 3
     pelmeni:
-      type: SHAPELESS
+      type: SHAPED
+      shape:
+        - "DDD"
+        - "BPB"
+        - "AWA"
       ingredients:
-        - dough
-        - COOKED_BEEF
-        - BOWL
+        D: dough
+        B: BEEF
+        P: PORKCHOP
+        A: ALLIUM
+        W: BOWL
       result: pelmeni
-      amount: 1
+      amount: 3
     instant-noodle:
-      type: SHAPELESS
+      type: SHAPED
+      shape:
+        - "DED"
+        - ".W."
+        - "..."
       ingredients:
-        - dough
-        - dough
-        - dough
-        - BOWL
+        D: dough
+        E: EGG
+        W: BOWL
       result: instant-noodle
-      amount: 1
+      amount: 2
     ramen:
-      type: SHAPELESS
+      type: SHAPED
+      shape:
+        - "IEI"
+        - "PWC"
+        - "..."
       ingredients:
-        - dough
-        - COOKED_CHICKEN
-        - EGG
-        - BOWL
+        I: instant-noodle
+        E: EGG
+        P: PORKCHOP
+        W: BOWL
+        C: COOKED_CHICKEN
       result: ramen
       amount: 1
     banh-mi:
-      type: SHAPELESS
+      type: SHAPED
+      shape:
+        - "BCA"
+        - "..."
+        - "..."
       ingredients:
-        - BREAD
-        - COOKED_CHICKEN
-        - CARROT
-        - ALLIUM
+        B: BREAD
+        C: COOKED_CHICKEN
+        A: ALLIUM
       result: banh-mi
       amount: 1
     milk-porridge:
-      type: SHAPELESS
+      type: SHAPED
+      shape:
+        - "MWS"
+        - ".B."
+        - "..."
       ingredients:
-        - MILK_BUCKET
-        - WHEAT
-        - SUGAR
-        - BOWL
+        M: MILK_BUCKET
+        W: WHEAT
+        S: SUGAR
+        B: BOWL
       result: milk-porridge
       amount: 1
     creamy-mushroom-soup:
-      type: SHAPELESS
+      type: SHAPED
+      shape:
+        - "BRK"
+        - ".W."
+        - "..."
       ingredients:
-        - BROWN_MUSHROOM
-        - RED_MUSHROOM
-        - MILK_BUCKET
-        - BOWL
+        B: BROWN_MUSHROOM
+        R: RED_MUSHROOM
+        K: MILK_BUCKET
+        W: BOWL
       result: creamy-mushroom-soup
       amount: 1
     chicken-skewers:
-      type: SHAPELESS
+      type: SHAPED
+      shape:
+        - "CCS"
+        - "..."
+        - "..."
       ingredients:
-        - COOKED_CHICKEN
-        - COOKED_CHICKEN
-        - STICK
+        C: COOKED_CHICKEN
+        S: STICK
       result: chicken-skewers
       amount: 1
     charlotte:
-      type: SHAPELESS
+      type: SHAPED
+      shape:
+        - "DAD"
+        - "SES"
+        - "..."
       ingredients:
-        - WHEAT
-        - WHEAT
-        - SUGAR
-        - EGG
-        - APPLE
+        D: dough
+        A: APPLE
+        S: SUGAR
+        E: EGG
       result: charlotte
       amount: 1
 

@@ -24,8 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
@@ -49,8 +47,6 @@ import java.util.zip.ZipOutputStream;
  */
 public final class ResourcePackService implements Listener {
 
-    public record CustomItemModel(String modelId, int customModelData) {}
-
     private static final String INDEX_PATH = "resource_pack/index";
     private static final String ROUTE = "/cooking-pack.zip";
 
@@ -59,8 +55,6 @@ public final class ResourcePackService implements Listener {
     private final boolean require;
     private final String urlOverride;
     private final int port;
-
-    private Map<String, List<CustomItemModel>> customItemModels = Map.of();
 
     private byte[] packBytes;
     private String sha1Hex;
@@ -71,15 +65,6 @@ public final class ResourcePackService implements Listener {
     private ExecutorService acceptor;
 
     private final ConcurrentHashMap<UUID, CountDownLatch> latches = new ConcurrentHashMap<>();
-
-    public static int customModelData(String itemId) {
-        int value = itemId.hashCode() & 0x7FFFFFFF;
-        return (value % 16_000_000) + 1;
-    }
-
-    public void setCustomItemModels(Map<String, List<CustomItemModel>> customItemModels) {
-        this.customItemModels = customItemModels == null ? Map.of() : customItemModels;
-    }
 
     public ResourcePackService(Core plugin) {
         this.plugin = plugin;
@@ -146,7 +131,6 @@ public final class ResourcePackService implements Listener {
                     zip.closeEntry();
                 }
             }
-            writeBaseItemDispatches(zip);
             zip.finish();
             packBytes = baos.toByteArray();
         } catch (IOException e) {
@@ -168,30 +152,6 @@ public final class ResourcePackService implements Listener {
         } catch (IOException ignored) {}
 
         return true;
-    }
-
-    private void writeBaseItemDispatches(ZipOutputStream zip) throws IOException {
-        for (Map.Entry<String, List<CustomItemModel>> e : customItemModels.entrySet()) {
-            String base = e.getKey();
-            List<CustomItemModel> models = new ArrayList<>(e.getValue());
-            models.sort(Comparator.comparingInt(CustomItemModel::customModelData));
-
-            StringBuilder json = new StringBuilder();
-            json.append("{\"model\":{\"type\":\"range_dispatch\",\"property\":\"minecraft:custom_model_data\",")
-                .append("\"fallback\":{\"type\":\"model\",\"model\":\"minecraft:item/").append(base).append("\"},")
-                .append("\"entries\":[");
-            for (int i = 0; i < models.size(); i++) {
-                if (i > 0) json.append(",");
-                CustomItemModel m = models.get(i);
-                json.append("{\"threshold\":").append(m.customModelData()).append(",")
-                    .append("\"model\":{\"type\":\"model\",\"model\":\"leet:item/").append(m.modelId()).append("\"}}");
-            }
-            json.append("]}}");
-
-            zip.putNextEntry(new ZipEntry("assets/minecraft/items/" + base + ".json"));
-            zip.write(json.toString().getBytes(StandardCharsets.UTF_8));
-            zip.closeEntry();
-        }
     }
 
     private void startEmbeddedServer() {
