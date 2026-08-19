@@ -14,7 +14,7 @@ Items defined here join the **shared custom-item registry**, so recipes in any c
 
 | Item | Screenshot base | Recipe | Yields | Notes |
 |---|---|---|---|---|
-| Salt | SUGAR | Smelt `WATER_BUCKET` (SMELT) | 1 | Smelting a water bucket yields salt; Minecraft returns the empty bucket |
+| Salt | SUGAR | Smelt `WATER_BUCKET` (SMELT) | 9 | Smelting a water bucket yields salt; Minecraft returns the empty bucket |
 
 ## Config layout
 
@@ -36,9 +36,9 @@ feature:
       type: SMELT
       ingredient: WATER_BUCKET
       result: salt
-      amount: 1
+      amount: 9
       experience: 0.35
-      # smelting a water bucket yields salt; the empty bucket is returned
+      # smelting a water bucket yields 9 salt; the empty bucket is returned
 
 messages:
   feature-off: "<red>Crafting is currently off for you."

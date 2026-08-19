@@ -2,6 +2,19 @@
 
 All notable changes to **LeetHelper**. Entries are newest first.
 
+## 1.4.1 — Resource pack proxy fix
+
+**Fixed**
+- Embedded resource-pack HTTP server now always starts, even when
+  `resource-pack.url` is set. Previously, setting the URL skipped the embedded
+  server entirely — so the URL pointed to a server that never started, and
+  clients behind FRPC/proxies couldn't download the pack.
+
+**Changed**
+- Salt smelting recipe now yields **9** per water bucket (was 1).
+
+---
+
 ## 1.4.0 — Custom foods, crafting engine, item give
 
 **Added**
