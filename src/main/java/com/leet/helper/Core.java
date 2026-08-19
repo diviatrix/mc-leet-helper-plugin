@@ -4,9 +4,12 @@ import com.leet.helper.command.BackCommand;
 import com.leet.helper.command.HelperCommand;
 import com.leet.helper.command.LeetCommand;
 import com.leet.helper.command.SkillsCommand;
+import com.leet.helper.craft.LeetItemRegistry;
 import com.leet.helper.feature.*;
 import com.leet.helper.feature.skills.SkillsFeature;
+import com.leet.helper.resource.ResourcePackService;
 import com.leet.helper.storage.StorageManager;
+import org.bukkit.NamespacedKey;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -31,6 +34,9 @@ public class Core extends JavaPlugin {
     private FeatureManager featureManager;
     private Economy economy;
     private Permission vaultPermission;
+    private LeetItemRegistry itemRegistry;
+    private ResourcePackService resourcePackService;
+    private CraftingFeature craftingFeature;
 
     @Override
     public void onEnable() {
@@ -48,10 +54,17 @@ public class Core extends JavaPlugin {
         saveResourceIfMissing("features/skills.yml");
         saveResourceIfMissing("features/skill-tree.yml");
         saveResourceIfMissing("features/cooking.yml");
+        saveResourceIfMissing("features/crafting.yml");
 
         storageManager = new StorageManager(getDataFolder(), getLogger());
 
         setupVault();
+
+        // Shared custom-item registry and one resource-pack distributor, so every
+        // crafting feature registers items into a single map and icon distribution
+        // runs once regardless of how many features are enabled.
+        itemRegistry = new LeetItemRegistry(getLogger(), new NamespacedKey(this, "ci"));
+        resourcePackService = new ResourcePackService(this);
 
         featureManager = new FeatureManager(this);
         featureManager.register(new DoubleJumpFeature(this));
@@ -62,8 +75,14 @@ public class Core extends JavaPlugin {
         featureManager.register(new FallDamageFeature(this));
         featureManager.register(new XpFeature(this));
         featureManager.register(new SkillsFeature(this));
-        featureManager.register(new CookingFeature(this));
+        featureManager.register(new CookingFeature(this, itemRegistry));
+        craftingFeature = new CraftingFeature(this, itemRegistry);
+        featureManager.register(craftingFeature);
         featureManager.enableAll();
+
+        // One shared server: distribute the item-texture pack regardless of
+        // which crafting feature is enabled (the index holds every item).
+        resourcePackService.start();
 
         getCommand("leeta").setExecutor(new HelperCommand(this));
         getCommand("leeta").setTabCompleter(new HelperCommand(this));
@@ -88,6 +107,9 @@ public class Core extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (resourcePackService != null) {
+            resourcePackService.stop();
+        }
         if (featureManager != null) {
             featureManager.disableAll();
         }
@@ -173,6 +195,10 @@ public class Core extends JavaPlugin {
 
     public StorageManager storageManager() {
         return storageManager;
+    }
+
+    public LeetItemRegistry itemRegistry() {
+        return itemRegistry;
     }
 
     public FeatureManager featureManager() {

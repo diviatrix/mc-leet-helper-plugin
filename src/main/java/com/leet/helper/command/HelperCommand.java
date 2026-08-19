@@ -3,10 +3,13 @@ package com.leet.helper.command;
 import com.leet.helper.Core;
 import com.leet.helper.feature.AbstractFeature;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +27,7 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info> [args]"));
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info|give> [args]"));
             return true;
         }
 
@@ -32,7 +35,8 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
             case "list" -> handleList(sender);
             case "toggle" -> handleToggle(sender, args);
             case "info" -> handleInfo(sender, args);
-            default -> sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info> [args]"));
+            case "give" -> handleGive(sender, args);
+            default -> sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info|give> [args]"));
         }
         return true;
     }
@@ -70,8 +74,7 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Feature <white>" + id + " <gray>is now " + status));
     }
 
-    private void handleInfo(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("leet.admin")) {
+    private void handleInfo(CommandSender sender, String[] args) {        if (!sender.hasPermission("leet.admin")) {
             sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>No permission."));
             return;
         }
@@ -92,10 +95,56 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(MiniMessage.miniMessage().deserialize("<gray>Status: " + status));
     }
 
+    private void handleGive(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("leet.admin")) {
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>No permission."));
+            return;
+        }
+        // Usage: /leeta give <itemId> [amount] [player]
+        if (args.length < 2) {
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta give <item-id> [amount] [player]"));
+            return;
+        }
+        String itemId = args[1].toLowerCase();
+        ItemStack stack = plugin.itemRegistry().create(itemId);
+        if (stack == null) {
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>Unknown custom item: " + itemId));
+            return;
+        }
+        int amount = 1;
+        try {
+            if (args.length >= 3) amount = Math.max(1, Math.min(Integer.parseInt(args[2]), 64));
+        } catch (NumberFormatException e) {
+            // ignore and keep amount 1
+        }
+        stack.setAmount(amount);
+
+        Player target = null;
+        if (args.length >= 4) {
+            target = Bukkit.getPlayerExact(args[3]);
+            if (target == null) {
+                sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>Player not found: " + args[3]));
+                return;
+            }
+        } else if (sender instanceof Player p) {
+            target = p;
+        } else {
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>Console needs a player: /leeta give <item-id> <amount> <player>"));
+            return;
+        }
+
+        target.getInventory().addItem(stack);
+        sender.sendMessage(MiniMessage.miniMessage().deserialize(
+            "<green>Gave <white>" + amount + "x " + itemId + " <green>to <white>" + target.getName()));
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
-            return filterPrefix(List.of("list", "toggle", "info"), args[0]);
+            return filterPrefix(List.of("list", "toggle", "info", "give"), args[0]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("give")) {
+            return filterPrefix(new ArrayList<>(plugin.itemRegistry().ids()), args[1]);
         }
         if (args.length == 2 && (args[0].equalsIgnoreCase("toggle") || args[0].equalsIgnoreCase("info"))) {
             List<String> ids = plugin.featureManager().all().stream()

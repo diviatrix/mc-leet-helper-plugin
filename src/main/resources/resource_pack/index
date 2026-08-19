@@ -9,6 +9,7 @@ assets/leet/items/item/instant-noodle.json
 assets/leet/items/item/milk-porridge.json
 assets/leet/items/item/pelmeni.json
 assets/leet/items/item/ramen.json
+assets/leet/items/item/salt.json
 assets/leet/models/item/banh-mi.json
 assets/leet/models/item/borsh.json
 assets/leet/models/item/charlotte.json
@@ -20,6 +21,7 @@ assets/leet/models/item/instant-noodle.json
 assets/leet/models/item/milk-porridge.json
 assets/leet/models/item/pelmeni.json
 assets/leet/models/item/ramen.json
+assets/leet/models/item/salt.json
 assets/leet/textures/item/banh-mi.png
 assets/leet/textures/item/borsh.png
 assets/leet/textures/item/charlotte.png
@@ -31,4 +33,5 @@ assets/leet/textures/item/instant-noodle.png
 assets/leet/textures/item/milk-porridge.png
 assets/leet/textures/item/pelmeni.png
 assets/leet/textures/item/ramen.png
+assets/leet/textures/item/salt.png
 pack.mcmeta

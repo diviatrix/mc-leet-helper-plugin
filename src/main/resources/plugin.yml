@@ -9,7 +9,7 @@ softdepend: [Vault]
 commands:
   leeta:
     description: Admin helper command
-    usage: /leeta <list|toggle|info> [args]
+    usage: /leeta <list|toggle|info|give> [args]
     permission: leet.admin
   back:
     description: Teleport back to death location

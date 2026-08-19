@@ -214,7 +214,7 @@ feature:
       quality-items:
         - BOW
         - FISHING_ROD
-        - NAMETAG
+        - NAME_TAG
         - SADDLE
         - NAUTILUS_SHELL
         - BOOK

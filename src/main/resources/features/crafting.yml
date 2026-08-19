@@ -1,0 +1,30 @@
+base:
+  enabled: true       # server-level switch: ON = condiment/craft recipes available to every player
+  # No permission / default-permission: crafting needs no permission node (like cooking).
+  worlds: []
+  cooldown: 0
+  message-type: ACTION_BAR
+
+feature:
+  # Non-food custom items (condiments). Each is a base material the item is shown
+  # as + name/lore; the client icon comes from leet:item/<id>.
+  items:
+    salt:
+      material: SUGAR
+      name: "Salt"
+      lore:
+        - "White crystalline seasoning."
+
+  # Recipes. Types: SHAPELESS (flat `ingredients`), SHAPED (3x3 `shape` + letter
+  # map), or SMELT (furnace: `ingredient` + `result`, keeps a bucket's empty form).
+  recipes:
+    salt:
+      type: SMELT
+      ingredient: WATER_BUCKET
+      result: salt
+      amount: 1
+      experience: 0.35
+      # smelting a water bucket yields salt; Minecraft returns the empty bucket
+
+messages:
+  feature-off: "<red>Crafting is currently off for you."
