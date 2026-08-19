@@ -168,16 +168,17 @@ feature:
       type: SHAPED
       shape:
         - "IEI"
-        - "PWC"
-        - "..."
+        - "PKC"
+        - ".W."
       ingredients:
         I: instant-noodle
         E: EGG
         P: PORKCHOP
+        K: DRIED_KELP
+        C: CHICKEN
         W: BOWL
-        C: COOKED_CHICKEN
       result: ramen
-      amount: 1
+      amount: 2
     banh-mi:
       type: SHAPED
       shape:
