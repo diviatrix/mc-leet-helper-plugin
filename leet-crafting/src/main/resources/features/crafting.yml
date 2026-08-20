@@ -1,22 +1,167 @@
 base:
-  enabled: true       # server-level switch: ON = condiment/craft recipes available to every player
-  # No permission / default-permission: crafting needs no permission node (like cooking).
+  enabled: true       # server-level switch: ON = custom item recipes available to every player
+  # No permission / default-permission: crafting needs no permission node.
   worlds: []
   cooldown: 0
   message-type: ACTION_BAR
 
 feature:
-  # Non-food custom items (condiments). Each is a base material the item is shown
-  # as + name/lore; the client icon comes from leet:item/<id>.
+  # Custom items the crafting recipes produce (and, for Dough, require as an
+  # ingredient). Each item = a base Material the item is shown as + name/lore.
+  # Dish items carry hunger/saturation: on eat the plugin cancels the vanilla
+  # nutrition and applies THESE values instead (dishes restore more than their
+  # raw parts). Items without hunger/saturation are plain ingredients (Dough,
+  # Salt).
   items:
     salt:
       material: SUGAR
       name: "Salt"
       lore:
         - "White crystalline seasoning."
+    dough:
+      material: WHEAT
+      name: "Dough"
+      lore:
+        - "Flour and egg, mixed and ready."
+    croissant:
+      material: BREAD
+      name: "Croissant"
+      hunger: 2
+      saturation: 2
+      lore:
+        - "Flaky, buttery bakery fresh."
+    borsh:
+      material: BREAD
+      name: "Borsh"
+      hunger: 6
+      saturation: 9
+      lore:
+        - "Hearty beetroot and beef stew."
+    pelmeni:
+      material: BREAD
+      name: "Pelmeni"
+      hunger: 3
+      saturation: 4
+      lore:
+        - "Dumplings stuffed with seasoned beef."
+    instant-noodle:
+      material: BREAD
+      name: "Instant Noodle"
+      hunger: 2
+      saturation: 1
+      lore:
+        - "Quick noodles, ready in a bowl."
+    ramen:
+      material: BREAD
+      name: "Ramen"
+      hunger: 4
+      saturation: 6
+      lore:
+        - "Rich broth, noodles and egg."
+    banh-mi:
+      material: BREAD
+      name: "Banh Mi"
+      hunger: 4
+      saturation: 6
+      lore:
+        - "A crusty baguette stuffed with chicken."
+    milk-porridge:
+      material: BREAD
+      name: "Milk Porridge"
+      hunger: 4
+      saturation: 6
+      lore:
+        - "Soft, sweet grain in warm milk."
+    creamy-mushroom-soup:
+      material: BREAD
+      name: "Creamy Mushroom Soup"
+      hunger: 4
+      saturation: 6
+      lore:
+        - "Silky mushrooms in cream."
+    chicken-skewers:
+      material: COOKED_CHICKEN
+      name: "Chicken Skewers"
+      hunger: 4
+      saturation: 4
+      lore:
+        - "Grilled chicken on a stick."
+    charlotte:
+      material: BREAD
+      name: "Charlotte"
+      hunger: 6
+      saturation: 6
+      lore:
+        - "A layered apple-and-sponge cake."
+    pretzel:
+      material: BREAD
+      name: "Pretzel"
+      hunger: 3
+      saturation: 3
+      lore:
+        - "Salty, chewy, looped bread."
+    beef-jerky:
+      material: COOKED_BEEF
+      name: "Beef Jerky"
+      hunger: 5
+      saturation: 5
+      lore:
+        - "Chewy dried strips of beef."
+    chicken-jerky:
+      material: COOKED_CHICKEN
+      name: "Chicken Jerky"
+      hunger: 4
+      saturation: 4
+      lore:
+        - "Chewy dried strips of chicken."
+    hamon:
+      material: BREAD
+      name: "Jamón"
+      hunger: 4
+      saturation: 6
+      lore:
+        - "Cured, salted pork, sliced thin."
+    potato-chips:
+      material: BREAD
+      name: "Potato Chips"
+      hunger: 3
+      saturation: 2
+      lore:
+        - "Crisp, salted potato slices."
+    dry-salmon:
+      material: COOKED_SALMON
+      name: "Dry Salmon"
+      hunger: 5
+      saturation: 2
+      lore:
+        - "Salt-cured and dried salmon."
+    dry-cod:
+      material: COOKED_COD
+      name: "Dry Cod"
+      hunger: 4
+      saturation: 2
+      lore:
+        - "Salt-cured and dried cod."
+    chocolate-bar:
+      material: BREAD
+      name: "Chocolate Bar"
+      hunger: 16
+      saturation: 16
+      lore:
+        - "Smooth, sweet cacao."
+    chocolate-piece:
+      material: BREAD
+      name: "Chocolate Piece"
+      hunger: 2
+      saturation: 2
+      lore:
+        - "A single square of chocolate."
 
-  # Recipes. Types: SHAPELESS (flat `ingredients`), SHAPED (3x3 `shape` + letter
-  # map), or SMELT (furnace: `ingredient` + `result`, keeps a bucket's empty form).
+  # Crafting recipes. Type SHAPELESS = a flat `ingredients` list; SHAPED = a 3x3
+  # `shape` of letters plus an `ingredients` map of letter -> item. A result is
+  # either a custom item id above (e.g. `dough`) or `material:<MATERIAL>` for a
+  # vanilla output (e.g. the second way to make bread). Shapeless ingredients are
+  # either a vanilla Material name or a custom item id (matched exactly by tag+name).
   recipes:
     salt:
       type: SMELT
@@ -24,7 +169,230 @@ feature:
       result: salt
       amount: 9
       experience: 0.35
-      # smelting a water bucket yields salt; Minecraft returns the empty bucket
+      # smelting a water bucket yields 9 salt; the empty bucket is returned
+    dough:
+      type: SHAPELESS
+      ingredients:
+        - WHEAT
+        - WHEAT
+        - EGG
+      result: dough
+      amount: 1
+    bread:
+      type: SHAPELESS
+      ingredients:
+        - dough
+      result: material:BREAD
+      amount: 1
+    croissant:
+      type: SHAPED
+      shape:
+        - "DDD"
+        - "SMS"
+        - "..."
+      ingredients:
+        D: dough
+        S: SUGAR
+        M: MILK_BUCKET
+      result: croissant
+      amount: 6
+    borsh:
+      type: SHAPED
+      shape:
+        - "BRB"
+        - "PPP"
+        - "CWA"
+      ingredients:
+        B: BEEF
+        R: BEETROOT
+        P: POTATO
+        C: CARROT
+        W: BOWL
+        A: ALLIUM
+      result: borsh
+      amount: 6
+    pelmeni:
+      type: SHAPED
+      shape:
+        - "DDD"
+        - "BPB"
+        - "AWA"
+      ingredients:
+        D: dough
+        B: BEEF
+        P: PORKCHOP
+        A: ALLIUM
+        W: BOWL
+      result: pelmeni
+      amount: 8
+    instant-noodle:
+      type: SHAPED
+      shape:
+        - "DED"
+        - "..."
+        - "..."
+      ingredients:
+        D: dough
+        E: EGG
+      result: instant-noodle
+      amount: 3
+    ramen:
+      type: SHAPED
+      shape:
+        - "IEI"
+        - "PKC"
+        - ".W."
+      ingredients:
+        I: instant-noodle
+        E: EGG
+        P: PORKCHOP
+        K: DRIED_KELP
+        C: CHICKEN
+        W: BOWL
+      result: ramen
+      amount: 8
+    banh-mi:
+      type: SHAPED
+      shape:
+        - "BCA"
+        - "..."
+        - "..."
+      ingredients:
+        B: BREAD
+        C: COOKED_CHICKEN
+        A: ALLIUM
+      result: banh-mi
+      amount: 6
+    milk-porridge:
+      type: SHAPED
+      shape:
+        - "MWS"
+        - ".B."
+        - "..."
+      ingredients:
+        M: MILK_BUCKET
+        W: WHEAT
+        S: SUGAR
+        B: BOWL
+      result: milk-porridge
+      amount: 4
+    creamy-mushroom-soup:
+      type: SHAPED
+      shape:
+        - "BRK"
+        - ".W."
+        - "..."
+      ingredients:
+        B: BROWN_MUSHROOM
+        R: RED_MUSHROOM
+        K: MILK_BUCKET
+        W: BOWL
+      result: creamy-mushroom-soup
+      amount: 4
+    chicken-skewers:
+      type: SHAPED
+      shape:
+        - "CCS"
+        - "..."
+        - "..."
+      ingredients:
+        C: COOKED_CHICKEN
+        S: STICK
+      result: chicken-skewers
+      amount: 4
+    charlotte:
+      type: SHAPED
+      shape:
+        - "DAD"
+        - "SES"
+        - "..."
+      ingredients:
+        D: dough
+        A: APPLE
+        S: SUGAR
+        E: EGG
+      result: charlotte
+      amount: 2
+    pretzel:
+      type: SHAPELESS
+      ingredients:
+        - dough
+        - dough
+        - salt
+      result: pretzel
+      amount: 2
+    beef-jerky:
+      type: SHAPELESS
+      ingredients:
+        - BEEF
+        - BEEF
+        - salt
+      result: beef-jerky
+      amount: 3
+    chicken-jerky:
+      type: SHAPELESS
+      ingredients:
+        - CHICKEN
+        - CHICKEN
+        - salt
+      result: chicken-jerky
+      amount: 3
+    hamon:
+      type: SHAPED
+      shape:
+        - "PPP"
+        - "SSS"
+        - "PPP"
+      ingredients:
+        P: PORKCHOP
+        S: salt
+      result: hamon
+      amount: 8
+    potato-chips:
+      type: SHAPELESS
+      ingredients:
+        - POTATO
+        - POTATO
+        - POTATO
+        - salt
+      result: potato-chips
+      amount: 4
+    dry-salmon:
+      type: SHAPELESS
+      ingredients:
+        - SALMON
+        - SALMON
+        - SALMON
+        - salt
+      result: dry-salmon
+      amount: 4
+    dry-cod:
+      type: SHAPELESS
+      ingredients:
+        - COD
+        - COD
+        - COD
+        - salt
+      result: dry-cod
+      amount: 4
+    chocolate-bar:
+      type: SHAPED
+      shape:
+        - "CCC"
+        - "SMS"
+        - "CCC"
+      ingredients:
+        C: COCOA_BEANS
+        S: SUGAR
+        M: MILK_BUCKET
+      result: chocolate-bar
+      amount: 1
+    chocolate-piece:
+      type: SHAPELESS
+      ingredients:
+        - chocolate-bar
+      result: chocolate-piece
+      amount: 8
 
 messages:
   feature-off: "<red>Crafting is currently off for you."

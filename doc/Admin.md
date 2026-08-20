@@ -4,7 +4,7 @@ The `/leeta` admin command and the `leet.admin.*` permission nodes that gate it.
 
 `/leeta` is provided by **LeetCore**, but because it browses LeetCore's **shared
 feature registry**, it manages features from **all three** plugins (LeetCore's seven
-standalone features, LeetSkills' `skills`, LeetCrafting's `crafting`/`cooking`).
+standalone features, LeetSkills' `skills`, LeetCrafting's `crafting`).
 
 > Feature-facing permissions (`leet.feat.*`) are documented per feature — see the
 > [feature docs index](features/).
@@ -72,10 +72,12 @@ log-level: INFO
 ```
 
 > **LeetCrafting** has its own `config.yml` too (`plugins/LeetCrafting/config.yml`) with the
-> same `config-version`/`log-level` plus the `resource-pack.*` distribution settings (see the
-> [Cooking](features/cooking.md#dish-icons--resource-pack) feature doc). **LeetSkills** has no
-> global `config.yml` — its configuration lives entirely in `features/skills.yml` and
-> `features/skill-tree.yml`.
+> same `config-version`/`log-level` plus the `resource-pack.*` distribution settings. The full
+> operational guide for the resource pack — config keys, FRPC/reverse-proxy deployment, the
+> `/craft-pack.zip` path-routing rule, and log-line diagnostics — lives in
+> **[Resource Pack Distribution](resource-pack.md)**; the [Crafting](features/crafting.md) feature
+> doc links it from its "Behavior" section. **LeetSkills** has no global `config.yml` — its
+> configuration lives entirely in `features/skills.yml` and `features/skill-tree.yml`.
 
 | Key | Type | Description |
 |---|---|---|
@@ -114,6 +116,9 @@ The `log-level` is read from `config.yml`, though most feature-related messages 
 | Skill levels reset on restart | LeetSkills' `plugins/LeetSkills/data.db` file was deleted/moved, or the SQLite connection failed to initialize (SEVERE log). |
 | `data.db` not created | Check the startup logs for `Failed to initialize SQLite`. The plugin degrades gracefully (Back feature won't persist). |
 | DoubleJump not triggering | Check game mode (Creative/Spectator excluded), `double_jump` cooldown (1s default), or the permission/world whitelist. |
+| Custom dish/condiment items show no custom icon | The resource pack was never delivered. See the [Resource Pack guide](resource-pack.md#troubleshooting) — common causes: `resource-pack.url` path doesn't end in `/craft-pack.zip`, FRPC isn't forwarding port 8043, `server-ip` is empty in `server.properties` (so the client URL is `localhost`), or the client declined an optional pack (`require: false`). |
+| `[LeetCrafting] Callback timed out after 10s, proceeding anyway.` | The client never sent the final callback. Verify with `[RP-HTTP] GET /craft-pack.zip -> 200 OK` in the log; if missing, the client can't reach the URL at all. If present but the callback still times out, check for `FAILED_RELOAD` (SHA1 mismatch) or `DECLINED` (player rejected an optional pack). Full matrix in [Resource Pack guide](resource-pack.md#troubleshooting). |
+| `[LeetCrafting] No resource-pack URL available. Set resource-pack.url in config.yml.` | `resource-pack.url` is empty **and** `server-ip` is blank in `server.properties` — the embedded server fell back to `localhost`, which remote clients can't reach. Set `url` (path must end with `/craft-pack.zip`) or `server-ip`. |
 
 ---
 

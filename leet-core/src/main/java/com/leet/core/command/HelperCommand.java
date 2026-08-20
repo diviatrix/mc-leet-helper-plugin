@@ -152,7 +152,7 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
         RELOAD_GROUPS.put("core", List.of(
             "double_jump", "durability", "auto_crop", "back", "tree_feller", "fall_damage", "xp"));
         RELOAD_GROUPS.put("skills", List.of("skills"));
-        RELOAD_GROUPS.put("craft", List.of("crafting", "cooking"));
+        RELOAD_GROUPS.put("craft", List.of("crafting"));
     }
 
     private void handleReload(CommandSender sender, String[] args) {

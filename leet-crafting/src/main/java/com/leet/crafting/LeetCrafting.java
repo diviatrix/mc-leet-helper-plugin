@@ -7,22 +7,23 @@ import com.leet.crafting.craft.LeetItemRegistry;
 import com.leet.crafting.resource.ResourcePackService;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
+import java.io.File;
 
 /**
- * LeetCrafting — the custom items + recipes plugin (merged Cooking + Crafting).
- * It soft-depends on LeetCore, looks up the shared {@link CoreApi}, registers its
- * crafting/cooking features into core's shared feature registry, and owns its item
- * domain: the {@link LeetItemRegistry} (registered with core as a read-only
+ * LeetCrafting — the custom items + recipes plugin. It soft-depends on
+ * LeetCore, looks up the shared {@link CoreApi}, registers a single
+ * {@code crafting} feature into core's shared feature registry, and owns its
+ * item domain: the {@link LeetItemRegistry} (registered with core as a read-only
  * {@link CustomItemView} so /leeta give works) and the item resource pack
  * ({@link ResourcePackService}), constructed, started and stopped here. Without
  * LeetCore it disables itself gracefully.
  */
 public final class LeetCrafting extends JavaPlugin {
 
-    private static final List<String> DOMAINS = List.of("crafting", "cooking");
+    private static final String FEATURE_ID = "crafting";
 
     private CoreApi core;
     private LeetItemRegistry itemRegistry;
@@ -38,20 +39,17 @@ public final class LeetCrafting extends JavaPlugin {
         itemRegistry = new LeetItemRegistry(getLogger(), new NamespacedKey(this, "ci"));
         Bukkit.getServicesManager().register(CustomItemView.class, itemRegistry, this, org.bukkit.plugin.ServicePriority.Normal);
 
-        // Pre-load every domain's items before registering either feature, so recipe
-        // ingredient resolution (e.g. cooking referencing crafting's salt) is
-        // independent of feature load order.
-        CraftFeature.preloadItemSections(this, itemRegistry, "crafting", "cooking");
-
-        if (DOMAINS.stream().noneMatch(id -> core.registerFeature(new CraftFeature(core, this, id, itemRegistry)))) {
-            getLogger().severe("Failed to register crafting/cooking features with LeetCore. LeetCrafting will not enable.");
+        CraftFeature feature = new CraftFeature(core, this, itemRegistry);
+        feature.setRecipeBookAutodiscovery(getConfig().getBoolean("recipe-book-autodiscovery", true));
+        if (!core.registerFeature(feature)) {
+            getLogger().severe("Failed to register the 'crafting' feature with LeetCore. LeetCrafting will not enable.");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
         resourcePackService = new ResourcePackService(this);
         resourcePackService.start();
-        getLogger().info("LeetCrafting registered 'crafting' and 'cooking' features with LeetCore.");
+        getLogger().info("LeetCrafting registered the 'crafting' feature with LeetCore.");
     }
 
     @Override
@@ -60,15 +58,35 @@ public final class LeetCrafting extends JavaPlugin {
             resourcePackService.stop();
             resourcePackService = null;
         }
-        DOMAINS.forEach(id -> FeaturePluginSupport.disableFeature(core, id));
+        FeaturePluginSupport.disableFeature(core, FEATURE_ID);
         core = null;
         itemRegistry = null;
     }
 
-    /** Writes this plugin's default feature configs on first run. */
+    /** Writes this plugin's default feature configs on first run and migrates any pre-merge state. */
     private void saveFeatureConfigs() {
         FeaturePluginSupport.saveResourceIfMissing(this, "features/crafting.yml");
-        FeaturePluginSupport.saveResourceIfMissing(this, "features/cooking.yml");
+        // One-off migration: pre-1.5.x split the crafting domain into two YAMLs
+        // (crafting.yml + cooking.yml) and two feature ids. Existing servers may
+        // have an on-disk cooking.yml with a custom base.enabled; carry that value
+        // over to the merged crafting.yml and remove the stale file.
+        File legacy = new File(getDataFolder(), "features/cooking.yml");
+        if (legacy.isFile()) {
+            File merged = new File(getDataFolder(), "features/crafting.yml");
+            try {
+                YamlConfiguration legacyCfg = YamlConfiguration.loadConfiguration(legacy);
+                YamlConfiguration mergedCfg = YamlConfiguration.loadConfiguration(merged);
+                if (!mergedCfg.contains("base.enabled")) {
+                    mergedCfg.set("base.enabled", legacyCfg.getBoolean("base.enabled", true));
+                    mergedCfg.save(merged);
+                    getLogger().info("Migrated base.enabled from legacy features/cooking.yml into features/crafting.yml.");
+                }
+            } catch (Exception e) {
+                getLogger().warning("Failed to migrate legacy features/cooking.yml: " + e.getMessage());
+            }
+            if (!legacy.delete()) {
+                legacy.deleteOnExit();
+            }
+        }
     }
 }
-

@@ -12,6 +12,8 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -182,6 +184,17 @@ public final class LeetRecipeRegistry {
         }
         registeredKeys.clear();
         recipesByKey.clear();
+    }
+
+    /** Discovers every recipe on the server for the given player (recipe book). */
+    public static void discoverAll(Player player) {
+        var it = Bukkit.recipeIterator();
+        while (it.hasNext()) {
+            Recipe recipe = it.next();
+            if (recipe instanceof Keyed keyed) {
+                player.discoverRecipe(keyed.getKey());
+            }
+        }
     }
 
     public RecipeDef defFor(Recipe recipe) {

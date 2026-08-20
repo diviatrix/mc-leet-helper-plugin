@@ -38,7 +38,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Builds and distributes the craft/cooking item-texture resource pack.
+ * Builds and distributes the craft item-texture resource pack.
  *
  * <p>LeetCrafting constructs and owns this service. It reads the
  * {@code resource_pack/index} manifest from this plugin's JAR, zips every listed

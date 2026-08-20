@@ -2,6 +2,59 @@
 
 All notable changes to **LeetHelper**. Entries are newest first.
 
+## Unreleased — Crafting feature merge
+
+**Changed**
+- **Cooking and Crafting are now a single feature.** LeetCrafting registers **one**
+  `crafting` feature with `com.leet.core` instead of two (`cooking` + `crafting`).
+  The custom food items (Dough, Croissant, Borsh, …) and the non-food items (Salt)
+  live in the same `plugins/LeetCrafting/features/crafting.yml`. The `CraftingFeature` /
+  `CookingFeature` Java stubs were deleted; `CraftFeature` now hardcodes the
+  `crafting` id.
+- The `/leet cook` info subcommand is gone. Crafting is server-wide and toggleable
+  via `/leeta toggle crafting` (admin) or by editing `base.enabled`.
+- `/leeta reload craft` reloads the single `crafting` feature.
+
+**Migration**
+- Existing servers with a pre-merge `plugins/LeetCrafting/features/cooking.yml`: on
+  the first start with this version, the plugin copies `cooking.yml`'s `base.enabled`
+  into `crafting.yml` (only if `crafting.yml` has no explicit value) and deletes the
+  stale `cooking.yml`. Your on/off state survives the upgrade.
+
+**Docs**
+- `doc/features/cooking.md` deleted; all dish recipes + Salt + the config layout
+  now live in `doc/features/crafting.md`.
+- `doc/ARCHITECTURE.md`, `doc/Admin.md`, `doc/permissions.md`, `doc/resource-pack.md`,
+  and `README.md` updated to drop the Cooking feature references and the
+  `/leet cook` subcommand.
+
+---
+
+## Unreleased — Resource-pack ops doc + docs cleanup
+
+**Docs**
+- New **`doc/resource-pack.md`** — the canonical operational guide for the
+  LeetCrafting item-texture resource pack: config keys, the embedded HTTP server,
+  FRPC / reverse-proxy deployment, the **`/craft-pack.zip` path-routing rule**, log-line
+  diagnostics (`[RP]`, `[RP-HTTP]`, `Callback fired`, `Callback timed out`), and a full
+  troubleshooting matrix.
+- `doc/features/cooking.md` and `doc/features/crafting.md` — the long "Dish icons &
+  resource pack" section was removed (it duplicated plugin-level concerns) and replaced
+  with a one-line pointer to the new guide from each feature's "Notes & limits" section.
+  Both features share the same resource pack and the same icon pipeline; neither doc
+  should be where the operational story lives.
+- `doc/Admin.md` — Configuration section links the new guide; Troubleshooting table now
+  covers "custom items show no icon", "`Callback timed out after 10s`", and
+  "No resource-pack URL available" with concrete causes/fixes.
+- `README.md` — added Resource Pack link to the Table of Contents and a step-5
+  configuration pointer in Installation.
+- Removed `doc/ARCHITECTURE-REWORK.md` — its contents were a plan/record for the
+  rework that produced the current three-plugin split; the result is what
+  `doc/ARCHITECTURE.md` describes today. Cross-references updated.
+- Removed empty `doc/dev/`.
+
+---
+
 ## 1.5.1 — Admin feature reload
 
 **Added**

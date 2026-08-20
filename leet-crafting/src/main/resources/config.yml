@@ -1,9 +1,13 @@
 config-version: 1
 log-level: INFO
 
-# Item resource-pack distribution (item textures for crafted/cooked dishes).
+# Item resource-pack distribution (item textures for crafting items).
 resource-pack:
   enabled: true
   port: 8043             # embedded HTTP server port
   url: ""                # optional: external URL hosting the pack (skip embedded server)
   require: false         # false = optional
+
+# Recipe book: when true, all custom crafting recipes are discovered
+# for every player on join so they appear in the in-game recipe book.
+recipe-book-autodiscovery: true

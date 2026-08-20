@@ -7,6 +7,7 @@ A bundle of **Paper 26.2** plugins providing modular gameplay features, split in
 - [Overview](#overview)
 - [Requirements](#requirements)
 - [Installation](#installation)
+- [Resource pack (item icons)](doc/resource-pack.md)
 - [Permissions](doc/permissions.md)
 - [Commands](#commands)
   - [/leeta](#leeta)
@@ -32,7 +33,7 @@ LeetHelper is delivered as **three jars** that must be deployed together. Each p
 |---|---|---|---|
 | **LeetCore** | `leet-core-<v>.jar` | `com.leet.core` | Shared infrastructure (storage, item registry, feature registry, GUI, Vault) + the **7 standalone features** + the cross-plugin commands (`/leeta`, `/back`, `/leet`) |
 | **LeetSkills** | `leet-skills-<v>.jar` | `com.leet.skills` | The **Skills** feature — an XP-spent skill tree (`/skills`) |
-| **LeetCrafting** | `leet-crafting-<v>.jar` | `com.leet.crafting` | The **Cooking** and **Crafting** features — custom foods and condiment items, plus the item resource pack |
+| **LeetCrafting** | `leet-crafting-<v>.jar` | `com.leet.crafting` | The **Crafting** feature — custom foods and condiment items, plus the item resource pack |
 
 ### Features by plugin
 
@@ -50,7 +51,7 @@ LeetCore registers **seven** standalone features:
 
 LeetSkills registers the **Skills** feature: a skill tree (Traveler + 8 passive skills + advanced skills) leveled up by spending XP points.
 
-LeetCrafting registers **two** features: **Cooking** (custom food recipes and dishes) and **Crafting** (non-food condiments such as Salt), both server-wide.
+LeetCrafting registers the **Crafting** feature: a single server-level domain that bundles custom food items (Salt and ~20 dishes) and their recipes into one feature.
 
 Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, `give`); full per-feature details (config keys, limitations, permissions) are in **[doc/features/](doc/features/)**.
 
@@ -96,11 +97,12 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, 
    plugins/LeetCrafting/
    ├── config.yml                 # Global settings + resource-pack.* distribution
    └── features/
-       ├── cooking.yml            # Custom food items and recipes
-       └── crafting.yml           # Custom condiment items (e.g. Salt)
+       └── crafting.yml           # Custom food and condiment items, with all recipes
    ```
 
 4. **Configure to taste** — edit the files inside each plugin's `Plugins/<Name>/features/` folder. Restart the server for changes to take effect (there is **no reload command**; `base.enabled` toggles are the only thing that can be changed live, via `/leeta toggle`).
+
+5. **(Optional) Configure the item resource pack** — LeetCrafting ships a tiny additive `leet:` item-texture pack for the crafting items. By default it runs an embedded HTTP server on port 8043; for remote players (or behind FRPC/proxies) you'll want to set `resource-pack.url`. The full operational guide — including the `/craft-pack.zip` path-routing rule and the FRPC setup — is in **[Resource Pack Distribution](doc/resource-pack.md)**.
 
 > **Updating:** on startup each plugin merges its global `config.yml` and every feature config against the bundled defaults. Any **new key** introduced by a newer version is automatically added to your existing configs while all your other values are preserved. No manual copying needed.
 >
@@ -116,7 +118,7 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, 
 
 ## Permissions
 
-See **[doc/permissions.md](doc/permissions.md)** — the admin `/leeta` permissions (`leet.admin.*`) declared statically in LeetCore's `plugin.yml`, and the dynamic per-feature `leet.feat.*` permissions registered at runtime (a role the standalone features, Skills, and Cooking/Crafting each opt into or out of).
+See **[doc/permissions.md](doc/permissions.md)** — the admin `/leeta` permissions (`leet.admin.*`) declared statically in LeetCore's `plugin.yml`, and the dynamic per-feature `leet.feat.*` permissions registered at runtime (a role the standalone features, Skills, and Crafting each opt into or out of).
 
 ---
 
@@ -150,7 +152,7 @@ This command is player-only (the console receives a "This command can only be us
 
 ### /leet
 
-Player-side feature control (provided by **LeetCore**). Each player can turn supported features **off for themselves** (an off-switch — it never grants or revokes access). Persisted per-player in LeetCore's SQLite `kv_store`, so preferences survive restarts. A few server-level features have **no** per-player toggle and only offer info (e.g. Cooking).
+Player-side feature control (provided by **LeetCore**). Each player can turn supported features **off for themselves** (an off-switch — it never grants or revokes access). Persisted per-player in LeetCore's SQLite `kv_store`, so preferences survive restarts. A server-level feature with no per-player toggle is **Crafting** — it is controlled at the server level by `base.enabled` and is not exposed through `/leet`.
 
 | Subcommand | Permission | Description |
 |---|---|---|
@@ -161,16 +163,15 @@ Player-side feature control (provided by **LeetCore**). Each player can turn sup
 | `/leet fall` | `leet.feat.fall_damage` | Toggle **Fall Damage** on/off for yourself |
 | `/leet xp` | `leet.feat.xp` | Toggle **XP** on/off for yourself |
 | `/leet skills` | `leet.feat.skills` | Toggle **Skills** on/off for yourself |
-| `/leet cook` | *(none — server-enabled)* | Show **Cooking** info; recipes enable for the whole server (`base.enabled`) |
 
 **Permission model** — `/leet` is permission-gated by the underlying feature permissions:
-- The command is only available to players who have at least **one** `leet.feat.<id>` permission **or** an enabled server-level info feature. If a player has **none**, `/leet` reports `No permission.` and does nothing (including `list`, and no tab completion).
-- Tab completion and the status list only show the features the player is actually permissioned for (plus server-level info features like Cooking).
+- The command is only available to players who have at least **one** `leet.feat.<id>` permission. If a player has **none**, `/leet` reports `No permission.` and does nothing (including `list`, and no tab completion).
+- Tab completion and the status list only show the features the player is actually permissioned for.
 - Toggling a feature still checks that feature's permission (e.g. `leet.feat.double_jump`); without it, `/leet <sub>` is declined.
-- Because these toggle features default to `false`, their `/leet` subcommands need a granted permission — but **Cooking needs no permission**: it is controlled at the server level by `base.enabled` (see [Feature: Cooking](doc/features/cooking.md)).
-- `/leet skills` and `/leet cook` are shown/toggled **only when** the skills/cooking features are registered by their owning plugins (LeetSkills / LeetCrafting); `/leet` degrades gracefully if those plugins aren't loaded.
+- Because these toggle features default to `false`, their `/leet` subcommands need a granted permission — but **Crafting needs no permission**: it is controlled at the server level by `base.enabled` (see [Feature: Crafting](doc/features/crafting.md)).
+- `/leet skills` is shown/toggled **only when** the skills feature is registered by its owning plugin (LeetSkills); `/leet` degrades gracefully if that plugin isn't loaded.
 
-**How the toggle applies:** a player's off-toggle adds a layer inside `AbstractFeature.check()` (server enabled → base permission → personal toggle → world whitelist). When off, the feature stops firing for that player only; other players and the rest of the config are unaffected. Cooking is the exception — it bypasses the permission/toggle layers and enables for the whole server.
+**How the toggle applies:** a player's off-toggle adds a layer inside `AbstractFeature.check()` (server enabled → base permission → personal toggle → world whitelist). When off, the feature stops firing for that player only; other players and the rest of the config are unaffected. Crafting is the exception — it bypasses the permission/toggle layers and enables for the whole server.
 
 ### /skills
 

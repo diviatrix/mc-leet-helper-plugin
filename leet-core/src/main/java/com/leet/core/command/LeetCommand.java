@@ -1,7 +1,6 @@
 package com.leet.core.command;
 
 import com.leet.core.LeetCore;
-import com.leet.core.feature.AbstractFeature;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,9 +18,9 @@ import java.util.UUID;
 /**
  * Player-side feature control. Each alias maps to a feature ID. Toggleable
  * features (`ALIASES`) are a personal off-switch, persisted per-player in the
- * SQLite kv_store. Non-toggleable features (`INFO_ALIASES`) instead show info
- * (e.g. cooking: recipes are available whenever the feature is enabled, so
- * there is nothing to toggle).
+ * SQLite kv_store. There is no info-only feature here; crafting is open to all
+ * players when its base.enabled is true and shows up in /leeta as a regular
+ * entry (no /leet subcommand — toggle it with /leeta toggle crafting).
  */
 public class LeetCommand implements CommandExecutor, TabCompleter {
 
@@ -36,11 +35,6 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
         ALIASES.put("xp", "xp");
         ALIASES.put("skills", "skills");
     }
-
-    /** Non-toggleable features: `/leet <alias>` shows info instead of toggling. */
-    private static final Map<String, String> INFO_ALIASES = Map.of(
-        "cook", "cooking"
-    );
 
     private final LeetCore plugin;
 
@@ -63,15 +57,9 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         String alias = args[0].toLowerCase();
-        String infoFeatureId = INFO_ALIASES.get(alias);
-        if (infoFeatureId != null) {
-            if (!featurePresent(infoFeatureId)) return true;
-            showInfo(player, infoFeatureId);
-            return true;
-        }
         String featureId = ALIASES.get(alias);
         if (featureId == null) {
-            player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leet <list|dj|crop|tree|fall|xp|skills|cook>"));
+            player.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leet <list|dj|crop|tree|fall|xp|skills>"));
             return true;
         }
         if (!featurePresent(featureId)) return true;
@@ -103,11 +91,6 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
             boolean on = plugin.storageManager().getUserToggle(featureId, uuid) != Boolean.FALSE;
             sendStatusLine(player, featureId, on);
         }
-        // Info-only features need no permission; they're ON whenever the feature is enabled.
-        for (String featureId : INFO_ALIASES.values()) {
-            if (!featurePresent(featureId)) continue;
-            sendStatusLine(player, featureId, featureActive(player, featureId));
-        }
     }
 
     private void sendStatusLine(Player player, String featureId, boolean on) {
@@ -116,38 +99,17 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
             "<gray>- <white>" + displayName(featureId) + " <gray>[ " + status + " <gray>]"));
     }
 
-    /** Shows feature info for a non-toggleable feature (e.g. cooking). */
-    private void showInfo(Player player, String featureId) {
-        boolean on = featureActive(player, featureId);
-        player.sendMessage(MiniMessage.miniMessage().deserialize(
-            "<gray>Feature <white>" + displayName(featureId)
-            + " <gray>is <" + (on ? "green>enabled" : "red>disabled") + "<reset>. "
-            + infoNote(featureId)));
-    }
-
-    private static String infoNote(String featureId) {
-        return switch (featureId) {
-            case "cooking" -> "Custom food recipes \u2014 available whenever the feature is enabled (no permission).";
-            default -> "";
-        };
-    }
-
     /** Whether the feature currently applies to the player (its own gating rules). */
     private boolean featureActive(Player player, String featureId) {
         return plugin.featureManager().get(featureId)
             .map(f -> f.appliesTo(player)).orElse(false);
     }
 
-    /** True when the player can use /leet at all: any permission, or an open info feature. */
+    /** True when the player can use /leet at all: any permission. */
     private boolean hasAnyPermission(Player player) {
         for (String featureId : ALIASES.values()) {
             if (!featurePresent(featureId)) continue;
             if (player.hasPermission(permissionFor(featureId))) return true;
-        }
-        for (String featureId : INFO_ALIASES.values()) {
-            if (!featurePresent(featureId)) continue;
-            AbstractFeature feature = plugin.featureManager().get(featureId).orElse(null);
-            if (feature != null && feature.isEnabled()) return true;
         }
         return false;
     }
@@ -167,7 +129,6 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
             case "fall_damage" -> "Fall Damage";
             case "xp" -> "XP";
             case "skills" -> "Skills";
-            case "cooking" -> "Cooking";
             default -> "Double Jump";
         };
     }
@@ -183,8 +144,6 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
                         options.add(aliasFor(featureId));
                     }
                 }
-                // Info-only features are always available (no permission required).
-                options.addAll(INFO_ALIASES.keySet());
             }
             return CommandUtil.filterPrefix(options, args[0]);
         }
@@ -193,9 +152,6 @@ public class LeetCommand implements CommandExecutor, TabCompleter {
 
     private static String aliasFor(String featureId) {
         for (Map.Entry<String, String> e : ALIASES.entrySet()) {
-            if (e.getValue().equals(featureId)) return e.getKey();
-        }
-        for (Map.Entry<String, String> e : INFO_ALIASES.entrySet()) {
             if (e.getValue().equals(featureId)) return e.getKey();
         }
         return featureId;

@@ -6,69 +6,56 @@ import com.leet.crafting.craft.LeetRecipeRegistry;
 import com.leet.core.feature.AbstractFeature;
 import com.leet.core.feature.MessagingFeature;
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.inventory.Recipe;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * A reusable custom item + recipe feature (the merged Cooking/Crafting domain).
- * A single feature id owns a {@code features/<id>.yml} file with its own
- * {@code feature.items}/{@code feature.recipes} sections, registered into core's
- * shared {@link LeetItemRegistry}. The LeetCrafting plugin instantiates one for
- * {@code cooking} and one for {@code crafting} so both keep their own /leet info
- * and /leeta toggle, but share the core item registry so recipes may cross-reference
- * each other's items (e.g. a cooking dish requiring crafted salt).
+ * The single merged crafting feature. Owns {@code features/crafting.yml}
+ * (items + recipes), registers them into the shared {@link LeetItemRegistry},
+ * and contributes recipes to vanilla. Server-wide (no permission, no per-player
+ * toggle); gated by {@code base.enabled} and the {@code base.worlds} whitelist.
  */
 public final class CraftFeature extends AbstractFeature implements MessagingFeature {
 
-    private final String id;
+    private static final String FEATURE_ID = "crafting";
+
     private final LeetItemRegistry items;
     private final LeetRecipeRegistry recipes;
+    private boolean recipeBookAutodiscovery;
 
-    public CraftFeature(CoreApi core, JavaPlugin owner, String id, LeetItemRegistry items) {
+    public CraftFeature(CoreApi core, JavaPlugin owner, LeetItemRegistry items) {
         super(core, owner);
-        this.id = id;
         this.items = items;
         this.recipes = new LeetRecipeRegistry(owner.getLogger(), items);
     }
 
+    /** Sets whether all recipes are auto-discovered for players on join. */
+    public void setRecipeBookAutodiscovery(boolean enabled) {
+        this.recipeBookAutodiscovery = enabled;
+    }
+
     @Override
     public String featureId() {
-        return id;
+        return FEATURE_ID;
     }
 
     @Override
     protected void loadFeatureConfig(YamlConfiguration cfg) {
-        items.load(id, cfg.getConfigurationSection("feature.items"));
-        recipes.reload(id, cfg.getConfigurationSection("feature.recipes"));
-    }
-
-    /**
-     * Loads only the {@code feature.items} section of {@code features/<id>.yml}
-     * into the shared registry, without parsing recipes. LeetCrafting pre-loads
-     * every domain's items this way before registering any feature, so recipe
-     * ingredient resolution is independent of feature load order (e.g. a cooking
-     * recipe may reference crafting's salt regardless of registration order).
-     */
-    public static void preloadItemSections(JavaPlugin owner, LeetItemRegistry items, String... featureIds) {
-        for (String id : featureIds) {
-            java.io.File file = new java.io.File(owner.getDataFolder(), "features/" + id + ".yml");
-            YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-            items.load(id, cfg.getConfigurationSection("feature.items"));
-        }
+        items.load(FEATURE_ID, cfg.getConfigurationSection("feature.items"));
+        recipes.reload(FEATURE_ID, cfg.getConfigurationSection("feature.recipes"));
     }
 
     @Override
     public void enable() {
         super.enable();
         if (enabled) {
-            recipes.register(new NamespacedKey(owner, id));
+            recipes.register(new NamespacedKey(owner, FEATURE_ID));
         }
     }
 
@@ -78,7 +65,7 @@ public final class CraftFeature extends AbstractFeature implements MessagingFeat
         super.disable();
     }
 
-    /** Crafting/cooking is open to every player (server-enabled toggle + world whitelist). */
+    /** Crafting is open to every player (server-enabled toggle + world whitelist). */
     @Override
     protected boolean check(Player player) {
         if (!enabled) return false;
@@ -104,5 +91,12 @@ public final class CraftFeature extends AbstractFeature implements MessagingFeat
         if (check(player)) return;
         event.setCancelled(true);
         sendMessage(player, "feature-off");
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        if (enabled && recipeBookAutodiscovery) {
+            LeetRecipeRegistry.discoverAll(event.getPlayer());
+        }
     }
 }

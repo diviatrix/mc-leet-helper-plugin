@@ -72,8 +72,8 @@ public abstract class AbstractFeature implements Listener, ToggleableFeature {
             permission = cfg.getString("base.permission", "leet.feat." + featureId());
             defaultPermission = cfg.getString("base.default-permission", "true");
             // Only register a runtime permission when the config actually declares
-            // a base.permission key; features that omit it (e.g. cooking/crafting,
-            // which are open to everyone) get no phantom node.
+            // a base.permission key; features that omit it (e.g. crafting, which
+            // is open to everyone) get no phantom node.
             permissionLookupEnabled = cfg.contains("base.permission");
             worlds = cfg.getStringList("base.worlds");
             cooldownSeconds = cfg.getInt("base.cooldown", 0);

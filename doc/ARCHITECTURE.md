@@ -80,24 +80,21 @@ leet-skills/                          # LeetSkills — the skill-tree plugin
     features/skills.yml               # Skill definitions (+ binds-feature / toggleable / effects)
     features/skill-tree.yml           # Tree topology + advanced GUI slots
 
-leet-crafting/                        # LeetCrafting — custom items & recipes (merged Cooking + Crafting)
-  src/main/java/com/leet/crafting/
-    LeetCrafting.java                 # Plugin lifecycle; binds to CoreApi; owns item registry + resource pack
-    CraftFeature.java                 # One generic feature instance per domain (crafting, cooking)
-    CookingFeature.java               # (stub/aggregator for the cooking domain)
-    CraftingFeature.java              # (stub/aggregator for the crafting domain)
-    craft/
-      LeetItem.java                   # A single custom item (id, material, name/lore, food, leet:item model)
-      LeetItemRegistry.java           # id -> item registry; registered with core as CustomItemView
-      LeetRecipeRegistry.java         # Generic SHAPED/SHAPELESS/SMELT recipe parse + register/gate
-    resource/
-      ResourcePackService.java        # Builds + serves the additive item-texture resource pack
-  src/main/resources/
-    plugin.yml                        # LeetCrafting metadata (softdepend Vault, LeetCore); no commands
-    config.yml                        # Global + resource-pack.* distribution settings
-    features/cooking.yml              # Custom food items and recipes
-    features/crafting.yml             # Custom condiment items and recipes (Salt)
-    resource_pack/                    # Additive asset pack (leet: item models + textures + index)
+leet-crafting/                        # LeetCrafting — custom items & recipes
+    src/main/java/com/leet/crafting/
+      LeetCrafting.java                 # Plugin lifecycle; binds to CoreApi; owns item registry + resource pack
+      CraftFeature.java                 # The single crafting feature (custom items + recipes)
+      craft/
+        LeetItem.java                   # A single custom item (id, material, name/lore, food, leet:item model)
+        LeetItemRegistry.java           # id -> item registry; registered with core as CustomItemView
+        LeetRecipeRegistry.java         # Generic SHAPED/SHAPELESS/SMELT recipe parse + register/gate
+      resource/
+        ResourcePackService.java        # Builds + serves the additive item-texture resource pack
+    src/main/resources/
+      plugin.yml                        # LeetCrafting metadata (softdepend Vault, LeetCore); no commands
+      config.yml                        # Global + resource-pack.* distribution settings
+      features/crafting.yml             # All custom items and recipes (condiments + dishes)
+      resource_pack/                    # Additive asset pack (leet: item models + textures + index)
 tools/cooking/                        # One-off Python tooling for the cooking values/textures (run from repo root)
 ```
 
@@ -105,7 +102,7 @@ tools/cooking/                        # One-off Python tooling for the cooking v
 
 - **LeetCore** boots first, resolves Vault, owns the shared feature registry, storage, and generic GUI, registers its **seven** standalone features, exposes itself as the **`CoreApi`** service, and wires up the `/leeta`, `/back`, and `/leet` commands. Skill and crafting features are contributed *into* LeetCore's shared registry by the other two plugins.
 - **LeetSkills** soft-depends on LeetCore, looks up `CoreApi`, contributes the `skills` feature, and keeps its **own** SQLite store for skill levels/toggles.
-- **LeetCrafting** soft-depends on LeetCore, contributes the `crafting` and `cooking` features, and owns the item domain: `LeetItemRegistry` (registered with core as a read-only `CustomItemView`, so `/leeta give` and command/eat handling work) and the `ResourcePackService`.
+- **LeetCrafting** soft-depends on LeetCore, contributes the single `crafting` feature (food + condiment items and recipes), and owns the item domain: `LeetItemRegistry` (registered with core as a read-only `CustomItemView`, so `/leeta give` and command/eat handling work) and the `ResourcePackService`.
 
 ---
 
@@ -125,9 +122,9 @@ Core never reaches into the concrete classes of the other plugins: it drives eve
 
 ### Crafting engine & resource pack
 
-Cooking and Crafting both build their items and recipes from the generic machinery in `com.leet.crafting.craft` (owned by **LeetCrafting**, not core):
+The crafting feature builds its items and recipes from the generic machinery in `com.leet.crafting.craft` (owned by **LeetCrafting**, not core):
 
-- **`LeetItemRegistry`** — one `id → item` map shared by all crafting domains. Each domain's `feature.items` section is pre-loaded into it *before* either feature registers (order-independent), so any recipe in any domain can reference any item id (e.g. Cooking can use Crafting's `salt`). The `ci` PersistentData tag + `leet:item/<id>` item model are set here. The registry is registered with core as a `CustomItemView`.
+- **`LeetItemRegistry`** — one `id → item` map. The crafting feature's `feature.items` section is loaded into it once, so any recipe in the same config can reference any item id by name. The `ci` PersistentData tag + `leet:item/<id>` item model are set here. The registry is registered with core as a `CustomItemView`.
 - **`LeetRecipeRegistry`** — parses a `feature.recipes` section into Bukkit recipes. Supports **SHAPELESS** (a flat list), **SHAPED** (3 rows of 3 + a letter→ingredient map), and **SMELT** (a single furnace `ingredient` → `result`, with optional `experience`/`cooking-time`). Results are a custom item id or `material:<MATERIAL>`.
 - **`ResourcePackService`** — one instance owned by **LeetCrafting**, built in `onEnable` and stopped in `onDisable`. It builds and serves the additive `leet:` item pack (nothing in `assets/minecraft` is overridden), configured under `resource-pack.*` in LeetCrafting's `config.yml`.
 
@@ -192,7 +189,7 @@ messages:
   # key: "MiniMessage formatted string"
 ```
 
-**Cooking and Crafting omit `base.permission`/`default-permission`** — they are server-wide (open to all when `base.enabled` is true). `registerPermission()` skips registering a node when the config lacks the `base.permission` key.
+**Crafting omits `base.permission`/`default-permission`** — it's server-wide (open to all when `base.enabled` is true). `registerPermission()` skips registering a node when the config lacks the `base.permission` key.
 
 #### Three-level control per feature
 
@@ -230,7 +227,6 @@ Each feature's config file (path shown relative to the owning plugin's data fold
 | LeetCore | Fall Damage | `features/fall_damage.yml` | [features/fall-damage](features/fall-damage.md) |
 | LeetCore | XP | `features/xp.yml` | [features/xp](features/xp.md) |
 | LeetSkills | Skills | `features/skills.yml` + `features/skill-tree.yml` | [features/skills](features/skills.md) |
-| LeetCrafting | Cooking | `features/cooking.yml` | [features/cooking](features/cooking.md) |
 | LeetCrafting | Crafting | `features/crafting.yml` | [features/crafting](features/crafting.md) |
 
 ### Automatic config merging (backfill)
@@ -246,7 +242,7 @@ Every config — each plugin's global `config.yml` **and** each feature file —
 ## Permission Model
 
 - **Admin permissions** (`leet.admin`, `leet.admin.list|toggle|info`) are declared statically in **LeetCore's** `plugin.yml` and gate `/leeta`. (The `/back` command permission `leet.feat.back` is also declared statically there.)
-- **Feature permissions** (`leet.feat.<id>`) are **not** in any `plugin.yml`. The owning plugin's feature registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()`, using the node from `base.permission` and the default from `base.default-permission`. **Cooking/Crafting declare no permission at all** (server-wide). **Skills** registers a single `leet.feat.skills` node (default `false`).
+- **Feature permissions** (`leet.feat.<id>`) are **not** in any `plugin.yml`. The owning plugin's feature registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()`, using the node from `base.permission` and the default from `base.default-permission`. **Crafting declares no permission at all** (server-wide). **Skills** registers a single `leet.feat.skills` node (default `false`).
 - **`/skills`** has **no static command permission** — access is gated entirely at runtime by the same `leet.feat.skills` node (a single source of truth, default-denied; group-scoped so `AuthMe` default-group denial applies).
 - **Checks** use Bukkit's `player.hasPermission(permission)` everywhere. Even with Vault installed, the plugins do **not** route permission lookups through Vault's `Permission` provider — that provider is resolved at startup but unused.
 
@@ -303,4 +299,4 @@ Notes:
 
 - [BUILDING.md](BUILDING.md) — how to compile and package the three plugins
 - [README](../README.md) — configuration, permissions, commands, and operational usage
-- [ARCHITECTURE-REWORK.md](ARCHITECTURE-REWORK.md) — the rework plan that led to this three-plugin split and its implementation status
+- [CHANGELOG.md](CHANGELOG.md) — release history, including the rework that produced this three-plugin split
