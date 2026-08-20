@@ -1,0 +1,102 @@
+name: Release
+
+# Build the three plugin jars and publish a GitHub Release. Triggered manually
+# (Actions -> Run workflow), letting you choose the release version.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. 1.5.0). Drives the jar filenames and the changelog lookup. Leading 'v' is stripped."
+        required: true
+        type: string
+      prerelease:
+        description: "Publish as a prerelease"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build:
+    name: Build jars and release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25 (Gradle toolchain)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      # Sets up the Gradle wrapper cache; the version auto-provisions the JDK 25
+      # toolchain used by the build.
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Derive release version from input
+        id: version
+        shell: bash
+        run: |
+          raw="${{ github.event.inputs.version }}"
+          version="${raw#v}"                     # strip leading 'v' if present
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Build the three plugin jars
+        run: ./gradlew clean build --no-daemon
+
+      # Confirm the three jars for this exact version were produced. `clean build`
+      # routes every jar into the shared root build/libs/ (see build.gradle.kts).
+      - name: Verify release jars exist
+        id: jars
+        shell: bash
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          missing=0
+          for name in leet-core leet-skills leet-crafting; do
+            jar="build/libs/${name}-${version}.jar"
+            if [ ! -f "$jar" ]; then
+              echo "::error::Expected jar missing: ${jar}" >&2
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "Available artifacts in build/libs/:" >&2
+            ls -1 build/libs/ >&2
+            exit 1
+          fi
+
+      # Pull the CHANGELOG section for this version (between its `## <version>` header
+      # and the next `## ` header) for use as the release body.
+      - name: Extract changelog section for this version
+        id: changelog
+        shell: bash
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          body="$(awk -v v="$version" '
+            /^## / {
+              if (in_section) exit
+              if ($2 == v) { in_section=1; next }
+            }
+            in_section { print }
+          ' doc/CHANGELOG.md)"
+          if [ -z "${body}" ]; then
+            body="Release ${version} of the LeetHelper plugin bundle. See the CHANGELOG for details."
+          fi
+          echo "notes<<EOF" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "${body}" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: "LeetHelper ${{ steps.version.outputs.version }}"
+          body: ${{ steps.changelog.outputs.notes }}
+          files: |
+            build/libs/leet-core-${{ steps.version.outputs.version }}.jar
+            build/libs/leet-skills-${{ steps.version.outputs.version }}.jar
+            build/libs/leet-crafting-${{ steps.version.outputs.version }}.jar
+          draft: false
+          prerelease: ${{ inputs.prerelease }}
