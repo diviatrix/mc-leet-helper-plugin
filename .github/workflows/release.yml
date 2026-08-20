@@ -16,6 +16,11 @@ on:
         default: false
         type: boolean
 
+# GITHUB_TOKEN is read-only by default; creating a release (and its tag) needs
+# write access to repo contents.
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build jars and release
