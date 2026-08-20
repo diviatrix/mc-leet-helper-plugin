@@ -72,6 +72,11 @@ public final class GuiManager implements Listener {
         this.tagKey = new NamespacedKey(owner, "gui");
     }
 
+    /** The {@link NamespacedKey} the manager uses to read/write click-routing tags on items. */
+    public NamespacedKey tagKey() {
+        return tagKey;
+    }
+
     public void start() {
         Bukkit.getPluginManager().registerEvents(this, owner);
     }
@@ -207,7 +212,8 @@ public final class GuiManager implements Listener {
         ItemMeta meta = item.getItemMeta();
         meta.displayName(MM.deserialize(name));
         meta.lore(List.of(MM.deserialize(lore)));
-        tag(item, tag);
+        meta.getPersistentDataContainer().set(tagKey, PersistentDataType.STRING, tag);
+        item.setItemMeta(meta);
         return item;
     }
 

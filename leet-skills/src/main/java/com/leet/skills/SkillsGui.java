@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -197,10 +198,10 @@ public final class SkillsGui {
     // --- item builders (skill-specific) ---
 
     private ItemStack skillIcon(SkillConfig skill, int level, int cost, boolean unlocked) {
-        var item = gui().action(skill.icon(), "<yellow><bold>" + skill.name()
-            + " <gray>[ " + level + "/" + skill.maxLevel() + " ]", "", "skill:" + skill.id());
-        // Replace the auto lore with the detailed skill lore.
+        var item = new ItemStack(skill.icon());
         var meta = item.getItemMeta();
+        meta.displayName(MM.deserialize("<yellow><bold>" + skill.name()
+            + " <gray>[ " + level + "/" + skill.maxLevel() + " ]"));
         List<Component> lore = new ArrayList<>();
         List<SkillConfig.Effect> effects = skill.effects();
         if (effects.isEmpty()) {
@@ -221,6 +222,8 @@ public final class SkillsGui {
                 : "<aqua>Level up: <yellow>" + cost + " XP"));
         }
         meta.lore(lore);
+        meta.getPersistentDataContainer().set(gui().tagKey(), PersistentDataType.STRING,
+            "skill:" + skill.id());
         item.setItemMeta(meta);
         return item;
     }
