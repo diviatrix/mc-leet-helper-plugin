@@ -31,3 +31,7 @@ build
 
 # Ignore Kotlin plugin data
 .kotlin
+
+# Python bytecode (tools/ scripts)
+__pycache__/
+*.py[cod]

@@ -104,7 +104,13 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, 
 
 > **Updating:** on startup each plugin merges its global `config.yml` and every feature config against the bundled defaults. Any **new key** introduced by a newer version is automatically added to your existing configs while all your other values are preserved. No manual copying needed.
 >
-> **Skill data note:** skill levels/toggles live in `plugins/LeetSkills/data.db`. Upgrading from the pre-split single plugin moves them to this new DB, so previously-earned levels are not carried over automatically.
+> **Skill data note:** skill levels/toggles live in `plugins/LeetSkills/data.db`. Upgrading from the pre-split single plugin (whose data was in `plugins/LeetHelper/data.db`) requires a **manual, one-off migration** to retain player skill progress. Run it **once from the server root** so it finds the default paths:
+>
+> ```bash
+> python3 tools/migration/migrate_skills_1_4_1-1.5.0.py
+> ```
+>
+> Only skill levels are copied; all other data is per-plugin and not carried over.
 
 ---
 

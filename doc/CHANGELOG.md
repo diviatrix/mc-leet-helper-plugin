@@ -49,8 +49,10 @@ All notable changes to **LeetHelper**. Entries are newest first.
 **Notes**
 - **Deploy all three jars together** (LeetCore first) — missing any jar removes its
   features.
-- Skill levels/toggles moved to a new skills DB (`plugins/LeetSkills/data.db`), so levels
-  earned under the old single plugin are not carried over.
+- Skill levels moved to a new skills DB (`plugins/LeetSkills/data.db`, was
+  `plugins/LeetHelper/data.db`). A manual, one-off migration retains player skill
+  progress: run `python3 tools/migration/migrate_skills_1_4_1-1.5.0.py` from the
+  server root (see the script's header). Other data is per-plugin and not carried over.
 
 ---
 
