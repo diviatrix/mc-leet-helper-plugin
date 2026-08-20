@@ -1,11 +1,11 @@
 package com.leet.skills;
 
-import org.bukkit.plugin.Plugin;
+import com.leet.core.util.MaterialSets;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -92,7 +92,8 @@ public final class SkillConfig {
     private SkillConfig(Plugin owner, String id, ConfigurationSection s) {
         this.id = id;
         this.name = s.getString("name", id);
-        this.icon = parseMaterial(owner, s.getString("icon", "STONE"), id, "icon", Material.STONE);
+        this.icon = MaterialSets.readOne(owner.getLogger(), s.getString("icon", "STONE"),
+            "skills." + id + ".icon", Material.STONE);
         this.maxLevel = s.getInt("max-level", 10);
         this.exp = s.getIntegerList("exp").isEmpty()
             ? defaultExp()
@@ -105,11 +106,12 @@ public final class SkillConfig {
         this.boundFeature = bound == null || bound.isBlank() ? null : bound.toLowerCase();
         this.toggleable = s.getBoolean("toggleable", false);
 
-        this.logs = readMaterials(owner, s, "logs", id);
-        this.minerBlocks = readMaterials(owner, s, "blocks", id);
-        this.crops = readMaterials(owner, s, "crops", id);
-        this.bonusItems = readMaterialsList(owner, s, "bonus-items", id);
-        this.qualityItems = readMaterialsList(owner, s, "quality-items", id);
+        String tag = "skills." + id;
+        this.logs = MaterialSets.readSet(owner.getLogger(), s.getStringList("logs"), tag + ".logs");
+        this.minerBlocks = MaterialSets.readSet(owner.getLogger(), s.getStringList("blocks"), tag + ".blocks");
+        this.crops = MaterialSets.readSet(owner.getLogger(), s.getStringList("crops"), tag + ".crops");
+        this.bonusItems = MaterialSets.readList(owner.getLogger(), s.getStringList("bonus-items"), tag + ".bonus-items", Material.STONE);
+        this.qualityItems = MaterialSets.readList(owner.getLogger(), s.getStringList("quality-items"), tag + ".quality-items", Material.STONE);
     }
 
     public static SkillConfig read(Plugin owner, ConfigurationSection section) {
@@ -125,8 +127,8 @@ public final class SkillConfig {
             if (e == null) continue;
             String name = e.getString("name", effectId);
             String desc = e.getString("desc", name);
-            Material icon = parseMaterial(owner, e.getString("icon", "STONE"), id,
-                "effects." + effectId + ".icon", Material.STONE);
+            Material icon = MaterialSets.readOne(owner.getLogger(), e.getString("icon", "STONE"),
+                "skills." + id + ".effects." + effectId + ".icon", Material.STONE);
             double perLevel = e.getDouble("per-level", 0);
             int unlockAt = e.getInt("unlock-at", 0);
             double unlockValue = e.getDouble("unlock-value", 0);
@@ -163,36 +165,9 @@ public final class SkillConfig {
         return 0;
     }
 
-    private static Material parseMaterial(Plugin owner, String material, String id, String key, Material fallback) {
-        try {
-            return Material.valueOf(material);
-        } catch (IllegalArgumentException e) {
-            owner.getLogger().warning("Invalid material in skills." + id + "." + key + ": " + material);
-            return fallback;
-        }
-    }
-
-    private static Set<Material> readMaterials(Plugin owner, ConfigurationSection s,
-                                               String key, String id) {
-        Set<Material> set = new HashSet<>();
-        for (String name : s.getStringList(key)) {
-            set.add(parseMaterial(owner, name, id, key, Material.STONE));
-        }
-        return set;
-    }
-
-    private static List<Material> readMaterialsList(Plugin owner, ConfigurationSection s,
-                                                    String key, String id) {
-        List<Material> list = new ArrayList<>();
-        for (String name : s.getStringList(key)) {
-            list.add(parseMaterial(owner, name, id, key, Material.STONE));
-        }
-        return list;
-    }
-
     /** Graceful fallback so an empty exp table still gives levelable skills. */
     private List<Integer> defaultExp() {
-        List<Integer> list = new ArrayList<>();
+        List<Integer> list = new java.util.ArrayList<>();
         for (int i = 1; i <= 10; i++) {
             list.add(20 * i * i);
         }

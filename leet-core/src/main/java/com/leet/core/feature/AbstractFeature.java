@@ -1,10 +1,10 @@
 package com.leet.core.feature;
 
 import com.leet.core.CoreApi;
+import com.leet.core.plugin.FeaturePluginSupport;
 import com.leet.core.storage.StorageManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -12,10 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -138,31 +134,8 @@ public abstract class AbstractFeature implements Listener, ToggleableFeature {
             return null;
         }
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-        mergeMissingKeys(cfg, file, "features/" + fileName);
+        FeaturePluginSupport.mergeMissingKeys(owner, cfg, file, "features/" + fileName);
         return cfg;
-    }
-
-    private void mergeMissingKeys(YamlConfiguration cfg, File file, String resourcePath) {
-        InputStream defaultStream = owner.getResource(resourcePath);
-        if (defaultStream == null) return;
-        YamlConfiguration defaults = YamlConfiguration.loadConfiguration(
-            new InputStreamReader(defaultStream, StandardCharsets.UTF_8));
-        boolean changed = false;
-        for (String key : defaults.getKeys(true)) {
-            Object value = defaults.get(key);
-            if (value instanceof ConfigurationSection) continue;
-            if (!cfg.contains(key)) {
-                cfg.set(key, value);
-                changed = true;
-            }
-        }
-        if (!changed) return;
-        try {
-            cfg.save(file);
-        } catch (IOException e) {
-            owner.getLogger().log(java.util.logging.Level.SEVERE,
-                "Failed to merge defaults into feature config: " + featureId(), e);
-        }
     }
 
     // --- shared gating (permission + toggle + world) ---

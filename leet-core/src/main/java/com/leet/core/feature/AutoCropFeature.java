@@ -1,6 +1,7 @@
 package com.leet.core.feature;
 
 import com.leet.core.CoreApi;
+import com.leet.core.util.MaterialSets;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -11,8 +12,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class AutoCropFeature extends AbstractFeature implements CostedFeature, BlockBreakerFeature {
@@ -37,15 +36,7 @@ public class AutoCropFeature extends AbstractFeature implements CostedFeature, B
         radius = Math.min(cfg.getInt("feature.radius", 3), 5);
         requireMature = cfg.getBoolean("feature.require-mature", true);
         requireHoe = cfg.getBoolean("feature.require-hoe", false);
-        materials = new HashSet<>();
-        List<String> materialNames = cfg.getStringList("feature.materials");
-        for (String name : materialNames) {
-            try {
-                materials.add(Material.valueOf(name));
-            } catch (IllegalArgumentException e) {
-                owner.getLogger().warning("Invalid material in auto_crop materials: " + name);
-            }
-        }
+        materials = MaterialSets.readSet(owner.getLogger(), cfg.getStringList("feature.materials"), "auto_crop materials");
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

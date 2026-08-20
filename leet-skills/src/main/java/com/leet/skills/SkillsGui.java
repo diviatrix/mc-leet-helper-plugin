@@ -1,6 +1,7 @@
 package com.leet.skills;
 
 import com.leet.core.gui.GuiManager;
+import com.leet.core.util.MiniMessageUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
@@ -25,7 +26,7 @@ import java.util.List;
  */
 public final class SkillsGui {
 
-    private static final MiniMessage MM = MiniMessage.miniMessage();
+    private static final MiniMessage MM = MiniMessageUtil.miniMessage();
 
     /** Slots of the 3x3 ring around the center skill (slot 22). */
     private static final int[] RING_SLOTS = {12, 13, 14, 21, 23, 30, 31, 32};

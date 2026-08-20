@@ -201,6 +201,16 @@ Each player-gated feature has three independent on/off controls:
 
 All three are checked by `check(player)` at the start of every relevant event or command. *All* must pass for the feature to act.
 
+<a id="feature-permissions"></a>
+#### Feature permissions
+
+Every gated feature follows the same permission lifecycle; this is the canonical place for it — feature docs only link here:
+
+- **Node:** `leet.feat.<id>` · **default:** `false` (nobody can use the feature until granted). The node unlocks the feature's effect and (where applicable) the matching `/leet <alias>` personal off-toggle.
+- **Grant the node** in your permission plugin (LuckPerms, PEX, ...) to allow the feature. The node alone is not enough — `base.enabled`, the permission, and `base.worlds` must all pass.
+- **Set `base.default-permission`** in the feature's YAML to `true` (everyone) or `op` (ops only) to change the out-of-box default. The runtime permission is registered once at startup, so changing `base.permission` or `base.default-permission` requires a **restart**.
+- **Server-wide features** (Crafting) declare no `base.permission` key, so no runtime node is registered and `check(player)` skips the permission step — they apply to everyone whenever enabled.
+
 ### Message Delivery Types
 
 Messages are rendered with [MiniMessage](https://docs.advntr.dev/minimessage/format.html) and delivered according to `base.message-type`:

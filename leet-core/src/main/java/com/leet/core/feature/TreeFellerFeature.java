@@ -1,6 +1,7 @@
 package com.leet.core.feature;
 
 import com.leet.core.CoreApi;
+import com.leet.core.util.MaterialSets;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -11,7 +12,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class TreeFellerFeature extends AbstractFeature implements CostedFeature, BlockBreakerFeature {
@@ -31,14 +31,7 @@ public class TreeFellerFeature extends AbstractFeature implements CostedFeature,
 
     @Override
     protected void loadFeatureConfig(YamlConfiguration cfg) {
-        logs = new HashSet<>();
-        for (String name : cfg.getStringList("feature.logs")) {
-            try {
-                logs.add(Material.valueOf(name));
-            } catch (IllegalArgumentException e) {
-                owner.getLogger().warning("Invalid material in tree_feller logs: " + name);
-            }
-        }
+        logs = MaterialSets.readSet(owner.getLogger(), cfg.getStringList("feature.logs"), "tree_feller logs");
         maxBlocks = cfg.getInt("feature.max-blocks", 100);
     }
 

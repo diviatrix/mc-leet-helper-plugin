@@ -1,6 +1,7 @@
 package com.leet.core.feature;
 
 import com.leet.core.CoreApi;
+import com.leet.core.util.MaterialSets;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
@@ -103,15 +104,10 @@ public class XpFeature extends AbstractFeature implements MessagingFeature {
     }
 
     private void readMaterials(YamlConfiguration cfg, String path, Map<Material, Integer> into) {
-        ConfigurationSection section = cfg.getConfigurationSection(path + ".materials");
-        if (section == null) return;
-        for (String name : section.getKeys(false)) {
-            try {
-                into.put(Material.valueOf(name), section.getInt(name));
-            } catch (IllegalArgumentException e) {
-                owner.getLogger().warning("Invalid material in xp " + path + ": " + name);
-            }
-        }
+        Map<Material, Integer> loaded = MaterialSets.readMap(
+            owner.getLogger(), cfg.getConfigurationSection(path + ".materials"), "xp " + path);
+        into.clear();
+        into.putAll(loaded);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

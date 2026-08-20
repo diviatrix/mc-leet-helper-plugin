@@ -16,6 +16,7 @@ feature:
     salt:
       material: SUGAR
       name: "Salt"
+      max-stack-size: 64        # SUGAR inherits 64; explicit for clarity
       lore:
         - "White crystalline seasoning."
     dough:

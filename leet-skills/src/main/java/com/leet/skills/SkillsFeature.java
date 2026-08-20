@@ -6,6 +6,7 @@ import com.leet.core.feature.BlockBreakerFeature;
 import com.leet.core.feature.CooldownAware;
 import com.leet.core.feature.MessagingFeature;
 import com.leet.core.storage.StorageManager;
+import com.leet.core.util.MiniMessageUtil;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -31,7 +32,7 @@ public class SkillsFeature extends AbstractFeature implements CooldownAware, Mes
 
     public static final String STAMINA = "stamina";
 
-    private static final MiniMessage MM = MiniMessage.miniMessage();
+    private static final MiniMessage MM = MiniMessageUtil.miniMessage();
 
     private final Map<String, SkillConfig> skills = new LinkedHashMap<>();
     private final Map<UUID, SkillState> states = new HashMap<>();

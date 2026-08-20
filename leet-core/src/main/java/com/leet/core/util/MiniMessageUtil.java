@@ -8,6 +8,11 @@ public class MiniMessageUtil {
 
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
+    /** Shared {@link MiniMessage} instance — use this instead of {@code MiniMessage.miniMessage()}. */
+    public static MiniMessage miniMessage() {
+        return MINI_MESSAGE;
+    }
+
     public static Component deserialize(String input) {
         if (input == null || input.isEmpty()) return Component.empty();
         return MINI_MESSAGE.deserialize(input);

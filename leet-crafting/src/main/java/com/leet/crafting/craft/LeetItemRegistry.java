@@ -54,7 +54,8 @@ public final class LeetItemRegistry implements CustomItemView {
                 material,
                 s.getStringList("lore"),
                 Math.max(0, s.getInt("hunger", 0)),
-                Math.max(0, s.getInt("saturation", 0))));
+                Math.max(0, s.getInt("saturation", 0)),
+                Math.max(0, s.getInt("max-stack-size", 0))));
         }
     }
 

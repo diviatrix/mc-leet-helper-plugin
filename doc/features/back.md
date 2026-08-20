@@ -8,9 +8,7 @@ Death locations and persistent cooldowns are stored in LeetCore's `plugins/LeetC
 Teleports players to their last death location. **Persistent** via SQLite — survives server restarts.
 
 **Permissions**
-- **Node:** `leet.feat.back` · **default:** `false` (nobody).
-- Grant the node (e.g. LuckPerms) to have death locations saved **and** to use `/back` (the command is registered with `permission: leet.feat.back`). The node alone is not enough — `base.enabled`, the permission, and `base.worlds` must all pass.
-- Set `base.default-permission` in `back.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
+- See [Feature permissions](../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.back` · default `false`. The node also unlocks the `/back` command (the command is registered with `permission: leet.feat.back`).
 
 **Behavior — on death**
 1. Player dies → `check()` (enabled + permission + world).

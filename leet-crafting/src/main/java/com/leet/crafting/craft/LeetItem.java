@@ -1,5 +1,6 @@
 package com.leet.crafting.craft;
 
+import com.leet.core.util.MiniMessageUtil;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -12,7 +13,8 @@ import java.util.List;
 
 /**
  * A single custom item: an id, a base {@link Material}, display name/lore, an
- * optional hunger/saturation (food), and a {@code leet:item/<id>} client model.
+ * optional hunger/saturation (food), an optional {@code maxStackSize} override,
+ * and a {@code leet:item/<id>} client model.
  *
  * <p>Generic and shared: any crafting/recipe feature can register items here and
  * any recipe may reference them by id. The {@code ci} PersistentData tag marks
@@ -24,9 +26,10 @@ public record LeetItem(
     Material material,
     List<String> lore,
     int hunger,
-    int saturation) {
+    int saturation,
+    int maxStackSize) {
 
-    private static final MiniMessage MM = MiniMessage.miniMessage();
+    private static final MiniMessage MM = MiniMessageUtil.miniMessage();
 
     public boolean isFood() {
         return hunger > 0;
@@ -34,8 +37,9 @@ public record LeetItem(
 
     /**
      * Builds the actual held {@link ItemStack}: base material + name/lore +
-     * {@code ci} PDC tag + {@code leet:item/<id>} item model. When the item is
-     * food, a real FOOD data component is set so it is edible server-side.
+     * {@code ci} PDC tag + {@code leet:item/<id>} item model + optional
+     * {@code max-stack-size} override. When the item is food, a real FOOD data
+     * component is set so it is edible server-side.
      */
     public ItemStack create(NamespacedKey ciKey) {
         ItemStack stack = new ItemStack(material);
@@ -46,6 +50,9 @@ public record LeetItem(
         }
         meta.getPersistentDataContainer().set(ciKey, PersistentDataType.STRING, id);
         meta.setItemModel(new NamespacedKey("leet", "item/" + id));
+        if (maxStackSize > 0) {
+            meta.setMaxStackSize(maxStackSize);
+        }
         stack.setItemMeta(meta);
         if (isFood()) {
             stack.setData(io.papermc.paper.datacomponent.DataComponentTypes.FOOD,

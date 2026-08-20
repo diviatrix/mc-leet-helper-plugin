@@ -15,21 +15,16 @@ import com.leet.core.feature.FeatureRegistry;
 import com.leet.core.feature.TreeFellerFeature;
 import com.leet.core.feature.XpFeature;
 import com.leet.core.gui.GuiManager;
+import com.leet.core.plugin.FeaturePluginSupport;
 import com.leet.core.storage.StorageManager;
 import com.leet.core.util.MiniMessageUtil;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
 
 /**
  * LeetCore — the sharing core plugin. It owns the shared engines (storage, item
@@ -51,13 +46,13 @@ public class LeetCore extends JavaPlugin implements CoreApi {
 
         saveDefaultConfig();
         mergeConfigDefaults();
-        saveResourceIfMissing("features/double_jump.yml");
-        saveResourceIfMissing("features/durability.yml");
-        saveResourceIfMissing("features/auto_crop.yml");
-        saveResourceIfMissing("features/back.yml");
-        saveResourceIfMissing("features/tree_feller.yml");
-        saveResourceIfMissing("features/fall_damage.yml");
-        saveResourceIfMissing("features/xp.yml");
+        FeaturePluginSupport.saveResourceIfMissing(this, "features/double_jump.yml");
+        FeaturePluginSupport.saveResourceIfMissing(this, "features/durability.yml");
+        FeaturePluginSupport.saveResourceIfMissing(this, "features/auto_crop.yml");
+        FeaturePluginSupport.saveResourceIfMissing(this, "features/back.yml");
+        FeaturePluginSupport.saveResourceIfMissing(this, "features/tree_feller.yml");
+        FeaturePluginSupport.saveResourceIfMissing(this, "features/fall_damage.yml");
+        FeaturePluginSupport.saveResourceIfMissing(this, "features/xp.yml");
 
         storageManager = new StorageManager(getDataFolder(), getLogger());
         setupVault();
@@ -129,13 +124,6 @@ public class LeetCore extends JavaPlugin implements CoreApi {
         }
     }
 
-    private void saveResourceIfMissing(String path) {
-        java.io.File file = new java.io.File(getDataFolder(), path);
-        if (!file.exists()) {
-            saveResource(path, false);
-        }
-    }
-
     /**
      * Adds any keys present in the bundled config.yml that are missing from the
      * on-disk file, preserving the server admin's existing values.
@@ -144,24 +132,7 @@ public class LeetCore extends JavaPlugin implements CoreApi {
         File file = new File(getDataFolder(), "config.yml");
         if (!file.exists()) return;
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-        InputStream defaultStream = getResource("config.yml");
-        if (defaultStream == null) return;
-        YamlConfiguration defaults = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream, StandardCharsets.UTF_8));
-        boolean changed = false;
-        for (String key : defaults.getKeys(true)) {
-            Object value = defaults.get(key);
-            if (value instanceof org.bukkit.configuration.ConfigurationSection) continue;
-            if (!cfg.contains(key)) {
-                cfg.set(key, value);
-                changed = true;
-            }
-        }
-        if (!changed) return;
-        try {
-            cfg.save(file);
-        } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Failed to merge config.yml defaults", e);
-        }
+        FeaturePluginSupport.mergeMissingKeys(this, cfg, file, "config.yml");
     }
 
     @Override

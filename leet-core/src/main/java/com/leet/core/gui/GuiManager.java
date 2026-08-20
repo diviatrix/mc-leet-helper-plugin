@@ -1,5 +1,6 @@
 package com.leet.core.gui;
 
+import com.leet.core.util.MiniMessageUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -45,7 +46,7 @@ import java.util.UUID;
  */
 public final class GuiManager implements Listener {
 
-    private static final MiniMessage MM = MiniMessage.miniMessage();
+    private static final MiniMessage MM = MiniMessageUtil.miniMessage();
 
     private final JavaPlugin owner;
     private final NamespacedKey tagKey;

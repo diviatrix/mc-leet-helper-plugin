@@ -7,9 +7,7 @@
 Modifies durability damage for **whitelisted** items.
 
 **Permissions**
-- **Node:** `leet.feat.durability` · **default:** `false` (nobody).
-- Grant the node (e.g. LuckPerms) to apply the durability multiplier to a player's items. There is no `/leet` toggle for this feature — access is purely permission-driven. The node alone is not enough — `base.enabled`, the permission, and `base.worlds` must all pass.
-- Set `base.default-permission` in `durability.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
+- See [Feature permissions](../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.durability` · default `false`. There is no `/leet` toggle for this feature — access is purely permission-driven.
 
 **Behavior**
 1. A held/broken item takes durability damage (`PlayerItemDamageEvent`).
