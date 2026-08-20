@@ -2,7 +2,9 @@
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Auto-harvests nearby mature crops when a player breaks one. Config file `features/auto_crop.yml`.
+**Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/auto_crop.yml`.
+
+Auto-harvests nearby mature crops when a player breaks one.
 
 **Permissions**
 - **Node:** `leet.feat.auto_crop` · **default:** `false` (nobody).

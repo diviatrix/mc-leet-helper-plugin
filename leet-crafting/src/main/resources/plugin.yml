@@ -1,0 +1,7 @@
+name: LeetCrafting
+version: "${version}"
+main: com.leet.crafting.LeetCrafting
+api-version: "26.2"
+description: Leet crafting & cooking plugin - custom items and recipes
+author: Leet
+softdepend: [Vault, LeetCore]

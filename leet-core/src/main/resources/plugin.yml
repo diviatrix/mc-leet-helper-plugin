@@ -1,0 +1,39 @@
+name: LeetCore
+version: "${version}"
+main: com.leet.core.LeetCore
+api-version: "26.2"
+description: Leet core plugin - shared mechanics, storage, and commands
+author: Leet
+softdepend: [Vault]
+
+commands:
+  leeta:
+    description: Admin helper command
+    usage: /leeta <list|toggle|info|give> [args]
+    permission: leet.admin
+  back:
+    description: Teleport back to death location
+    usage: /back
+    permission: leet.feat.back
+  leet:
+    description: Toggle features on/off for yourself
+    usage: /leet <list|dj|crop|tree|fall|xp|skills|cook>
+    aliases: []
+
+permissions:
+  leet.admin:
+    description: Admin access to leeta commands
+    default: op
+    children:
+      leet.admin.list: true
+      leet.admin.toggle: true
+      leet.admin.info: true
+  leet.admin.list:
+    description: List all features
+    default: op
+  leet.admin.toggle:
+    description: Toggle features on/off
+    default: op
+  leet.admin.info:
+    description: View feature info
+    default: op

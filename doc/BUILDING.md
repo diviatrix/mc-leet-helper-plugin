@@ -1,6 +1,6 @@
 # Building from Source
 
-How to compile and package LeetHelper from source. This is **optional** — the default way to get the plugin is to download a prebuilt jar from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases) page. Building from source is only needed for contributors or for testing unreleased changes.
+How to compile and package **LeetHelper** from source. This is **optional** — the default way to get the plugins is to download the three prebuilt jars from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases) page. Building from source is only needed for contributors or for testing unreleased changes.
 
 ## Prerequisites
 
@@ -8,36 +8,56 @@ How to compile and package LeetHelper from source. This is **optional** — the 
 - **Gradle 9.7** (a wrapper is included — you only need to invoke `./gradlew`)
 - **Internet connection** on the first build (downloads the Paper dev bundle)
 
+## Project layout
+
+It's a multi-project Gradle build (`settings.gradle.kts`). Each subproject is an independent Paper plugin that applies the same paperweight toolchain:
+
+```
+settings.gradle.kts     # rootProject + include("leet-core", "leet-skills", "leet-crafting")
+build.gradle.kts        # subprojects { version = "..." }; jars routed to build/libs/
+leet-core/              # LeetCore plugin
+leet-skills/            # LeetSkills plugin
+leet-crafting/          # LeetCrafting plugin
+```
+
 ## Commands
 
 ```bash
-# Full build (compiles and produces the jar)
+# Full build (compiles all three plugins and produces the jars)
 ./gradlew build
 
 # Clean + build
 ./gradlew clean build
 
-# Just compile, skip packaging
-./gradlew compileJava
+# Just compile one plugin, skip packaging
+./gradlew :leet-core:compileJava
 ```
 
-**Output artifact:** `build/libs/leet-helper-<version>.jar`
+**Output artifacts** — all three jars land in the shared root `build/libs/`:
 
-> **Version is single-sourced:** the release version lives in **`build.gradle.kts`** (the `version` property). It drives both the jar filename and the `version` injected into the packaged `plugin.yml` at build time — bump it in exactly one place.
+```
+build/libs/leet-core-<version>.jar
+build/libs/leet-skills-<version>.jar
+leet-crafting-<version>.jar
+```
+
+Deploy **all three** into the server `plugins/` folder together — LeetSkills and LeetCrafting soft-depend on LeetCore (`softdepend: [LeetCore]`), so LeetCore must be present (and loads first) for them to function.
+
+> **Version is single-sourced:** the release version lives in the root **`build.gradle.kts`** `subprojects { version = ... }` block. It drives both each jar filename and the `version` injected into the packaged `plugin.yml` at build time — bump it in exactly one place.
 
 > **First build note:** the paperweight plugin downloads and runs a Paper server JAR to produce the remapped API (~40s). Subsequent builds are cached and faster.
 
 ## What the build does
 
-`build.gradle.kts` uses `io.papermc.paperweight.userdev` (v2.0.0-beta.21) with `paperDevBundle("26.2.build.+")`. The Vault API is included as a `compileOnly` dependency (JitPack `com.github.MilkBowl:VaultAPI:1.7.1`).
+The root `build.gradle.kts` `subprojects` block applies `io.papermc.paperweight.userdev` (v2.0.0-beta.21) with `paperDevBundle("26.2.build.+")` to every subproject. Each subproject also pulls The Vault API as a `compileOnly` dependency (JitPack `com.github.MilkBowl:VaultAPI:1.7.1`); `leet-skills` and `leet-crafting` add a `compileOnly` dependency on `:leet-core` so they can compile against the shared `CoreApi`.
 
-The version is injected into `plugin.yml` at build time via `tasks.processResources` (a `filesMatching("plugin.yml")` + `expand`), so `project.version` is the single source of truth for both the jar filename and the runtime version.
+The version is injected into each `plugin.yml` at build time via `tasks.processResources` (a `filesMatching("plugin.yml")` + `expand`), so `project.version` is the single source of truth for both the jar filename and the runtime version.
 
 ## Testing
 
-There is no unit-test suite or test plugin wired into the Gradle build (`gradle.properties` enables Gradle configuration-cache only). Verification is manual on a Paper 26.2 server — see the per-feature behavior notes and troubleshooting in [Admin.md](Admin.md#troubleshooting).
+There is no unit-test suite or test plugin wired into the Gradle build (`gradle.properties` enables Gradle configuration-cache only). Verification is manual on a Paper 26.2 server with all three jars installed — see the per-feature behavior notes and troubleshooting in [Admin.md](Admin.md#troubleshooting).
 
 ## Related docs
 
-- [Architecture](ARCHITECTURE.md) — how the plugin is structured internally
+- [Architecture](ARCHITECTURE.md) — how the three plugins are structured internally and how they cooperate
 - [README](../README.md) — configuration, permissions, commands, and operational usage

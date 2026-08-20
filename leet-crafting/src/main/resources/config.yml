@@ -1,0 +1,9 @@
+config-version: 1
+log-level: INFO
+
+# Item resource-pack distribution (item textures for crafted/cooked dishes).
+resource-pack:
+  enabled: true
+  port: 8043             # embedded HTTP server port
+  url: ""                # optional: external URL hosting the pack (skip embedded server)
+  require: false         # false = optional

@@ -2,7 +2,10 @@
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Teleports players to their last death location. **Persistent** via SQLite — survives server restarts. Config file `features/back.yml`.
+**Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/back.yml`.
+Death locations and persistent cooldowns are stored in LeetCore's `plugins/LeetCore/data.db`.
+
+Teleports players to their last death location. **Persistent** via SQLite — survives server restarts.
 
 **Permissions**
 - **Node:** `leet.feat.back` · **default:** `false` (nobody).

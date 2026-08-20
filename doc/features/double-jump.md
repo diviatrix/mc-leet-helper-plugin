@@ -2,7 +2,9 @@
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Allows a mid-air double jump. Config file `features/double_jump.yml`.
+**Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/double_jump.yml`.
+
+Allows a mid-air double jump.
 
 **Permissions**
 - **Node:** `leet.feat.double_jump` · **default:** `false` (nobody).

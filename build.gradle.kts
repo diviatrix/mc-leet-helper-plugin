@@ -1,39 +1,40 @@
-plugins {
-    java
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
-}
+// Root build: applies shared Java/toolchain/repository configuration to every
+// subproject. Each subproject (leet-core, leet-skills, leet-crafting) is its own
+// Paper plugin and applies the paperweight userdev plugin itself so it can be
+// packaged independently.
 
-group = "com.leet"
-version = "1.4.1"
+subprojects {
+    apply(plugin = "java")
 
-base {
-    archivesName = "leet-helper"
-}
+    group = "com.leet"
+    version = "1.5.0"
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(25))
+    extensions.configure<JavaPluginExtension> {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(25))
+        }
     }
-}
 
-repositories {
-    mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://jitpack.io")
-}
+    repositories {
+        mavenCentral()
+        maven("https://repo.papermc.io/repository/maven-public/")
+        maven("https://jitpack.io")
+    }
 
-dependencies {
-    paperweight.paperDevBundle("26.2.build.+")
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7.1") { isTransitive = false }
-}
+    // Route every subproject's jar into the single shared root build/libs/ so a
+    // single `./gradlew build` colates all three plugin jars in one folder, ready
+    // to drop into the server's plugins/ directory together.
+    tasks.withType<Jar>().configureEach {
+        val rootLibs = rootProject.layout.buildDirectory.dir("libs")
+        destinationDirectory.set(rootLibs)
+    }
 
-// Single source of truth for the version: rely on the project `version`
-// property, then inject it into plugin.yml at build time. Bumping once in
-// build.gradle.kts updates both the jar filename and the runtime version.
-
-tasks.processResources {
-    val versionTokens = mapOf("version" to project.version.toString())
-    filesMatching("plugin.yml") {
-        expand(versionTokens)
+    // Single source of truth for the version: rely on the project `version`
+    // property, then inject it into each plugin.yml at build time.
+    tasks.withType<ProcessResources>().configureEach {
+        val versionTokens = mapOf("version" to project.version.toString())
+        filesMatching("plugin.yml") {
+            expand(versionTokens)
+        }
     }
 }

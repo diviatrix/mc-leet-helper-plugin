@@ -2,10 +2,62 @@
 
 All notable changes to **LeetHelper**. Entries are newest first.
 
+## 1.5.0 — Three-plugin split
+
+**Added**
+- The single plugin is now split into **three cooperating Paper plugins**, built by a
+  multi-project Gradle build (see [BUILDING](BUILDING.md)) and deployed as three jars into
+  `plugins/` together:
+  - **LeetCore** (`leet-core-1.5.0.jar`) — shared infrastructure (storage, item/feature
+    registry, generic GUI, Vault) + the seven standalone features + `/leeta`, `/back`,
+    `/leet`.
+  - **LeetSkills** (`leet-skills-1.5.0.jar`) — the Skills feature (`/skills`).
+  - **LeetCrafting** (`leet-crafting-1.5.0.jar`) — the Cooking and Crafting features, plus
+    the item resource pack.
+- LeetSkills and LeetCrafting `softdepend` on LeetCore and disable themselves if it's
+  absent. All three jars share one version, single-sourced in `build.gradle.kts`.
+- **Shared service seam (CoreApi):** core exposes a narrow `CoreApi` (via the Bukkit
+  ServicesManager); skills and crafting look it up to contribute features into core's
+  shared feature registry. `/leeta` and `/leet` browse that registry, so they manage
+  features from all three plugins uniformly.
+
+**Changed**
+- **Feature roles:** `AbstractFeature` is now a thin gated base; cost, cooldowns,
+  messages, and protection-aware block-breaking are opt-in role interfaces
+  (`CostedFeature`, `CooldownAware`, `MessagingFeature`, `BlockBreakerFeature`,
+  `ToggleableFeature`).
+- **Storage split:** each plugin owns its own data. Core keeps the `/leet` toggles and
+  Back death locations (`plugins/LeetCore/data.db`); skills keeps skill levels/toggles
+  (`plugins/LeetSkills/data.db`); crafting owns no DB. This fixes the earlier
+  "split-brain" where skill state could collide with feature toggle rows.
+- **Resource pack ownership:** the item resource pack server moved into LeetCrafting
+  (`resource-pack.*` now lives in `plugins/LeetCrafting/config.yml`), constructed and
+  stopped with that plugin.
+- **Config-driven skill binding & layout:** each overlapping skill declares
+  `binds-feature`/`toggleable` in `skills.yml`, and advanced GUI slots come from
+  `tree.slots` in `skill-tree.yml` (a missing slot logs a warning rather than silently
+  dropping the skill).
+- **Crafting engine ownership:** `LeetItemRegistry` / `LeetRecipeRegistry` moved into
+  LeetCrafting; the crafting/cooking item domains are preloaded order-independently.
+- **Skills command & permissions:** `/skills` has no static command permission; access is
+  gated at runtime by the single `leet.feat.skills` node (default-denied).
+
+**Docs**
+- `README`, `BUILDING`, `ARCHITECTURE`, `permissions`, `Admin`, and all feature docs
+  rewritten for the three-plugin split; added the `tools/cooking/` tooling README.
+
+**Notes**
+- **Deploy all three jars together** (LeetCore first) — missing any jar removes its
+  features.
+- Skill levels/toggles moved to a new skills DB (`plugins/LeetSkills/data.db`), so levels
+  earned under the old single plugin are not carried over.
+
+---
+
 ## 1.4.1 — Resource pack proxy fix
 
 **Fixed**
-- Embedded resource-pack HTTP server now always starts, even when
+- Embedded resource-pack HTTP server always starts, even when
   `resource-pack.url` is set. Previously, setting the URL skipped the embedded
   server entirely — so the URL pointed to a server that never started, and
   clients behind FRPC/proxies couldn't download the pack.

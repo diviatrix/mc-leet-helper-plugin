@@ -1,0 +1,325 @@
+base:
+  enabled: true
+  permission: leet.feat.skills
+  default-permission: false
+  worlds: []
+  cooldown: 0
+  message-type: ACTION_BAR
+
+feature:
+  gui:
+    title: "Skills"
+    # Inventory height in rows (4-9). The skill ring needs at least 4.
+    rows: 6
+
+  # Shared limits used by the advanced/standalone-overlap skills.
+  tree-feller:
+    # Cap on how many logs the tree-feller skill may fell in one go.
+    max-blocks: 100
+  auto-crop:
+    # Whether auto-crop harvests only mature crops. Radius comes from the
+    # skill's level (1-3).
+    require-mature: true
+  double-jump:
+    # Horizontal/vertical multipliers for the double-jump skill launch.
+    horizontal-multiplier: 0.25
+    vertical-multiplier: 1.0
+
+  # Each skill is a generic definition: name/icon/max-level/exp/lore plus an
+  # `effects` list. Which skills appear in the tree, their order, and their
+  # prerequisites are set separately in features/skill-tree.yml — a skill is
+  # defined here and reused/arranged there.
+  skills:
+    stamina:
+      name: "Traveler"
+      icon: GOLDEN_APPLE
+      max-level: 10
+      exp: [50, 75, 110, 160, 220, 300, 400, 520, 660, 820]
+      effects:
+        hunger:
+          name: "Hunger drain slow-down"
+          desc: "slower hunger drain"
+          icon: BREAD
+          per-level: 5      # +5%/level; up to 50% at level 10
+        regen:
+          name: "Health regen boost"
+          desc: "faster health regen"
+          icon: APPLE
+          per-level: 5      # +5%/level; up to 50% at level 10
+
+    lumberjack:
+      name: "Lumberjack"
+      icon: OAK_SAPLING
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      logs:
+        - OAK_LOG
+        - SPRUCE_LOG
+        - BIRCH_LOG
+        - JUNGLE_LOG
+        - ACACIA_LOG
+        - DARK_OAK_LOG
+        - MANGROVE_LOG
+        - CHERRY_LOG
+        - PALE_OAK_LOG
+        - CRIMSON_STEM
+        - WARPED_STEM
+      effects:
+        extra-block:
+          name: "Bonus log drop"
+          desc: "bonus log drop"
+          icon: OAK_LOG
+          per-level: 10     # 100% at level 10
+
+    gardener:
+      name: "Gardener"
+      icon: GOLDEN_APPLE
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      effects:
+        apple:
+          name: "Apple drop"
+          desc: "apple drop"
+          icon: APPLE
+          per-level: 2.5    # 25% at level 10
+        golden-apple:
+          name: "Golden apple drop"
+          desc: "golden apple drop"
+          icon: GOLDEN_APPLE
+          per-level: 0.5    # 5% at level 10
+
+    miner:
+      name: "Miner"
+      icon: DIAMOND
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      blocks:
+        - STONE
+        - COBBLESTONE
+        - DEEPSLATE
+        - COBBLED_DEEPSLATE
+        - TUFF
+        - GRANITE
+        - DIORITE
+        - ANDESITE
+        - NETHERRACK
+        - COAL_ORE
+        - DEEPSLATE_COAL_ORE
+        - COPPER_ORE
+        - DEEPSLATE_COPPER_ORE
+        - IRON_ORE
+        - DEEPSLATE_IRON_ORE
+        - GOLD_ORE
+        - DEEPSLATE_GOLD_ORE
+        - NETHER_GOLD_ORE
+        - REDSTONE_ORE
+        - DEEPSLATE_REDSTONE_ORE
+        - LAPIS_ORE
+        - DEEPSLATE_LAPIS_ORE
+        - DIAMOND_ORE
+        - DEEPSLATE_DIAMOND_ORE
+        - EMERALD_ORE
+        - DEEPSLATE_EMERALD_ORE
+        - ANCIENT_DEBRIS
+      effects:
+        extra-block:
+          name: "Bonus block drop"
+          desc: "bonus block drop"
+          icon: IRON_ORE
+          per-level: 2.5    # 25% at level 10
+
+    farmer:
+      name: "Farmer"
+      icon: WHEAT
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      crops:
+        - WHEAT
+        - CARROTS
+        - POTATOES
+        - BEETROOTS
+        - NETHER_WART
+        - COCOA
+        - SWEET_BERRY_BUSH
+      effects:
+        extra-drop:
+          name: "Extra crop drop"
+          desc: "extra crop drop"
+          icon: WHEAT
+          per-level: 5      # 50% at level 10
+        seed:
+          name: "Bonus seed"
+          desc: "bonus seed"
+          icon: WHEAT_SEEDS
+          per-level: 1      # 10% at level 10
+
+    smith:
+      name: "Smith"
+      icon: ANVIL
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      binds-feature: durability
+      effects:
+        durability:
+          name: "Ignore tool damage"
+          desc: "chance a tool takes no durability damage"
+          icon: ANVIL
+          per-level: 5      # 50% at level 10
+
+    animalist:
+      name: "Animalist"
+      icon: SHEARS
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      effects:
+        extra-gather:
+          name: "Bonus gathering"
+          desc: "bonus wool or milk"
+          icon: SHEARS
+          per-level: 2.5    # 25% at level 10
+
+    breeder:
+      name: "Breeder"
+      icon: SHEEP_SPAWN_EGG
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      effects:
+        breed:
+          name: "Extra baby on breeding"
+          desc: "chance of an extra baby when breeding"
+          icon: SHEEP_SPAWN_EGG
+          per-level: 2.5    # 25% at level 10
+
+    fisherman:
+      name: "Fisherman"
+      icon: TROPICAL_FISH
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      bonus-items:
+        - COD
+        - SALMON
+        - TROPICAL_FISH
+        - PUFFERFISH
+      effects:
+        extra-catch:
+          name: "Bonus catch"
+          desc: "bonus catch"
+          icon: COD
+          per-level: 2.5    # 25% at level 10
+
+    lucky-catch:
+      name: "Lucky Catch"
+      icon: ENCHANTED_BOOK
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      quality-items:
+        - BOW
+        - FISHING_ROD
+        - NAME_TAG
+        - SADDLE
+        - NAUTILUS_SHELL
+        - BOOK
+      effects:
+        quality:
+          name: "Higher-tier catch"
+          desc: "higher-tier catch"
+          icon: ENCHANTED_BOOK
+          per-level: 1      # 10% at level 10
+
+    warrior:
+      name: "Warrior"
+      icon: SPIDER_EYE
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      effects:
+        crit:
+          name: "Critical damage"
+          desc: "chance your attacks deal double damage"
+          icon: REDSTONE
+          per-level: 2.5    # 25% at level 10
+
+    explorer:
+      name: "Explorer"
+      icon: LANTERN
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      effects:
+        speed:
+          name: "Walk speed"
+          desc: "faster walk speed"
+          icon: SUGAR
+          per-level: 2      # +20% at level 10
+
+    # --- Advanced skills: 1-level definitions pulled into the tree via
+    #     features/skill-tree.yml's `advanced` list + `requires`.
+    tree-feller:
+      name: "Tree Feller"
+      icon: OAK_LOG
+      max-level: 1
+      exp: [500]
+      binds-feature: tree_feller
+      toggleable: true
+      lore:
+        - "Fell a whole tree with one swing."
+
+    auto-crop:
+      name: "Auto Crop"
+      icon: GREEN_DYE
+      max-level: 3
+      exp: [450, 600, 800]
+      binds-feature: auto_crop
+      toggleable: true
+      lore:
+        - "Auto-harvest a field of mature crops."
+        - "Harvest radius grows with level (1-3)."
+
+    fall-nullify:
+      name: "Fall Nullify"
+      icon: FEATHER
+      max-level: 1
+      exp: [350]
+      binds-feature: fall_damage
+      toggleable: true
+      lore:
+        - "Take no damage from falling."
+
+    double-jump:
+      name: "Double Jump"
+      icon: SLIME_BALL
+      max-level: 1
+      exp: [300]
+      binds-feature: double_jump
+      toggleable: true
+      lore:
+        - "Jump again in mid-air."
+
+    swimmer:
+      name: "Swimmer"
+      icon: WATER_BUCKET
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      effects:
+        swim-speed:
+          name: "Swim speed"
+          desc: "faster swimming"
+          icon: WATER_BUCKET
+          per-level: 5      # +5%/level water speed; up to 50% at level 10
+
+    diver:
+      name: "Diver"
+      icon: HEART_OF_THE_SEA
+      max-level: 10
+      exp: [80, 110, 150, 200, 260, 330, 410, 500, 600, 710]
+      effects:
+        breathing:
+          name: "Extended breathing"
+          desc: "hold your breath longer underwater"
+          icon: HEART_OF_THE_SEA
+          per-level: 10     # +10%/level; up to 100% (2x) at level 10
+
+messages:
+  feature-off: "<red>Skills are currently off for you."
+  insufficient-xp: "<red>Not enough XP (need <needed>)."
+  locked: "<red><skill> is locked. Reach <required> level <require-level> to unlock."
+  max-level: "<green><skill> is already at max level."
+  level-up: "<green><skill> is now level <level>!<reset> (-<cost> XP)"

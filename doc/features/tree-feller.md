@@ -2,7 +2,9 @@
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Breaking one log automatically breaks the whole connected tree. Config file `features/tree_feller.yml`.
+**Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/tree_feller.yml`.
+
+Breaking one log automatically breaks the whole connected tree.
 
 **Permissions**
 - **Node:** `leet.feat.tree_feller` · **default:** `false` (nobody).

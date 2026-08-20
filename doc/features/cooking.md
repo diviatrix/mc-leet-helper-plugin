@@ -1,8 +1,10 @@
 # Feature: Cooking
 
+**Owning plugin:** LeetCrafting · Config file `plugins/LeetCrafting/features/cooking.yml`.
+
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Adds advanced **crafting recipes** for custom food items. Config file `features/cooking.yml`. Cooking is a **server-level** feature: when `base.enabled` is `true`, every recipe is available to **all** players — no skill, no permission, no per-player toggle. Dishes are placed on an already-edible base material and reapply custom hunger/saturation when eaten, so the combined dishes restore more than their raw parts.
+Adds advanced **crafting recipes** for custom food items. Cooking is a **server-level** feature: when `base.enabled` is `true`, every recipe is available to **all** players — no skill, no permission, no per-player toggle. Dishes are placed on an already-edible base material and reapply custom hunger/saturation when eaten, so the combined dishes restore more than their raw parts.
 
 **How it's controlled**
 - Enabled/disabled at the **server** level via `base.enabled`. Turning the feature on gives everyone on the server every recipe; there is no per-recipe or per-player unlock.
@@ -114,14 +116,13 @@ A recipe ingredient is either a vanilla `Material` name (matched by material) or
 
 ## Dish icons & resource pack
 
-Each dish item carries a client-side **icon** via an `item_model` (`leet:item/<id>`). The icons come from a tiny, **additive** resource pack that the plugin builds (from `resource_pack/index`) and serves during the player's configuration phase (a small embedded HTTP server, or an external `resource-pack.url`). Nothing in `assets/minecraft` is overridden — every texture/model lives under `assets/leet/` and the base material keeps its vanilla look. Distribution is configured in **`config.yml`**:
+Each dish item carries a client-side **icon** via an `item_model` (`leet:item/<id>`). The icons come from a tiny, **additive** resource pack that the crafting plugin builds (from `resource_pack/index`) and serves during the player's configuration phase (a small embedded HTTP server, or an external `resource-pack.url`). Nothing in `assets/minecraft` is overridden — every texture/model lives under `assets/leet/` and the base material keeps its vanilla look. Distribution is configured in **LeetCrafting's `config.yml`** (`plugins/LeetCrafting/config.yml`):
 
 ```yaml
 resource-pack:
   enabled: true   # master switch for distributing the icons
   port: 8043      # internal HTTP port, used when `url` is empty
   url: ""         # optional: host the bundled zip yourself and point here
-  prompt: ""      # optional text shown when the client is asked to install the pack
   require: false  # false = optional; declining leaves everyone else's textures intact
 ```
 

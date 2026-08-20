@@ -1,6 +1,6 @@
 # LeetHelper
 
-A **Paper 26.2** plugin providing modular gameplay features. Each feature has its own on-disk YAML config, its own permission node, per-world whitelisting, optional cooldowns, and an optional per-use Vault economy cost.
+A bundle of **Paper 26.2** plugins providing modular gameplay features, split into three cooperating jars: **LeetCore**, **LeetSkills**, and **LeetCrafting**. Each feature has its own on-disk YAML config, its own permission node, per-world whitelisting, optional cooldowns, and an optional per-use Vault economy cost.
 
 ## Table of Contents
 
@@ -12,6 +12,7 @@ A **Paper 26.2** plugin providing modular gameplay features. Each feature has it
   - [/leeta](#leeta)
   - [/back](#back)
   - [/leet](#leet)
+  - [/skills](#skills)
 - [Storage & Economy](#storage--economy)
 - [Feature docs (doc/features/)](doc/features/)
 - [Development](#development)
@@ -25,7 +26,17 @@ A **Paper 26.2** plugin providing modular gameplay features. Each feature has it
 
 ## Overview
 
-LeetHelper registers ten gameplay features plus one admin command.
+LeetHelper is delivered as **three jars** that must be deployed together. Each plugin owns its own features and data folder; LeetSkills and LeetCrafting bind to LeetCore through a shared service API (see [Architecture](doc/ARCHITECTURE.md)).
+
+| Plugin | Jar | Package | What it provides |
+|---|---|---|---|
+| **LeetCore** | `leet-core-<v>.jar` | `com.leet.core` | Shared infrastructure (storage, item registry, feature registry, GUI, Vault) + the **7 standalone features** + the cross-plugin commands (`/leeta`, `/back`, `/leet`) |
+| **LeetSkills** | `leet-skills-<v>.jar` | `com.leet.skills` | The **Skills** feature — an XP-spent skill tree (`/skills`) |
+| **LeetCrafting** | `leet-crafting-<v>.jar` | `com.leet.crafting` | The **Cooking** and **Crafting** features — custom foods and condiment items, plus the item resource pack |
+
+### Features by plugin
+
+LeetCore registers **seven** standalone features:
 
 | Feature | ID | Description |
 |---|---|---|
@@ -36,9 +47,10 @@ LeetHelper registers ten gameplay features plus one admin command.
 | [Tree Feller](doc/features/tree-feller.md) | `tree_feller` | Felling a log drops the whole connected tree |
 | [Fall Damage](doc/features/fall-damage.md) | `fall_damage` | Negates all fall damage for eligible players |
 | [XP](doc/features/xp.md) | `xp` | Bonus vanilla XP for mining, woodcutting, crops, fishing, building, and killing |
-| [Skills](doc/features/skills.md) | `skills` | A skill tree (Traveler + 8 passive skills + 1-level advanced skills) leveled up by spending XP points |
-| [Cooking](doc/features/cooking.md) | `cooking` | Server-wide custom food recipes and dishes (SHAPED/SHAPELESS/SMELT), each with a client icon from a bundled additive resource pack |
-| [Crafting](doc/features/crafting.md) | `crafting` | Server-wide custom **non-food** items (condiments), e.g. Salt (smelt a water bucket); its items are usable in Cooking recipes |
+
+LeetSkills registers the **Skills** feature: a skill tree (Traveler + 8 passive skills + advanced skills) leveled up by spending XP points.
+
+LeetCrafting registers **two** features: **Cooking** (custom food recipes and dishes) and **Crafting** (non-food condiments such as Salt), both server-wide.
 
 Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, `give`); full per-feature details (config keys, limitations, permissions) are in **[doc/features/](doc/features/)**.
 
@@ -49,22 +61,23 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, 
 | Requirement | Version |
 |---|---|
 | Server software | Paper **26.2**+ (Bundled API jar is compiled against `26.2`). Spigot/CraftBukkit are **not** supported. |
-| Java | **25+** — the JVM your server runs the plugin on. (Build/toolchain details, which also target Java 25, are in [Building from Source](doc/BUILDING.md).) |
-| Vault | Optional. Only needed for feature per-use costs. The plugin works fully without it. |
+| All three jars | **LeetCore, LeetSkills, LeetCrafting** must be present together. LeetSkills and LeetCrafting soft-depend on LeetCore and disable themselves if it's absent. |
+| Java | **25+** — the JVM your server runs the plugins on. (Build/toolchain details, which also target Java 25, are in [Building from Source](doc/BUILDING.md).) |
+| Vault | Optional. Only needed for feature per-use costs. The plugins work fully without it. |
 
 ---
 
 ## Installation
 
-1. **Download the jar** from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases).
+1. **Download the three jars** (`.jar` for each of LeetCore, LeetSkills, LeetCrafting) from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases).
   Building from source is optional — see [Building from Source](doc/BUILDING.md).
-2. **Copy the jar** into your server's `plugins/` folder.
-3. **Start the server.** On first launch the plugin creates its data folder and writes default configuration files:
+2. **Copy all three jars** into your server's `plugins/` folder.
+3. **Start the server.** LeetCore loads first (it provides the shared services); LeetSkills and LeetCrafting then bind to it. On first launch each plugin creates its own data folder and writes default configuration files:
 
    ```
-   plugins/LeetHelper/
+   plugins/LeetCore/
    ├── config.yml                 # Global settings (log level, schema version)
-   ├── data.db                    # SQLite database (Back feature persistence)
+   ├── data.db                    # SQLite database (Back death locations, /leet toggles)
    └── features/
        ├── double_jump.yml
        ├── durability.yml
@@ -72,22 +85,32 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, 
        ├── back.yml
        ├── tree_feller.yml
        ├── fall_damage.yml
-       ├── xp.yml
-       ├── skills.yml
-       ├── skill-tree.yml
-       ├── cooking.yml
-       └── crafting.yml
+       └── xp.yml
+
+   plugins/LeetSkills/
+   ├── data.db                    # SQLite database (skill levels + per-player skill toggles)
+   └── features/
+       ├── skills.yml             # Skill definitions
+       └── skill-tree.yml         # Tree topology (ring/advanced/slots + requires)
+
+   plugins/LeetCrafting/
+   ├── config.yml                 # Global settings + resource-pack.* distribution
+   └── features/
+       ├── cooking.yml            # Custom food items and recipes
+       └── crafting.yml           # Custom condiment items (e.g. Salt)
    ```
 
-4. **Configure to taste** — edit the files inside `plugins/LeetHelper/features/`. Restart the server for changes to take effect (there is **no reload command**; `base.enabled` toggles are the only thing that can be changed live, via `/leeta toggle`).
+4. **Configure to taste** — edit the files inside each plugin's `Plugins/<Name>/features/` folder. Restart the server for changes to take effect (there is **no reload command**; `base.enabled` toggles are the only thing that can be changed live, via `/leeta toggle`).
 
-> **Updating the plugin:** on startup the global `config.yml` and every feature config are merged against the bundled defaults. Any **new key** introduced by a newer plugin version (e.g. `require-hoe`) is automatically added to your existing configs while all your other values are preserved. No manual copying needed.
+> **Updating:** on startup each plugin merges its global `config.yml` and every feature config against the bundled defaults. Any **new key** introduced by a newer version is automatically added to your existing configs while all your other values are preserved. No manual copying needed.
+>
+> **Skill data note:** skill levels/toggles live in `plugins/LeetSkills/data.db`. Upgrading from the pre-split single plugin moves them to this new DB, so previously-earned levels are not carried over automatically.
 
 ---
 
 ## Permissions
 
-See **[doc/permissions.md](doc/permissions.md)** — the admin `/leeta` permissions (`leet.admin.*`) declared statically in `plugin.yml`, and the dynamic per-feature `leet.feat.*` permissions registered at runtime.
+See **[doc/permissions.md](doc/permissions.md)** — the admin `/leeta` permissions (`leet.admin.*`) declared statically in LeetCore's `plugin.yml`, and the dynamic per-feature `leet.feat.*` permissions registered at runtime (a role the standalone features, Skills, and Cooking/Crafting each opt into or out of).
 
 ---
 
@@ -95,7 +118,7 @@ See **[doc/permissions.md](doc/permissions.md)** — the admin `/leeta` permissi
 
 ### /leeta
 
-Admin command for managing features and giving custom items. Requires the `leeta` command permission (`leet.admin`, op by default). Full reference in [doc/Admin.md](doc/Admin.md).
+Admin command (provided by **LeetCore**) for managing features and giving custom items. Requires the `leeta` command permission (`leet.admin`, op by default). Full reference in [doc/Admin.md](doc/Admin.md).
 
 | Subcommand | Permission | Description |
 |---|---|---|
@@ -109,6 +132,8 @@ Tab completion is provided for subcommands, feature IDs, and item IDs.
 
 **On toggle:** `FeatureManager.toggle()` disables the feature (unregisters listeners), re-enables it if it was off, and writes the new state back to `base.enabled` in the feature's YAML file — so the toggle survives a restart. A toggle does **not** reload the rest of the config; config file edits still need a restart.
 
+`/leeta` works across **all three plugins**: LeetSkills and LeetCrafting contribute their features into LeetCore's shared registry, so they appear in `/leeta list`, can be toggled by `/leeta toggle`, and their items are grabbable via `/leeta give`.
+
 ### /back
 
 | Command | Permission | Description |
@@ -117,19 +142,9 @@ Tab completion is provided for subcommands, feature IDs, and item IDs.
 
 This command is player-only (the console receives a "This command can only be used by players." message). On success/failure, feedback is delivered via the Back feature's `message-type`.
 
-### /skills
-
-Opens the skill-tree GUI (Traveler in the center; the ring skills unlock once Traveler reaches max level, and 1-level advanced skills unlock around the tree once a ring skill hits level 10). Leveling skills spends **vanilla XP points** (`player.getTotalExperience()`).
-
-| Command | Permission | Description |
-|---|---|---|
-| `/skills` | `leet.feat.skills` | Open the skill tree (see [Feature: Skills](doc/features/skills.md)) |
-
-In the tree, click a skill to see its description and a Level Up button; confirm to spend XP and advance a level. The GUI is player-only.
-
 ### /leet
 
-Player-side feature control. Each player can turn supported features **off for themselves** (an off-switch — it never grants or revokes access). Persisted per-player in the SQLite `kv_store`, so preferences survive restarts. A few server-level features have **no** per-player toggle and only offer info (e.g. Cooking).
+Player-side feature control (provided by **LeetCore**). Each player can turn supported features **off for themselves** (an off-switch — it never grants or revokes access). Persisted per-player in LeetCore's SQLite `kv_store`, so preferences survive restarts. A few server-level features have **no** per-player toggle and only offer info (e.g. Cooking).
 
 | Subcommand | Permission | Description |
 |---|---|---|
@@ -147,22 +162,36 @@ Player-side feature control. Each player can turn supported features **off for t
 - Tab completion and the status list only show the features the player is actually permissioned for (plus server-level info features like Cooking).
 - Toggling a feature still checks that feature's permission (e.g. `leet.feat.double_jump`); without it, `/leet <sub>` is declined.
 - Because these toggle features default to `false`, their `/leet` subcommands need a granted permission — but **Cooking needs no permission**: it is controlled at the server level by `base.enabled` (see [Feature: Cooking](doc/features/cooking.md)).
+- `/leet skills` and `/leet cook` are shown/toggled **only when** the skills/cooking features are registered by their owning plugins (LeetSkills / LeetCrafting); `/leet` degrades gracefully if those plugins aren't loaded.
 
 **How the toggle applies:** a player's off-toggle adds a layer inside `AbstractFeature.check()` (server enabled → base permission → personal toggle → world whitelist). When off, the feature stops firing for that player only; other players and the rest of the config are unaffected. Cooking is the exception — it bypasses the permission/toggle layers and enables for the whole server.
+
+### /skills
+
+Provided by **LeetSkills**. Opens the skill-tree GUI (Traveler in the center; the ring skills unlock once Traveler reaches max level, and advanced skills unlock around the tree once a ring skill hits the required level). Leveling skills spends **vanilla XP points** (`player.getTotalExperience()`).
+
+| Command | Permission | Description |
+|---|---|---|
+| `/skills` | `leet.feat.skills` | Open the skill tree (see [Feature: Skills](doc/features/skills.md)) |
+
+In the tree, click a skill to see its description and a Level Up button; confirm to spend XP and advance a level. The GUI is player-only. There is **no** static command permission for `/skills`; access is gate entirely by the runtime `leet.feat.skills` node (default-denied).
 
 ---
 
 ## Storage & Economy
 
-The storage layers (runtime in-memory and persistent SQLite `data.db`) and the optional Vault income integration are covered in the **[Architecture](doc/ARCHITECTURE.md)** doc.
+- **LeetCore** — runtime (in-memory) + persistent SQLite `plugins/LeetCore/data.db`. Holds the `/leet` per-player toggles and the Back feature's death locations / persistent cooldowns. Resolves the optional Vault economy and passes it to features that declare a `cost`.
+- **LeetSkills** — its own SQLite `plugins/LeetSkills/data.db`, holding per-player skill **levels** and skill toggles.
+- **LeetCrafting** — no database; it owns only the item domain (item registry + recipes) and the served item resource pack.
+
+See the **[Architecture](doc/ARCHITECTURE.md)** doc for the storage and Vault internals.
 
 ---
 
 ## Development
 
-- **[Building & Testing](doc/BUILDING.md)** — prerequisites, Gradle commands, the output artifact, and how the version is single-sourced.
-- **[Architecture](doc/ARCHITECTURE.md)** — project structure, the feature model, config handling, storage, and the permission/Vault internals.
-
+- **[Building & Testing](doc/BUILDING.md)** — prerequisites, Gradle commands, the three output jars, and how the version is single-sourced.
+- **[Architecture](doc/ARCHITECTURE.md)** — the three-plugin project layout, the `CoreApi` service seam, the composable feature roles, config handling, storage split, and the permission/Vault internals.
 
 ## License
 

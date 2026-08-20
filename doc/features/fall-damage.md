@@ -2,7 +2,9 @@
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Negates all fall damage for eligible players, as a standalone feature **independent of Double Jump**. Config file `features/fall_damage.yml`.
+**Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/fall_damage.yml`.
+
+Negates all fall damage for eligible players, as a standalone feature **independent of Double Jump**.
 
 **Permissions**
 - **Node:** `leet.feat.fall_damage` · **default:** `false` (nobody).

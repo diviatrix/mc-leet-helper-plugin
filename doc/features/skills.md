@@ -1,7 +1,8 @@
 # Feature: Skills
 
-IMPORTANT NOTICE:
-The standalone `doublejump`, `fall damage`, `autocrop`, `tree feller`, `durability` features share effects with matching skills. These skills ignore the feature's enabled state and key off the feature's **permission**: if a player holds `leet.feat.<feature>`, the skill shows as **already acquired** and the feature is the only provider of the effect (the skill won't also fire — no double application). A player without that permission can still level the skill with XP and get the effect from the skill. Either way, exactly one thing fires per effect.
+**Owning plugin:** LeetSkills · Config files `plugins/LeetSkills/features/skills.yml` and `plugins/LeetSkills/features/skill-tree.yml`. Skill levels/toggles persist in LeetSkills' `plugins/LeetSkills/data.db`.
+
+> Each skill that duplicates a standalone feature (`smith`↔`durability`, `tree-feller`↔`tree_feller`, `auto-crop`↔`auto_crop`, `fall-nullify`↔`fall_damage`, `double-jump`↔`double_jump`) declares that binding in `skills.yml` with `binds-feature: <feature-id>` (and `toggleable: true` where the player may toggle it via `/leet`). The skill *ignores the feature's enabled state* and keys off the feature's **permission**: if a player holds `leet.feat.<feature>`, the skill shows as **already acquired** and the feature is the only provider of the effect (the skill won't also fire — no double application). A player without that permission can still level the skill with XP and get the effect from the skill. Either way, exactly one thing fires per effect.
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
@@ -14,7 +15,8 @@ The feature is split across **two config files**:
 Separating them lets you reshape the tree (reorder skills, drop `double-jump` or `tree-feller`, add your own, rewire prerequisites) in `skill-tree.yml` without touching a skill's definition; removing a skill from the tree simply leaves that effect to the matching standalone feature.
 
 **Permissions**
-- **Node:** `leet.feat.skills` · **default:** `false` (nobody).
+- **Node:** `leet.feat.skills` · **default:** `false` (nobody), registered at runtime by LeetSkills.
+- `/skills` has **no static command permission** — access is gated entirely by this same `leet.feat.skills` node at runtime (`SkillsCommand` checks `skillsFeature.appliesTo(player)`), so there's a single source of truth for the node (default-denied).
 - Grant the node (e.g. LuckPerms) to open `/skills` and to have passive effects apply; it also unlocks the `/leet skills` personal off-toggle. The node alone is not enough — `base.enabled`, the permission, `base.worlds` and the player toggle must all pass.
 - Set `base.default-permission` in `skills.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
 
@@ -27,7 +29,7 @@ Separating them lets you reshape the tree (reorder skills, drop `double-jump` or
 **Leveling**
 - Each skill starts at 0 and maxes at `max-level`. Per-skill `exp` list: entry *i* = XP to go from level *i* to *i+1* (a table per skill in `skills.yml`). Advanced skills have `max-level: 1` and a one-entry `exp` table.
 - A skill cannot be leveled until its prerequisite is met (`requires` in `skill-tree.yml`); beyond the GUI lock, `levelUp` refuses with the `locked` message.
-- Levels are persisted per-player in the SQLite `kv_store` (key `levels`, a Gson map of skill id → level), so they survive restarts.
+- Levels are persisted per-player in the skills plugin's SQLite `kv_store` (`plugins/LeetSkills/data.db`, key `levels`, a Gson map of skill id → level), so they survive restarts.
 
 ## The skill-tree config (`features/skill-tree.yml`)
 
@@ -38,7 +40,7 @@ tree:
     - miner
     - smith
     - ...
-  advanced:            # 1-level skills (their GUI slot is fixed per skill id)
+  advanced:            # advanced skills shown in the lower band, in display order
     - tree-feller
     - auto-crop
     - ...
@@ -46,10 +48,15 @@ tree:
     lumberjack: { skill: stamina, level: 10 }
     tree-feller: { skill: lumberjack, level: 10 }
     double-jump: { skill: fall-nullify, level: 1 }
+  slots:               # GUI slot per advanced skill (0..53 in a 9x6 inventory)
+    tree-feller: 10
+    auto-crop: 20
+    ...
 ```
 
 - `ring` / `advanced` are **ordered lists of skill ids** (each must have a matching `feature.skills.<id>` definition in `skills.yml`). Traveler is always the center and root. Reorder to change display order; remove an id to pull that skill out of the tree (its definition stays, so it can be added back). Unknown ids are skipped.
 - `requires` gives each skill the prerequisite it needs to unlock/level: reach `level` of `skill`. A skill with no entry has no prerequisite (open). Referencing `stamina` (the Traveler skill's id) is how the ring skills get gated at level 10; the advanced skills reference their ring skill at 10.
+- `slots` maps each advanced skill id to its GUI slot on the tree screen. **Every id in `advanced` needs a slot here**, or it will not render (and the plugin logs a warning at load). This is config-driven so a newly-added advanced skill either renders or logs loudly — never silently disappears.
 
 ## Ring skills (outer tier, unlocked by Traveler level 10)
 
@@ -90,11 +97,11 @@ Advanced skills are `max-level: 1`; buying them costs its single `exp` entry and
 The detail screen renders every effect as its own icon with its current modifier; the tree hover shows each effect's **current value + `desc`** (e.g. Smith at level 10 → `50% chance a tool takes no durability damage`). Locked skills show a glinting emerald lock.
 
 ### Skills vs. the standalone features
-Skills that duplicate a standalone feature (**Smith**↔`durability`, **Tree Feller**↔`tree_feller`, **Auto Crop**↔`auto_crop`, **Fall Nullify**↔`fall_damage`, **Double Jump**↔`double_jump`) ignore the feature's `base.enabled` entirely and key off the feature's **permission**:
+Skills that duplicate a standalone feature (**Smith**↔`durability`, **Tree Feller**↔`tree_feller`, **Auto Crop**↔`auto_crop`, **Fall Nullify**↔`fall_damage`, **Double Jump**↔`double_jump`) ignore the feature's `base.enabled` entirely and key off the feature's **permission**. The duplication is declared **in config**, not hard-coded: each such skill sets `binds-feature: <feature-id>` in its `skills.yml` definition, and `toggleable: true` where the player may also toggle it via `/leet`.
 - If the player holds `leet.feat.<feature>`, the skill is shown as **already acquired** (maxed, not purchasable) and the feature is the single provider of the effect — the skill's own passive does not fire for that player.
 - Otherwise the skill is a normal purchasable skill: level it with XP and the skill itself provides the effect.
 
-Because ownership switches on the permission, exactly one path ever fires per effect — no double invocation. A prerequisite that is a feature-granted skill (e.g. Double Jump needs Fall Nullify) counts as met when the player holds that feature's permission.
+Because ownership switches on the permission, exactly one path ever fires per effect — no double invocation. A prerequisite that is a feature-granted skill (e.g. Double Jump needs Fall Nullify) counts as met when the player holds that feature's permission. At load time a config check (`validateBindings`) warns if a `binds-feature` references a feature that isn't registered.
 
 ## Example config
 
@@ -167,6 +174,8 @@ feature:
       icon: OAK_LOG
       max-level: 1
       exp: [500]
+      binds-feature: tree_feller   # ties to the standalone feature; toggleable where set
+      toggleable: true
       lore:
         - "Fell a whole tree with one swing."
   # ... miner, farmer, fisherman, warrior, explorer, auto-crop, fall-nullify,
@@ -239,6 +248,8 @@ tree:
 | `<skill>.icon` | Material | — | GUI icon. |
 | `<skill>.max-level` | int | `10` | Max level (1 for advanced skills). |
 | `<skill>.exp` | int list | — | Per-level XP cost table (one entry for 1-level skills). |
+| `<skill>.binds-feature` | string | — | If set, this skill duplicates a standalone feature id; the skill keys off that feature's permission (see [Skills vs. the standalone features](#skills-vs-the-standalone-features)). |
+| `<skill>.toggleable` | bool | `false` | Only meaningful with `binds-feature`: allow the player to also toggle this skill via `/leet`. |
 | `<skill>.lore` | string list | — | Description for skills with no effects (e.g. the 1-level advanced skills). Effect skills show each effect's current value instead. |
 | `<skill>.effects.<id>` | section | — | A single effect; see below. |
 | `<skill>.effects.<id>.name` | string | id | Effect label on its detail icon. |
@@ -255,7 +266,8 @@ tree:
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `tree.ring` | string list | — | Ordered ring skills around Traveler. |
-| `tree.advanced` | string list | — | Ordered advanced skills below the ring (their GUI slot is fixed per skill id; mostly 1-level, but **Breeder** and **Lucky Catch** span 10). |
+| `tree.advanced` | string list | — | Ordered advanced skills below the ring (mostly 1-level, but **Breeder** and **Lucky Catch** span 10). |
+| `tree.slots.<advanced-id>` | int (0–53) | — | GUI slot for each advanced skill on the 9×6 tree screen. **Required for every id in `tree.advanced`** or it won't render (a warning is logged). |
 | `tree.requires.<skill>.skill` | string | — | Prerequisite skill id for `<skill>` (absent = no prerequisite). |
 | `tree.requires.<skill>.level` | int | `1` | Min level of the prerequisite skill needed to unlock `<skill>`. |
 

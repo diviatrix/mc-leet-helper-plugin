@@ -1,10 +1,11 @@
 # Architecture
 
-How LeetHelper is structured and works internally. For end-user configuration, permissions, and commands see [README](../README.md).
+How LeetHelper is structured and works internally as **three cooperating plugins**. For end-user configuration, permissions, and commands see [README](../README.md).
 
 Contents:
 
 - [Project Structure](#project-structure)
+- [How the plugins cooperate (CoreApi)](#how-the-plugins-cooperate-coreapi)
 - [Feature Model](#feature-model)
 - [Config Handling](#config-handling)
 - [Permission Model](#permission-model)
@@ -15,99 +16,156 @@ Contents:
 
 ## Project Structure
 
+The codebase is a Gradle multi-project build (see [BUILDING](BUILDING.md)). Three subprojects, each a standalone Paper plugin:
+
 ```
-src/main/
-  java/com/leet/helper/
-    Core.java            # Plugin lifecycle, Vault setup, dynamic permission registration
+build.gradle.kts, settings.gradle.kts   # multi-project build (version single-sourced)
+
+leet-core/                            # LeetCore — shared infra + 7 standalone features
+  src/main/java/com/leet/core/
+    LeetCore.java                     # Plugin lifecycle, Vault setup, CoreApi service registration
+    CoreApi.java                      # Service contract exposed to the other two plugins
     feature/
-      AbstractFeature.java       # Base class: config, permissions, cooldowns, messages, cost
-      FeatureManager.java        # Feature registry, enable/disable/toggle, toggle persistence
-      DoubleJumpFeature.java     # Double jump implementation
-      DurabilityFeature.java     # Durability multiplier implementation
-      AutoCropFeature.java       # Auto crop harvest implementation
-      BackFeature.java           # Death-back teleport implementation
-      TreeFellerFeature.java     # Whole-tree felling implementation
-      FallDamageFeature.java     # Fall-damage immunity implementation
-      XpFeature.java             # Bonus XP for actions implementation
-      SkillsFeature.java         # XP-spending skill tree with passive skills
-      CookingFeature.java        # Custom foods: items + recipes (SHAPED/SHAPELESS/SMELT)
-      CraftingFeature.java       # Non-food custom items (condiments, e.g. Salt)
-      TreeFellerUtil.java        # Shared whole-tree felling (Tree Feller + lumberjack)
-      AutoCropUtil.java          # Shared auto-harvest (Auto Crop + farmer)
-      craft/
-        LeetItem.java            # A single custom item (id, material, name/lore, food, leet:item model)
-        LeetItemRegistry.java    # Shared custom-item registry (all features collapse into one map)
-        LeetRecipeRegistry.java  # Generic SHAPED/SHAPELESS/SMELT recipe parse + register/gate
-      skills/
-        SkillConfig.java         # Data-driven per-skill definition (skills.yml)
-        SkillTreeConfig.java     # Tree topology: ring/advanced order + prerequisites (skill-tree.yml)
-        SkillState.java          # Per-player skill-level persistence
-        SkillsGui.java           # The /skills inventory interface
+      AbstractFeature.java            # Thin base: config, enable/disable, gating (check)
+      FeatureManager.java             # Feature registry, enable/disable/toggle, toggle persistence
+      FeatureRegistry.java            # Narrow read contract for cross-plugin consumers
+      ToggleableFeature.java          # Role: per-player /leet toggle
+      CostedFeature.java              # Role: Vault per-use cost
+      CooldownAware.java              # Role: cooldowns (runtime or persistent)
+      MessagingFeature.java           # Role: template messages (action bar/chat/title)
+      BlockBreakerFeature.java        # Role: protection-aware multi-block breaking
+      DoubleJumpFeature.java          # (CostedFeature + CooldownAware)
+      DurabilityFeature.java          # (CostedFeature)
+      AutoCropFeature.java            # (CostedFeature + BlockBreakerFeature)
+      BackFeature.java                # (CostedFeature + CooldownAware + MessagingFeature, persistent cooldown)
+      TreeFellerFeature.java          # (CostedFeature + BlockBreakerFeature)
+      FallDamageFeature.java          # (CostedFeature)
+      XpFeature.java                  # (MessagingFeature)
+      TreeFellerUtil.java             # Shared whole-tree felling (Tree Feller feature + skill)
+      AutoCropUtil.java               # Shared auto-harvest (Auto Crop feature + skill)
+    craft/
+      CustomItemView.java             # Read-only custom-item registry contract (service)
     command/
-      HelperCommand.java         # /leeta list|toggle|info|give (+ tab completion)
-      BackCommand.java           # /back
-      LeetCommand.java           # /leet player feature toggles (+ tab completion)
-      SkillsCommand.java         # /skills (opens the skill tree)
-    resource/
-      ResourcePackService.java   # Builds + serves the additive item-texture resource pack
+      HelperCommand.java              # /leeta list|toggle|info|give (+ tab completion)
+      BackCommand.java                # /back
+      LeetCommand.java                # /leet player feature toggles (+ tab completion)
+      CommandUtil.java                # Shared command helpers
+    gui/
+      GuiManager.java                 # Generic pages/actions inventory GUI backend
+    plugin/
+      FeaturePluginSupport.java       # requireCore/saveResourceIfMissing/disableFeature helpers
     storage/
-      StorageManager.java        # Runtime (in-memory) + persistent (SQLite) storage
+      StorageManager.java             # Runtime (in-memory) + persistent (SQLite) storage
     util/
-      MiniMessageUtil.java       # MiniMessage helpers
-  resources/
-    plugin.yml                   # Plugin metadata, command & admin permission declarations
-    config.yml                   # Global config
-    features/
-      double_jump.yml
-      durability.yml
-      auto_crop.yml
-      back.yml
-      tree_feller.yml
-      fall_damage.yml
-      xp.yml
-      skills.yml
-      skill-tree.yml
-      cooking.yml
-      crafting.yml
-    resource_pack/               # Additive asset pack (leet: item models + textures + index)
+      MiniMessageUtil.java            # MiniMessage helpers
+    ItemStackUtil.java                # Item helpers
+  src/main/resources/
+    plugin.yml                        # LeetCore metadata; /leeta, /back, /leet; leet.admin permissions
+    config.yml                        # Global core config
+    features/                         # double_jump, durability, auto_crop, back, tree_feller,
+                                      #   fall_damage, xp
+
+leet-skills/                          # LeetSkills — the skill-tree plugin
+  src/main/java/com/leet/skills/
+    LeetSkills.java                   # Plugin lifecycle; binds to CoreApi; owns skills SQLite store
+    SkillsFeature.java                # The 'skills' feature (gating/leveling/tree/GUI hub)
+    SkillPassiveHandler.java          # Passive effect event handlers + schedulers
+    SkillsGui.java                    # Thin client over core's GuiManager
+    SkillsCommand.java                # /skills (gates via leet.feat.skills at runtime)
+    SkillConfig.java                  # Per-skill definition (skills.yml)
+    SkillTreeConfig.java              # Tree topology: ring/advanced/slots + requires (skill-tree.yml)
+    SkillState.java                   # Per-player skill-level persistence
+  src/main/resources/
+    plugin.yml                        # LeetSkills metadata (softdepend Vault, LeetCore); /skills (no static perm)
+    features/skills.yml               # Skill definitions (+ binds-feature / toggleable / effects)
+    features/skill-tree.yml           # Tree topology + advanced GUI slots
+
+leet-crafting/                        # LeetCrafting — custom items & recipes (merged Cooking + Crafting)
+  src/main/java/com/leet/crafting/
+    LeetCrafting.java                 # Plugin lifecycle; binds to CoreApi; owns item registry + resource pack
+    CraftFeature.java                 # One generic feature instance per domain (crafting, cooking)
+    CookingFeature.java               # (stub/aggregator for the cooking domain)
+    CraftingFeature.java              # (stub/aggregator for the crafting domain)
+    craft/
+      LeetItem.java                   # A single custom item (id, material, name/lore, food, leet:item model)
+      LeetItemRegistry.java           # id -> item registry; registered with core as CustomItemView
+      LeetRecipeRegistry.java         # Generic SHAPED/SHAPELESS/SMELT recipe parse + register/gate
+    resource/
+      ResourcePackService.java        # Builds + serves the additive item-texture resource pack
+  src/main/resources/
+    plugin.yml                        # LeetCrafting metadata (softdepend Vault, LeetCore); no commands
+    config.yml                        # Global + resource-pack.* distribution settings
+    features/cooking.yml              # Custom food items and recipes
+    features/crafting.yml             # Custom condiment items and recipes (Salt)
+    resource_pack/                    # Additive asset pack (leet: item models + textures + index)
+tools/cooking/                        # One-off Python tooling for the cooking values/textures (run from repo root)
 ```
 
-`Core` boots the plugin, resolves Vault (Economy + Permission providers, both optional), registers the feature permissions dynamically, and owns the **shared** `LeetItemRegistry` and `ResourcePackService`. `FeatureManager` owns the feature registry and the enable/disable/toggle lifecycle.
+**What each plugin does:**
 
-### Shared crafting engines
+- **LeetCore** boots first, resolves Vault, owns the shared feature registry, storage, and generic GUI, registers its **seven** standalone features, exposes itself as the **`CoreApi`** service, and wires up the `/leeta`, `/back`, and `/leet` commands. Skill and crafting features are contributed *into* LeetCore's shared registry by the other two plugins.
+- **LeetSkills** soft-depends on LeetCore, looks up `CoreApi`, contributes the `skills` feature, and keeps its **own** SQLite store for skill levels/toggles.
+- **LeetCrafting** soft-depends on LeetCore, contributes the `crafting` and `cooking` features, and owns the item domain: `LeetItemRegistry` (registered with core as a read-only `CustomItemView`, so `/leeta give` and command/eat handling work) and the `ResourcePackService`.
 
-Cooking and Crafting both build their items and recipes from the same generic machinery in `com.leet.helper.craft`:
+---
 
-- **`LeetItemRegistry`** — one `id → item` map shared by every crafting feature. Each feature's `feature.items` section is loaded into it, so any recipe in any feature can reference any item id (e.g. Cooking can use Crafting's `salt`). The `ci` PersistentData tag + `leet:item/<id>` item model are set here. Because registration is shared and cumulative, features that *produce* ingredients enable **before** the features whose recipes *consume* them (Crafting is registered before Cooking in `Core`).
+## How the plugins cooperate (CoreApi)
+
+Core exposes a **narrow service contract** (`CoreApi`) registered via the Bukkit ServicesManager. LeetSkills and LeetCrafting look it up at enable time through `FeaturePluginSupport.requireCore(...)`; if LeetCore is absent they log a warning and disable themselves gracefully. `CoreApi` exposes:
+
+- `featureRegistry()` — the narrow `FeatureRegistry` (register/get/all/toggle) so the other plugins can contribute features and check registration.
+- `storageManager()` — core's persistent store (holds `/leet` toggles and Back death locations).
+- `itemRegistry()` — a read-only `CustomItemView` (may be null if no crafting plugin registered one).
+- `guiManager()` — the generic GUI backend skills uses.
+- `economy()` — the resolved Vault economy (or null).
+- `registerFeature(AbstractFeature)` — the entry point the other plugins use to add a feature to the shared registry.
+- `log(String)` — console logging with the LeetCore prefix.
+
+Core never reaches into the concrete classes of the other plugins: it drives everything through `FeatureRegistry` and the role interfaces, so `/leeta`, `/leet`, and the toggle lifecycle work uniformly across features regardless of which plugin registered them.
+
+### Crafting engine & resource pack
+
+Cooking and Crafting both build their items and recipes from the generic machinery in `com.leet.crafting.craft` (owned by **LeetCrafting**, not core):
+
+- **`LeetItemRegistry`** — one `id → item` map shared by all crafting domains. Each domain's `feature.items` section is pre-loaded into it *before* either feature registers (order-independent), so any recipe in any domain can reference any item id (e.g. Cooking can use Crafting's `salt`). The `ci` PersistentData tag + `leet:item/<id>` item model are set here. The registry is registered with core as a `CustomItemView`.
 - **`LeetRecipeRegistry`** — parses a `feature.recipes` section into Bukkit recipes. Supports **SHAPELESS** (a flat list), **SHAPED** (3 rows of 3 + a letter→ingredient map), and **SMELT** (a single furnace `ingredient` → `result`, with optional `experience`/`cooking-time`). Results are a custom item id or `material:<MATERIAL>`.
-- **`ResourcePackService`** — one instance owned by `Core`, builds and serves the additive `leet:` item pack (nothing in `assets/minecraft` is overridden).
-
+- **`ResourcePackService`** — one instance owned by **LeetCrafting**, built in `onEnable` and stopped in `onDisable`. It builds and serves the additive `leet:` item pack (nothing in `assets/minecraft` is overridden), configured under `resource-pack.*` in LeetCrafting's `config.yml`.
 
 ---
 
 ## Feature Model
 
-Every gameplay feature extends `AbstractFeature`. The base class provides the shared life-cycle and the common behaviour used by all event handlers:
+Features come in two tiers:
+
+- **Tier 1 — `AbstractFeature`** (a thin base): owns the genuinely common denominator for player-gated mechanics — config loading, `enable`/`disable` event lifecycle, and the gating `check(player)` (permission + per-player `/leet` toggle + world whitelist). It alone does **not** force any Vault/cooldown/messaging machinery on a feature.
+- **Tier 2 — opt-in role interfaces**, each with default methods, implemented only as needed:
+  - `CostedFeature` — Vault per-use cost (extends `MessagingFeature` for the `insufficient-funds` message).
+  - `CooldownAware` — cooldowns; `persistentCooldown()` switches between runtime and persistent (SQLite) storage.
+  - `MessagingFeature` — template messages delivered via `base.message-type`.
+  - `BlockBreakerFeature` — protection-aware multi-block breaking (`breakIfAllowed`).
+  - `ToggleableFeature` — the per-player `/leet` off-switch.
+
+Mapping (see the tree above): Double Jump / Back use cost + cooldown; Auto Crop / Tree Feller use cost + block-breaking; Durability / Fall Damage use cost only; XP uses messages only; Skills uses cooldown + messaging + block-breaking.
 
 - **Config loading** — `loadConfig()` reads `base.*` and per-feature settings, then calls the subclass's `loadFeatureConfig(cfg)` for its own keys. `enable()`/`disable()` register/unregister the event listeners.
 - **Gating** — `check(player)` enforces, in order: server `base.enabled` → the feature's `leet.feat.<id>` permission (`player.hasPermission`) → the player's personal `/leet` toggle → the `base.worlds` whitelist. All must pass.
-- **Cooldowns** — `checkCooldown`/`setCooldown` use runtime storage for most features; `BackFeature` has its own persistent-cooldown helpers.
-- **Messages** — `sendMessage(player, key, ...)` resolves a template from the feature's `messages` and delivers it per `base.message-type` (action bar, chat, or title) using MiniMessage.
-- **Per-use cost** — `chargeUse(player)` applies the optional Vault `feature.cost` (see [Vault / Economy Integration](#vault--economy-integration)); all features except XP charge per use. Cost semantics: multi-block features charge once per trigger action (Auto Crop / Tree Feller), passive features per event (Durability / Fall Damage); Back charges per `/back`.
+- **Cooldowns** — `CooldownAware` uses runtime storage for most features; `BackFeature` is a `CooldownAware` with `persistentCooldown() = true`.
+- **Messages** — `MessagingFeature.sendMessage(player, key, ...)` resolves a template from the feature's `messages` and delivers it per `base.message-type` (action bar, chat, or title) using MiniMessage.
+- **Per-use cost** — `CostedFeature.chargeUse(player)` applies the optional Vault `feature.cost`; all features except XP charge per use. Cost semantics: multi-block features charge once per trigger action (Auto Crop / Tree Feller), passive features per event (Durability / Fall Damage); Back charges per `/back`.
 
-`FeatureManager.toggle()` disables a feature, re-enables it if it was off, and persists `base.enabled` back to the feature's on-disk YAML (survives a restart). It does **not** reload the rest of the config.
+`FeatureManager.toggle()` disables a feature, re-enables it if it was off, and persists `base.enabled` back to the feature's on-disk YAML (survives a restart). It does **not** reload the rest of the config. `toggle()` persists `base.enabled` **before** calling `enable()`, so an OFF→ON toggle works at runtime.
 
 ### Multi-block breakers and protection plugins
 
-`AutoCropFeature` and `TreeFellerFeature` break many blocks per action. They run at `EventPriority.MONITOR` (so a protection plugin's cancellation of the original break is already visible) and route each additional block through `AbstractFeature.breakIfAllowed(player, block, tool)`, which fires a per-block `BlockBreakEvent` so claim/region plugins (GriefPrevention, WorldGuard, ...) are consulted per block. Protected blocks are skipped rather than force-broken.
+`AutoCropFeature` and `TreeFellerFeature` break many blocks per action. They run at `EventPriority.MONITOR` (so a protection plugin's cancellation of the original break is already visible) and route each additional block through `BlockBreakerFeature.breakIfAllowed(player, block, tool)`, which fires a per-block `BlockBreakEvent` so claim/region plugins (GriefPrevention, WorldGuard, ...) are consulted per block. Protected blocks are skipped rather than force-broken.
 
-The two gather loops are extracted into `TreeFellerUtil` and `AutoCropUtil` (same package, so they can call `breakIfAllowed`) and are reused by the advanced **tree-feller** and **auto-crop** skills — both features use the same helpers and the same protection-respecting `breakIfAllowed` path. Like the features, the advanced-skill breaks run at `MONITOR` behind a reentrancy guard (`felling` / `harvesting`). A skill that duplicates a standalone feature keys off the feature's **permission** (`hasFeaturePermission` in `SkillsFeature`): holding it counts as owning the skill, the feature supplies the effect, and the skill's own passive is suppressed — so the two never both fire.
+The two gather loops are extracted into `TreeFellerUtil` and `AutoCropUtil` (same package, so they can call `breakIfAllowed`) and are reused by the advanced **tree-feller** and **auto-crop** skills — both the standalone features and the skills use the same helpers and the same protection-respecting `breakIfAllowed` path. A skill that duplicates a standalone feature keys off the feature's **binding**: a skill with `binds-feature: <id>` shows as already acquired when the player holds the feature's permission (see [Skills vs. the standalone features](features/skills.md#skills-vs-the-standalone-features)), so the two never both fire.
 
 ### SkillsFeature is GUI-driven
 
-Unlike the other features, `SkillsFeature` does most of its player-facing work through an inventory GUI rather than a command response. `/skills` (via `SkillsCommand`) calls `SkillsFeature.openTree`, which delegates to `SkillsGui`. All skill trees/click handling live in `SkillsGui` (registered listener stays on the feature so `AbstractFeature`'s enable/disable lifecycle is respected); `SkillsFeature` implements the passive effects and the leveling (spending vanilla XP points via `player.getTotalExperience()` / `giveExp(-cost)`). A per-player `SkillState` caches levels in memory.
+`SkillsFeature` (in **LeetSkills**) does most of its player-facing work through an inventory GUI rather than a command response. `/skills` (via `SkillsCommand`) calls `SkillsFeature.openTree`, which delegates to `SkillsGui` — a thin client over LeetCore's generic `GuiManager`. `SkillsFeature` implements the passive effects and the leveling (spending vanilla XP points via `player.getTotalExperience()` / `giveExp(-cost)`). A per-player `SkillState` caches levels in memory and persists them to the skills plugin's own SQLite store.
 
-The skills feature loads **two configs**: `loadFeatureConfig` reads the skill definitions from `features/skills.yml` into `SkillConfig`, then loads `features/skill-tree.yml` into a `SkillTreeConfig`. The tree config owns the topology — the ordered `ring`/`advanced` skill-id lists (drive both the GUI tiers and the tier ordering) and the `requires` map (each skill's prerequisite, enforced by `SkillsFeature.prerequisiteSatisfied` for the GUI lock and the `levelUp` guard). Definitions are pure "what a skill is"; the tree decides "where it sits and what gates it". `SkillConfig` has no notion of prerequisites or placement.
+The skills feature loads **two configs**: `loadFeatureConfig` reads the skill definitions from `features/skills.yml` into `SkillConfig`, then loads `features/skill-tree.yml` into a `SkillTreeConfig`. The tree config owns the topology — the ordered `ring`/`advanced`/`slots` lists (driving both the GUI tiers and the tier ordering) and the `requires` map (each skill's prerequisite, enforced for the GUI lock and the `levelUp` guard). Definitions are pure "what a skill is"; the tree decides "where it sits and what gates it".
 
 ---
 
@@ -115,12 +173,12 @@ The skills feature loads **two configs**: `loadFeatureConfig` reads the skill de
 
 ### Common feature config layout
 
-Each feature config (`features/<id>.yml`) shares the same layout:
+Each feature config (`features/<id>.yml` in the owning plugin's data folder) shares the same layout:
 
 ```yaml
 base:
   enabled: true                    # Kill switch. false = feature fully off (no listeners).
-  permission: leet.feat.<id>       # Permission node controlling access
+  permission: leet.feat.<id>       # Permission node controlling access (omit for server-wide features)
   default-permission: false        # true | op | false  (Bukkit permission default)
   worlds: []                       # Empty = all worlds. Non-empty = whitelist of world names.
   cooldown: 0                      # Seconds between uses. 0 = no cooldown.
@@ -134,9 +192,11 @@ messages:
   # key: "MiniMessage formatted string"
 ```
 
+**Cooking and Crafting omit `base.permission`/`default-permission`** — they are server-wide (open to all when `base.enabled` is true). `registerPermission()` skips registering a node when the config lacks the `base.permission` key.
+
 #### Three-level control per feature
 
-Each feature has three independent on/off controls:
+Each player-gated feature has three independent on/off controls:
 
 1. **`base.enabled`** — server-wide kill switch. When `false`, the feature's event listeners are **not registered** at all.
 2. **`base.default-permission`** — the Bukkit default for the configured permission. Defaults to `false` (nobody can use the feature until you grant the node in your permission plugin, e.g. LuckPerms). `true` = everyone, `op` = ops only.
@@ -158,26 +218,26 @@ A missing or empty message template silently produces no message.
 
 ### Per-Feature Configs
 
-Each feature's config file and its reference doc:
+Each feature's config file (path shown relative to the owning plugin's data folder, e.g. `plugins/LeetCore/features/`) and its reference doc:
 
-| Feature | Config file | Reference |
-|---|---|---|
-| Double Jump | `double_jump.yml` | [feature-double-jump](features/double-jump.md) |
-| Durability | `durability.yml` | [feature-durability](features/durability.md) |
-| Auto Crop | `auto_crop.yml` | [feature-auto-crop](features/auto-crop.md) |
-| Back | `back.yml` | [feature-back](features/back.md) |
-| Tree Feller | `tree_feller.yml` | [feature-tree-feller](features/tree-feller.md) |
-| Fall Damage | `fall_damage.yml` | [feature-fall-damage](features/fall-damage.md) |
-| XP | `xp.yml` | [feature-xp](features/xp.md) |
-| Skills | `skills.yml` + `skill-tree.yml` | [feature-skills](features/skills.md) |
-| Cooking | `cooking.yml` | [feature-cooking](features/cooking.md) |
-| Crafting | `crafting.yml` | [feature-crafting](features/crafting.md) |
+| Plugin | Feature | Config file | Reference |
+|---|---|---|---|
+| LeetCore | Double Jump | `features/double_jump.yml` | [features/double-jump](features/double-jump.md) |
+| LeetCore | Durability | `features/durability.yml` | [features/durability](features/durability.md) |
+| LeetCore | Auto Crop | `features/auto_crop.yml` | [features/auto-crop](features/auto-crop.md) |
+| LeetCore | Back | `features/back.yml` | [features/back](features/back.md) |
+| LeetCore | Tree Feller | `features/tree_feller.yml` | [features/tree-feller](features/tree-feller.md) |
+| LeetCore | Fall Damage | `features/fall_damage.yml` | [features/fall-damage](features/fall-damage.md) |
+| LeetCore | XP | `features/xp.yml` | [features/xp](features/xp.md) |
+| LeetSkills | Skills | `features/skills.yml` + `features/skill-tree.yml` | [features/skills](features/skills.md) |
+| LeetCrafting | Cooking | `features/cooking.yml` | [features/cooking](features/cooking.md) |
+| LeetCrafting | Crafting | `features/crafting.yml` | [features/crafting](features/crafting.md) |
 
 ### Automatic config merging (backfill)
 
-Every config — the global `config.yml` **and** each feature file — is merged against the bundled default at startup (`mergeMissingKeys`). Any default keys missing from the on-disk file are added (and the file saved), while the server admin's existing values are preserved. Consequences:
+Every config — each plugin's global `config.yml` **and** each feature file — is merged against the bundled default at startup (`mergeMissingKeys` / `saveResourceIfMissing`). Any default keys missing from the on-disk file are added (and the file saved), while the server admin's existing values are preserved. Consequences:
 
-- Updating the jar automatically brings new options (e.g. `require-hoe`, `cost`) into existing configs.
+- Updating the jars automatically brings new options (e.g. `require-hoe`, `cost`) into existing configs.
 - Deleting a key yourself will **not** persist — it is restored from the default on the next start.
 - Removing a key is done by overriding its value, not by deleting it.
 
@@ -185,50 +245,51 @@ Every config — the global `config.yml` **and** each feature file — is merged
 
 ## Permission Model
 
-- **Admin permissions** (`leet.admin`, `leet.admin.list|toggle|info`) are declared statically in `plugin.yml` and gate `/leeta`.
-- **Feature permissions** (`leet.feat.<id>`) are **not** in `plugin.yml`. `Core` registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()` using the node from `base.permission` and the default from `base.default-permission`. Hence **config changes to permissions require a restart.**
-- **Checks** use Bukkit's `player.hasPermission(permission)` everywhere. Even with Vault installed, the plugin does **not** route permission lookups through Vault's `Permission` provider — that provider is resolved at startup but unused.
+- **Admin permissions** (`leet.admin`, `leet.admin.list|toggle|info`) are declared statically in **LeetCore's** `plugin.yml` and gate `/leeta`. (The `/back` command permission `leet.feat.back` is also declared statically there.)
+- **Feature permissions** (`leet.feat.<id>`) are **not** in any `plugin.yml`. The owning plugin's feature registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()`, using the node from `base.permission` and the default from `base.default-permission`. **Cooking/Crafting declare no permission at all** (server-wide). **Skills** registers a single `leet.feat.skills` node (default `false`).
+- **`/skills`** has **no static command permission** — access is gated entirely at runtime by the same `leet.feat.skills` node (a single source of truth, default-denied; group-scoped so `AuthMe` default-group denial applies).
+- **Checks** use Bukkit's `player.hasPermission(permission)` everywhere. Even with Vault installed, the plugins do **not** route permission lookups through Vault's `Permission` provider — that provider is resolved at startup but unused.
 
-Because feature permissions are denied by default and gated by `leet.feat.<id>`, every feature needs an explicit grant (e.g. LuckPerms) before it does anything. See [Permissions](permissions.md) for the per-feature table and `/leet` model.
+**Restart required for permission changes:** because feature permissions are registered once at startup, editing `base.permission` or `base.default-permission` requires a server restart to take effect. Because feature permissions are denied by default and gated by `leet.feat.<id>`, every gated feature needs an explicit grant (e.g. LuckPerms) before it does anything. See [Permissions](permissions.md) for the per-feature table and `/leet` model.
 
 ---
 
 ## Storage
 
-`StorageManager` provides two storage layers.
+Storage is **owned by each plugin** — no cross-plugin borrowing.
 
-### Runtime (in-memory)
+### LeetCore (`plugins/LeetCore/data.db`)
 
-- Backed by a nested map: `Map<featureId, Map<key, Map<uuid, Long>>>`.
-- **Lost on server restart.**
-- Used for **Double Jump** cooldowns.
+`StorageManager` provides two layers. Core's DB legitimately owns the cross-plugin control state.
 
-### Persistent (SQLite)
-
-- Database file: `plugins/LeetHelper/data.db`.
-- Single table:
-
+- **Runtime (in-memory)** — nested map `Map<featureId, Map<key, Map<uuid, Long>>>`; lost on restart. Used for **Double Jump** cooldowns.
+- **Persistent (SQLite)** — single table:
   ```
   kv_store(feature_id TEXT, key TEXT, uuid TEXT, value TEXT, updated_at INTEGER,
            PRIMARY KEY (feature_id, key, uuid))
   ```
+  Survives restarts. Holds the Back feature's death locations (JSON payloads) and persistent cooldowns, and the per-player `/leet` feature toggles (`feature_id` = feature, `key` = `user-toggle`; absent = enabled). Uses Bukkit's bundled SQLite JDBC (`jdbc:sqlite:...`).
 
-- **Survives restarts.**
-- Used for **Back** death locations (JSON payloads), persistent cooldowns, per-player `/leet` feature toggles (`feature_id` = feature, `key` = `user-toggle`, `value` = `true`/`false`; absent = enabled), (for XP, when configured) placed-block tracking, and **Skills** player levels (`feature_id` = skills, `key` = `levels`, `value` = Gson map of skill id → level).
-- Uses Bukkit's bundled SQLite JDBC (`jdbc:sqlite:...`). No external driver needed.
+### LeetSkills (`plugins/LeetSkills/data.db`)
 
-> **Backups:** `data.db` is written by the plugin. Backing it up preserves saved death locations and player toggle preferences. Deleting it clears all of that state.
+Its own `StorageManager`, holding per-player skill **levels** and skill **toggles** keyed by skill id. This fixes the pre-split "split-brain": skill level/toggle data no longer collides with any standalone feature's `/leet` rows.
+
+### LeetCrafting
+
+No database — it owns only the item domain and the served resource pack.
+
+> **Backups:** backing up each plugin's `data.db` preserves saved death locations and player toggle preferences (core) and skill levels (skills). Deleting a DB clears that plugin's state.
 
 ---
 
 ## Vault / Economy Integration
 
-Vault is an **optional soft dependency** (`softdepend: [Vault]`). The plugin detects it at startup and resolves the Vault `Economy` provider; it works entirely without Vault.
+Vault is an **optional soft dependency** (`softdepend: [Vault]`), resolved by **LeetCore** at startup; it works entirely without Vault. Core passes the resolved economy to features via `CoreApi.economy()`.
 
 | Area | Without Vault | With Vault (economy provider) |
 |---|---|---|
 | Economy (`feature.cost`) | Cost is silently skipped — no charges, no balance checks | Cost checked and deducted per use for any feature with `feature.cost > 0` |
-| Permissions | Uses Bukkit `player.hasPermission()` | Stills uses Bukkit `player.hasPermission()` (the Vault `Permission` provider is resolved but **not used**) |
+| Permissions | Uses Bukkit `player.hasPermission()` | Still uses Bukkit `player.hasPermission()` (the Vault `Permission` provider is resolved but **not used**) |
 
 Notes:
 
@@ -240,5 +301,6 @@ Notes:
 
 ## Related docs
 
-- [BUILDING.md](BUILDING.md) — how to compile and package
+- [BUILDING.md](BUILDING.md) — how to compile and package the three plugins
 - [README](../README.md) — configuration, permissions, commands, and operational usage
+- [ARCHITECTURE-REWORK.md](ARCHITECTURE-REWORK.md) — the rework plan that led to this three-plugin split and its implementation status

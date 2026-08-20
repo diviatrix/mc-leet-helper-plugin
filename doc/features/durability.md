@@ -2,7 +2,9 @@
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Modifies durability damage for **whitelisted** items. Config file `features/durability.yml`.
+**Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/durability.yml`.
+
+Modifies durability damage for **whitelisted** items.
 
 **Permissions**
 - **Node:** `leet.feat.durability` · **default:** `false` (nobody).

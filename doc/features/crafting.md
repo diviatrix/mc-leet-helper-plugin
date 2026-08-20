@@ -1,8 +1,10 @@
 # Feature: Crafting
 
+**Owning plugin:** LeetCrafting · Config file `plugins/LeetCrafting/features/crafting.yml`.
+
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
 
-Adds **custom crafting items** that are not food by themselves — condiments and seasonings. Config file `features/crafting.yml`. Crafting is a **server-level** feature, open to all players whenever `base.enabled` is `true` (like [Cooking](cooking.md)).
+Adds **custom crafting items** that are not food by themselves — condiments and seasonings. Crafting is a **server-level** feature, open to all players whenever `base.enabled` is `true` (like [Cooking](cooking.md)).
 
 **How it's controlled**
 - Enabled/disabled at the **server** level via `base.enabled`. No permission and no per-player toggle.

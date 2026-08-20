@@ -1,0 +1,16 @@
+name: LeetSkills
+version: "${version}"
+main: com.leet.skills.LeetSkills
+api-version: "26.2"
+description: Leet skill-tree plugin - passive skills spent with XP
+author: Leet
+softdepend: [Vault, LeetCore]
+
+commands:
+  skills:
+    description: Open the skill tree
+    usage: /skills
+    # No static command permission here: the skills feature registers the single
+    # group-accessible node leet.feat.skills (default-permission: false) at
+    # runtime, and the command honors that same node (see SkillsCommand). This
+    # avoids a second, default-ambiguous static declaration for the same node.
