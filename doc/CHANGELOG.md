@@ -2,6 +2,24 @@
 
 All notable changes to **LeetHelper**. Entries are newest first.
 
+## 1.5.1 — Admin feature reload
+
+**Added**
+- `/leeta reload <core|skills|craft>` — admin command that reloads a group's feature
+  configs from disk at runtime (re-reads `base.enabled` and re-registers listeners,
+  passives, and recipes). Permission: `leet.admin.reload` (default op, child of
+  `leet.admin`).
+- Reload groups: `core` → double_jump, durability, auto_crop, back, tree_feller,
+  fall_damage, xp; `skills` → skills; `craft` → crafting, cooking.
+
+**Notes**
+- Reloads only feature configs (`features/*.yml`); permission and command changes in
+  `plugin.yml` still require a restart.
+- A player with the `/skills` GUI open during `reload skills` should close and reopen
+  it.
+
+---
+
 ## 1.5.0 — Three-plugin split
 
 **Added**

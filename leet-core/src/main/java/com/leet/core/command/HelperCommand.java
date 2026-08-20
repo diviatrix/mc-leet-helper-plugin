@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class HelperCommand implements CommandExecutor, TabCompleter {
@@ -27,7 +28,7 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info|give> [args]"));
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info|give|reload> [args]"));
             return true;
         }
 
@@ -36,7 +37,8 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
             case "toggle" -> handleToggle(sender, args);
             case "info" -> handleInfo(sender, args);
             case "give" -> handleGive(sender, args);
-            default -> sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info|give> [args]"));
+            case "reload" -> handleReload(sender, args);
+            default -> sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info|give|reload> [args]"));
         }
         return true;
     }
@@ -143,10 +145,47 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
             "<green>Gave <white>" + amount + "x " + itemId + " <green>to <white>" + target.getName()));
     }
 
+    /** Reload groups: each maps to a set of feature ids owned by that plugin. */
+    private static final Map<String, List<String>> RELOAD_GROUPS = new java.util.LinkedHashMap<>();
+
+    static {
+        RELOAD_GROUPS.put("core", List.of(
+            "double_jump", "durability", "auto_crop", "back", "tree_feller", "fall_damage", "xp"));
+        RELOAD_GROUPS.put("skills", List.of("skills"));
+        RELOAD_GROUPS.put("craft", List.of("crafting", "cooking"));
+    }
+
+    private void handleReload(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("leet.admin") && !sender.hasPermission("leet.admin.reload")) {
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<red>No permission."));
+            return;
+        }
+        if (args.length < 2 || !RELOAD_GROUPS.containsKey(args[1].toLowerCase())) {
+            sender.sendMessage(MiniMessage.miniMessage().deserialize(
+                "<yellow>Usage: /leeta reload <core|skills|craft>"));
+            return;
+        }
+        String group = args[1].toLowerCase();
+        List<String> ids = RELOAD_GROUPS.get(group);
+        List<String> reloaded = new ArrayList<>();
+        for (String id : ids) {
+            if (plugin.featureManager().reload(id)) {
+                reloaded.add(id);
+            }
+        }
+        if (reloaded.isEmpty()) {
+            sender.sendMessage(MiniMessage.miniMessage().deserialize(
+                "<red>" + group + ": no features are registered (is that plugin installed?)."));
+            return;
+        }
+        sender.sendMessage(MiniMessage.miniMessage().deserialize(
+            "<green>" + group + ": reloaded <white>" + String.join(", ", reloaded)));
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
-            return CommandUtil.filterPrefix(List.of("list", "toggle", "info", "give"), args[0]);
+            return CommandUtil.filterPrefix(List.of("list", "toggle", "info", "give", "reload"), args[0]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("give")) {
             var view = plugin.itemRegistry();
@@ -158,6 +197,9 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
                 .map(AbstractFeature::id)
                 .toList();
             return CommandUtil.filterPrefix(ids, args[1]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("reload")) {
+            return CommandUtil.filterPrefix(new ArrayList<>(RELOAD_GROUPS.keySet()), args[1]);
         }
         return Collections.emptyList();
     }

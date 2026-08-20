@@ -9,7 +9,7 @@ softdepend: [Vault]
 commands:
   leeta:
     description: Admin helper command
-    usage: /leeta <list|toggle|info|give> [args]
+    usage: /leeta <list|toggle|info|give|reload> [args]
     permission: leet.admin
   back:
     description: Teleport back to death location
@@ -28,6 +28,7 @@ permissions:
       leet.admin.list: true
       leet.admin.toggle: true
       leet.admin.info: true
+      leet.admin.reload: true
   leet.admin.list:
     description: List all features
     default: op
@@ -36,4 +37,7 @@ permissions:
     default: op
   leet.admin.info:
     description: View feature info
+    default: op
+  leet.admin.reload:
+    description: Reload feature configs from disk
     default: op

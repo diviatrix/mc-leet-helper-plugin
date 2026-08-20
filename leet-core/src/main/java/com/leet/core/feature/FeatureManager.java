@@ -31,6 +31,31 @@ public class FeatureManager implements FeatureRegistry {
         }
     }
 
+    /**
+     * Reloads a single feature from its config file: disables it (unregistering
+     * listeners/recipes and stopping tasks), then re-enables it (re-running
+     * enable()/loadConfig() so config edits take effect at runtime).
+     */
+    public boolean reload(String id) {
+        if (!features.containsKey(id)) return false;
+        AbstractFeature feature = features.get(id);
+        try {
+            feature.disable();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to disable feature during reload: " + id, e);
+        }
+        // Re-read the persisted base.enabled BEFORE enable() so a feature that is
+        // disabled in its file stays disabled after the reload (mirrors toggle()).
+        Optional<File> file = fileFor(feature);
+        boolean shouldEnable = file
+            .map(f -> YamlConfiguration.loadConfiguration(f).getBoolean("base.enabled", false))
+            .orElse(true);
+        if (shouldEnable) {
+            feature.enable();
+        }
+        return true;
+    }
+
     public boolean toggle(String id) {
         if (!features.containsKey(id)) return false;
         AbstractFeature feature = features.get(id);
