@@ -1,13 +1,13 @@
 name: Release
 
-# Build the three plugin jars and publish a GitHub Release. Triggered manually
+# Build the four plugin jars and publish a GitHub Release. Triggered manually
 # (Actions -> Run workflow), letting you choose the release version.
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version (e.g. 1.5.0). Drives the jar filenames and the changelog lookup. Leading 'v' is stripped."
+        description: "Release version (e.g. 1.6.0). Drives the jar filenames and the changelog lookup. Leading 'v' is stripped."
         required: true
         type: string
       prerelease:
@@ -48,10 +48,10 @@ jobs:
           version="${raw#v}"                     # strip leading 'v' if present
           echo "version=${version}" >> "$GITHUB_OUTPUT"
 
-      - name: Build the three plugin jars
+      - name: Build the four plugin jars
         run: ./gradlew clean build --no-daemon
 
-      # Confirm the three jars for this exact version were produced. `clean build`
+      # Confirm the four jars for this exact version were produced. `clean build`
       # routes every jar into the shared root build/libs/ (see build.gradle.kts).
       - name: Verify release jars exist
         id: jars
@@ -59,7 +59,7 @@ jobs:
         run: |
           version="${{ steps.version.outputs.version }}"
           missing=0
-          for name in leet-core leet-skills leet-crafting; do
+          for name in leet-core leet-skills leet-crafting leet-vanity; do
             jar="build/libs/${name}-${version}.jar"
             if [ ! -f "$jar" ]; then
               echo "::error::Expected jar missing: ${jar}" >&2
@@ -103,5 +103,6 @@ jobs:
             build/libs/leet-core-${{ steps.version.outputs.version }}.jar
             build/libs/leet-skills-${{ steps.version.outputs.version }}.jar
             build/libs/leet-crafting-${{ steps.version.outputs.version }}.jar
+            build/libs/leet-vanity-${{ steps.version.outputs.version }}.jar
           draft: false
           prerelease: ${{ inputs.prerelease }}
