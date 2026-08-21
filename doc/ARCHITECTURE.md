@@ -1,6 +1,6 @@
 # Architecture
 
-How LeetHelper is structured and works internally as **three cooperating plugins**. For end-user configuration, permissions, and commands see [README](../README.md).
+How LeetHelper is structured and works internally as **four cooperating plugins**. For end-user configuration, permissions, and commands see [README](../README.md).
 
 Contents:
 
@@ -16,7 +16,7 @@ Contents:
 
 ## Project Structure
 
-The codebase is a Gradle multi-project build (see [BUILDING](BUILDING.md)). Three subprojects, each a standalone Paper plugin:
+The codebase is a Gradle multi-project build (see [BUILDING](BUILDING.md)). Four subprojects, each a standalone Paper plugin:
 
 ```
 build.gradle.kts, settings.gradle.kts   # multi-project build (version single-sourced)
@@ -24,7 +24,7 @@ build.gradle.kts, settings.gradle.kts   # multi-project build (version single-so
 leet-core/                            # LeetCore — shared infra + 7 standalone features
   src/main/java/com/leet/core/
     LeetCore.java                     # Plugin lifecycle, Vault setup, CoreApi service registration
-    CoreApi.java                      # Service contract exposed to the other two plugins
+    CoreApi.java                      # Service contract exposed to the other plugins
     feature/
       AbstractFeature.java            # Thin base: config, enable/disable, gating (check)
       FeatureManager.java             # Feature registry, enable/disable/toggle, toggle persistence
@@ -95,20 +95,30 @@ leet-crafting/                        # LeetCrafting — custom items & recipes
       config.yml                        # Global + resource-pack.* distribution settings
       features/crafting.yml             # All custom items and recipes (condiments + dishes)
       resource_pack/                    # Additive asset pack (leet: item models + textures + index)
+
+leet-vanity/                          # LeetVanity — a hub of distinct gameplay features
+    src/main/java/com/leet/vanity/
+      LeetVanity.java                       # Plugin lifecycle; binds to CoreApi
+      VanityFeature.java                # The 'vanity' hub feature: several capabilities under one feature id
+    src/main/resources/
+      plugin.yml                        # LeetVanity metadata (softdepend LeetCore); no commands
+      config.yml                        # Global settings (log level)
+      features/vanity.yml               # Hub config; each capability has its own section
 tools/cooking/                        # One-off Python tooling for the cooking values/textures (run from repo root)
 ```
 
 **What each plugin does:**
 
-- **LeetCore** boots first, resolves Vault, owns the shared feature registry, storage, and generic GUI, registers its **seven** standalone features, exposes itself as the **`CoreApi`** service, and wires up the `/leeta`, `/back`, and `/leet` commands. Skill and crafting features are contributed *into* LeetCore's shared registry by the other two plugins.
+- **LeetCore** boots first, resolves Vault, owns the shared feature registry, storage, and generic GUI, registers its **seven** standalone features, exposes itself as the **`CoreApi`** service, and wires up the `/leeta`, `/back`, and `/leet` commands. Skill, crafting, and vanity features are contributed *into* LeetCore's shared registry by the other plugins.
 - **LeetSkills** soft-depends on LeetCore, looks up `CoreApi`, contributes the `skills` feature, and keeps its **own** SQLite store for skill levels/toggles.
 - **LeetCrafting** soft-depends on LeetCore, contributes the single `crafting` feature (food + condiment items and recipes), and owns the item domain: `LeetItemRegistry` (registered with core as a read-only `CustomItemView`, so `/leeta give` and command/eat handling work) and the `ResourcePackService`.
+- **LeetVanity** soft-depends on LeetCore, contributes the single `vanity` hub feature (a group of distinct capabilities sharing one feature id), and owns no database.
 
 ---
 
 ## How the plugins cooperate (CoreApi)
 
-Core exposes a **narrow service contract** (`CoreApi`) registered via the Bukkit ServicesManager. LeetSkills and LeetCrafting look it up at enable time through `FeaturePluginSupport.requireCore(...)`; if LeetCore is absent they log a warning and disable themselves gracefully. `CoreApi` exposes:
+Core exposes a **narrow service contract** (`CoreApi`) registered via the Bukkit ServicesManager. LeetSkills, LeetCrafting and LeetVanity look it up at enable time through `FeaturePluginSupport.requireCore(...)`; if LeetCore is absent they log a warning and disable themselves gracefully. `CoreApi` exposes:
 
 - `featureRegistry()` — the narrow `FeatureRegistry` (register/get/all/toggle) so the other plugins can contribute features and check registration.
 - `storageManager()` — core's persistent store (holds `/leet` toggles and Back death locations).
@@ -156,7 +166,7 @@ Mapping (see the tree above): Double Jump / Back use cost + cooldown; Auto Crop 
 
 `AutoCropFeature` and `TreeFellerFeature` break many blocks per action. They run at `EventPriority.MONITOR` (so a protection plugin's cancellation of the original break is already visible) and route each additional block through `BlockBreakerFeature.breakIfAllowed(player, block, tool)`, which fires a per-block `BlockBreakEvent` so claim/region plugins (GriefPrevention, WorldGuard, ...) are consulted per block. Protected blocks are skipped rather than force-broken.
 
-The two gather loops are extracted into `TreeFellerUtil` and `AutoCropUtil` (same package, so they can call `breakIfAllowed`) and are reused by the advanced **tree-feller** and **auto-crop** skills — both the standalone features and the skills use the same helpers and the same protection-respecting `breakIfAllowed` path. A skill that duplicates a standalone feature keys off the feature's **binding**: a skill with `binds-feature: <id>` shows as already acquired when the player holds the feature's permission (see [Skills vs. the standalone features](features/skills.md#skills-vs-the-standalone-features)), so the two never both fire.
+The two gather loops are extracted into `TreeFellerUtil` and `AutoCropUtil` (same package, so they can call `breakIfAllowed`) and are reused by the advanced **tree-feller** and **auto-crop** skills — both the standalone features and the skills use the same helpers and the same protection-respecting `breakIfAllowed` path. A skill that duplicates a standalone feature keys off the feature's **binding**: a skill with `binds-feature: <id>` shows as already acquired when the player holds the feature's permission (see [Skills vs. the standalone features](features/skills/skills.md#skills-vs-the-standalone-features)), so the two never both fire.
 
 ### SkillsFeature is GUI-driven
 
@@ -229,15 +239,16 @@ Each feature's config file (path shown relative to the owning plugin's data fold
 
 | Plugin | Feature | Config file | Reference |
 |---|---|---|---|
-| LeetCore | Double Jump | `features/double_jump.yml` | [features/double-jump](features/double-jump.md) |
-| LeetCore | Durability | `features/durability.yml` | [features/durability](features/durability.md) |
-| LeetCore | Auto Crop | `features/auto_crop.yml` | [features/auto-crop](features/auto-crop.md) |
-| LeetCore | Back | `features/back.yml` | [features/back](features/back.md) |
-| LeetCore | Tree Feller | `features/tree_feller.yml` | [features/tree-feller](features/tree-feller.md) |
-| LeetCore | Fall Damage | `features/fall_damage.yml` | [features/fall-damage](features/fall-damage.md) |
-| LeetCore | XP | `features/xp.yml` | [features/xp](features/xp.md) |
-| LeetSkills | Skills | `features/skills.yml` + `features/skill-tree.yml` | [features/skills](features/skills.md) |
-| LeetCrafting | Crafting | `features/crafting.yml` | [features/crafting](features/crafting.md) |
+| LeetCore | Double Jump | `features/double_jump.yml` | [features/core/double-jump](features/core/double-jump.md) |
+| LeetCore | Durability | `features/durability.yml` | [features/core/durability](features/core/durability.md) |
+| LeetCore | Auto Crop | `features/auto_crop.yml` | [features/core/auto-crop](features/core/auto-crop.md) |
+| LeetCore | Back | `features/back.yml` | [features/core/back](features/core/back.md) |
+| LeetCore | Tree Feller | `features/tree_feller.yml` | [features/core/tree-feller](features/core/tree-feller.md) |
+| LeetCore | Fall Damage | `features/fall_damage.yml` | [features/core/fall-damage](features/core/fall-damage.md) |
+| LeetCore | XP | `features/xp.yml` | [features/core/xp](features/core/xp.md) |
+| LeetSkills | Skills | `features/skills.yml` + `features/skill-tree.yml` | [features/skills/skills](features/skills/skills.md) |
+| LeetCrafting | Crafting | `features/crafting.yml` | [features/crafting/crafting](features/crafting/crafting.md) |
+| LeetVanity | Vanity | `features/vanity.yml` | [features/vanity/vanity](features/vanity/vanity.md) |
 
 ### Automatic config merging (backfill)
 
@@ -278,11 +289,15 @@ Storage is **owned by each plugin** — no cross-plugin borrowing.
 
 ### LeetSkills (`plugins/LeetSkills/data.db`)
 
-Its own `StorageManager`, holding per-player skill **levels** and skill **toggles** keyed by skill id. This fixes the pre-split "split-brain": skill level/toggle data no longer collides with any standalone feature's `/leet` rows.
+Its own `StorageManager`, holding per-player skill **levels** and skill **toggles** keyed by skill id. Skill data is isolated from every standalone feature's `/leet` rows.
 
 ### LeetCrafting
 
 No database — it owns only the item domain and the served resource pack.
+
+### LeetVanity
+
+No database — its capabilities are stateless, driven entirely by `features/vanity.yml`.
 
 > **Backups:** backing up each plugin's `data.db` preserves saved death locations and player toggle preferences (core) and skill levels (skills). Deleting a DB clears that plugin's state.
 

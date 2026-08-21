@@ -16,3 +16,4 @@ rootProject.name = "mc-leet-helper-plugin"
 include("leet-core")
 include("leet-skills")
 include("leet-crafting")
+include("leet-vanity")

@@ -1,6 +1,6 @@
 # Resource Pack Distribution
 
-How LeetCrafting ships its **item-texture** resource pack to joining players. This is the canonical operational guide; the [Crafting](features/crafting.md) feature doc links it from its "Behavior" section.
+How LeetCrafting ships its **item-texture** resource pack to joining players. This is the canonical operational guide; the [Crafting](features/crafting/crafting.md) feature doc links it from its "Behavior" section.
 
 > **Owning plugin:** LeetCrafting · Config: `plugins/LeetCrafting/config.yml` under the `resource-pack:` block.
 

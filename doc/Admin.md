@@ -3,8 +3,8 @@
 The `/leeta` admin command and the `leet.admin.*` permission nodes that gate it.
 
 `/leeta` is provided by **LeetCore**, but because it browses LeetCore's **shared
-feature registry**, it manages features from **all three** plugins (LeetCore's seven
-standalone features, LeetSkills' `skills`, LeetCrafting's `crafting`).
+feature registry**, it manages features from **all four** plugins (LeetCore's seven
+standalone features, LeetSkills' `skills`, LeetCrafting's `crafting`, LeetVanity's `vanity`).
 
 > Feature-facing permissions (`leet.feat.*`) are documented per feature — see the
 > [feature docs index](features/).
@@ -75,9 +75,11 @@ log-level: INFO
 > same `config-version`/`log-level` plus the `resource-pack.*` distribution settings. The full
 > operational guide for the resource pack — config keys, FRPC/reverse-proxy deployment, the
 > `/craft-pack.zip` path-routing rule, and log-line diagnostics — lives in
-> **[Resource Pack Distribution](resource-pack.md)**; the [Crafting](features/crafting.md) feature
+> **[Resource Pack Distribution](resource-pack.md)**; the [Crafting](features/crafting/crafting.md) feature
 > doc links it from its "Behavior" section. **LeetSkills** has no global `config.yml` — its
 > configuration lives entirely in `features/skills.yml` and `features/skill-tree.yml`.
+> **LeetVanity** has a `config.yml` with `config-version`/`log-level`; its feature settings live in
+> `features/vanity.yml`.
 
 | Key | Type | Description |
 |---|---|---|
@@ -98,7 +100,7 @@ The `log-level` key (see [Configuration](#configuration)) selects a verbosity le
 
 The `log-level` is read from `config.yml`, though most feature-related messages are logged at the `INFO`/`WARNING`/`SEVERE` level regardless.
 
-> **Console prefix & color:** startup and status messages (e.g. `[LeetCore] Initializing LeetCore v<version>`, `[LeetCore] Enabled 7/7 core feature(s).`, the Vault status) are sent to the console via the console sender with a green `[LeetCore]` prefix. These colored lines appear in the live console but color codes are stripped from `logs/latest.log`. The automatically-printed Paper line `[LeetCore] Enabling LeetCore v<version>` and the plugin-logger `[LeetCore]` WARN/SEVERE lines come from Paper's logger and are not recolored. LeetSkills and LeetCrafting log under their own plugin names (`[LeetSkills]`, `[LeetCrafting]`).
+> **Console prefix & color:** startup and status messages (e.g. `[LeetCore] Initializing LeetCore v<version>`, `[LeetCore] Enabled 7/7 core feature(s).`, the Vault status) are sent to the console via the console sender with a green `[LeetCore]` prefix. These colored lines appear in the live console but color codes are stripped from `logs/latest.log`. The automatically-printed Paper line `[LeetCore] Enabling LeetCore v<version>` and the plugin-logger `[LeetCore]` WARN/SEVERE lines come from Paper's logger and are not recolored. LeetSkills, LeetCrafting and LeetVanity log under their own plugin names (`[LeetSkills]`, `[LeetCrafting]`, `[LeetVanity]`).
 
 ---
 
@@ -107,10 +109,10 @@ The `log-level` is read from `config.yml`, though most feature-related messages 
 | Symptom | Likely cause / fix |
 |---|---|
 | Plugin(s) don't load on start | Server is not Paper 26.2+, or the JVM is older than Java 25. Check console for a version mismatch. |
-| Skills / Crafting don't load | **LeetCore is missing.** LeetSkills and LeetCrafting `softdepend` on it and disable themselves if it isn't loaded. Deploy all three jars together (LeetCore first). |
+| Skills / Crafting / LeetVanity don't load | **LeetCore is missing.** LeetSkills, LeetCrafting and LeetVanity `softdepend` on it and disable themselves if it isn't loaded. Deploy all four jars together (LeetCore first). |
 | Feature config changes have no effect | Feature configs are read at startup; there is **no reload command**. Restart the server. |
 | `/leeta` not recognized / "unknown command" | The `leeta` command permission (`leet.admin`) is `op` by default — grant it or run as op. |
-| Durability whitelist warnings at startup | `Invalid material in durability whitelist:` — an entry in the on-disk `features/durability.yml` (in `plugins/LeetCore/features/`) whitelist is not a valid `Material` name (e.g. leftover `STEEL_*` or `HELMET`) and is being ignored. Remove it or use the correct enum name (see the note in [Durability](features/durability.md)). |
+| Durability whitelist warnings at startup | `Invalid material in durability whitelist:` — an entry in the on-disk `features/durability.yml` (in `plugins/LeetCore/features/`) whitelist is not a valid `Material` name (e.g. leftover `STEEL_*` or `HELMET`) and is being ignored. Remove it or use the correct enum name (see the note in [Durability](features/core/durability.md)). |
 | Feature cost not charged | Vault is not installed, or no economy provider is registered. Without Vault the cost feature is silently disabled. |
 | Death locations reset on restart | LeetCore's `plugins/LeetCore/data.db` file was deleted/moved, or the SQLite connection failed to initialize (SEVERE log). |
 | Skill levels reset on restart | LeetSkills' `plugins/LeetSkills/data.db` file was deleted/moved, or the SQLite connection failed to initialize (SEVERE log). |
@@ -124,7 +126,7 @@ The `log-level` is read from `config.yml`, though most feature-related messages 
 
 ## Known Limitations
 
-- **All three jars must be deployed together** — LeetSkills and LeetCrafting disable themselves without LeetCore; missing any jar removes its features.
+- **All four jars must be deployed together** — LeetSkills, LeetCrafting and LeetVanity disable themselves without LeetCore; missing any jar removes its features.
 - **No reload command** — config file changes require a restart. Only `/leeta toggle` can change `base.enabled` live.
 - **`config-version` is informational only** — the merge adds missing keys regardless of the version value; it never removes or rewrites existing keys.
 - **Vault permission provider is unused** — permission checks are Bukkit-native even with Vault installed.

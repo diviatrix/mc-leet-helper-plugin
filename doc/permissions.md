@@ -1,10 +1,10 @@
 # Permissions
 
-Permissions come from **three sources** across the three plugins:
+Permissions come from **three sources** across the four plugins:
 
 1. **Static admin permissions** (`leet.admin.*`) — declared in **LeetCore's** `plugin.yml`, gate `/leeta`. Documented in [Admin.md](Admin.md).
 2. **Runtime feature permissions** (`leet.feat.<id>`) — registered at startup by the owning plugin for each gated feature.
-3. **No permission at all** — Crafting is server-wide (open to all when `base.enabled` is true) and Skills gates via a single runtime node.
+3. **No permission at all** — Crafting is server-wide (open to all when `base.enabled` is true); Skills gates via a single runtime node.
 
 Each gameplay feature's `leet.feat.*` permission is documented in its own feature document (index: [features/](features/)).
 
@@ -19,6 +19,7 @@ Feature permissions are **not** declared in any `plugin.yml` (unlike the admin `
 - **LeetCore** registers nodes for its seven standalone features (`double_jump`, `durability`, `auto_crop`, `back`, `tree_feller`, `fall_damage`, `xp`) — one per feature, plus the static `leet.feat.back` command permission, from the config's `base.permission`.
 - **LeetSkills** registers a single `leet.feat.skills` node (default `false`). `/skills` has **no static command permission** — access is gated entirely by this same node at runtime (`SkillsCommand` checks `skillsFeature.appliesTo(player)`).
 - **LeetCrafting** registers **no** feature permission — Crafting declares no `base.permission` key, and `registerPermission()` skips a node when the config lacks the key. It is server-wide.
+- **Vanity** registers a single `leet.feat.vanity` node (default `false`). All of the plugin's distinct capabilities share this one node (see [Feature: Vanity](features/vanity/vanity.md)).
 
 `base.default-permission` maps to a Bukkit default:
 - `true` → `PermissionDefault.TRUE` (every player)
@@ -42,3 +43,4 @@ Feature permissions are **not** declared in any `plugin.yml` (unlike the admin `
 | XP | LeetCore | `leet.feat.xp` | `false` |
 | Skills | LeetSkills | `leet.feat.skills` | `false` |
 | Crafting | LeetCrafting | — (none) | server-wide |
+| Vanity | Vanity | `leet.feat.vanity` | `false` |

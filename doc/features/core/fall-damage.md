@@ -1,13 +1,13 @@
 # Feature: Fall Damage
 
-> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../../Admin.md)
 
 **Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/fall_damage.yml`.
 
 Negates all fall damage for eligible players, as a standalone feature **independent of Double Jump**.
 
 **Permissions**
-- See [Feature permissions](../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.fall_damage` · default `false`. The node also unlocks the `/leet fall` personal off-toggle.
+- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.fall_damage` · default `false`. The node also unlocks the `/leet fall` personal off-toggle.
 
 **Behavior**
 1. A player takes fall damage (`EntityDamageEvent`, cause `FALL`).

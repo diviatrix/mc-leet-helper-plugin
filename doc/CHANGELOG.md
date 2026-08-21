@@ -2,6 +2,29 @@
 
 All notable changes to **LeetHelper**. Entries are newest first.
 
+## Unreleased — LeetVanity plugin + connected openings
+
+**Added**
+- **LeetVanity** — a fourth plugin (`leet-vanity-<v>.jar`, package `com.leet.vanity`). It
+  soft-depends on LeetCore and contributes a single `vanity` hub feature into core's shared
+  feature registry. The hub groups several distinct, unrelated capabilities under one feature
+  id and one permission node (`leet.feat.vanity`, default `false`); future capabilities are
+  added as new sections of `plugins/LeetVanity/features/vanity.yml`.
+- **Connected openings** (the `vanity` feature's first capability, `feature.connected`) — when
+  either half of an adjacent, same-facing pair of doors is opened or closed, the other half
+  moves to match. Only doors participate (trapdoors and fence gates are excluded), and state
+  changes are followed both from a player right-clicking a half and from any redstone power
+  change on a door (buttons, levers, pressure plates, and wire alike).
+- **Sitting** (the `vanity` feature's second capability, `feature.sit`) — right-click any block
+  in the seat list (default: every stair and slab) to sit on it via a hidden armor stand; sneak
+  to get up. The player faces the seat's front (stairs) or keeps their own heading.
+
+**Docs**
+- `doc/features/vanity.md` added; `README`, `ARCHITECTURE`, `BUILDING`, `permissions`, and
+  `Admin` updated from "three plugins" to four, and the new feature is indexed.
+
+---
+
 ## Unreleased — Crafting feature merge
 
 **Changed**

@@ -1,13 +1,13 @@
 # Feature: Auto Crop
 
-> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../../Admin.md)
 
 **Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/auto_crop.yml`.
 
 Auto-harvests nearby mature crops when a player breaks one.
 
 **Permissions**
-- See [Feature permissions](../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.auto_crop` · default `false`. The node also unlocks the `/leet crop` personal off-toggle.
+- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.auto_crop` · default `false`. The node also unlocks the `/leet crop` personal off-toggle.
 
 **Behavior**
 1. A player breaks a block (`BlockBreakEvent`).

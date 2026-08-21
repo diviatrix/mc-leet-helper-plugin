@@ -1,0 +1,149 @@
+base:
+  enabled: true
+  permission: leet.feat.vanity
+  default-permission: false
+  worlds: []
+  cooldown: 0
+  message-type: ACTION_BAR
+
+feature:
+  # Opening either half of a double door opens/closes its matching neighbour too.
+  connected:
+    enabled: true
+    openable-types:
+      - OAK_DOOR
+      - SPRUCE_DOOR
+      - BIRCH_DOOR
+      - JUNGLE_DOOR
+      - ACACIA_DOOR
+      - DARK_OAK_DOOR
+      - MANGROVE_DOOR
+      - CHERRY_DOOR
+      - PALE_OAK_DOOR
+      - CRIMSON_DOOR
+      - WARPED_DOOR
+      - IRON_DOOR
+      - COPPER_DOOR
+      - EXPOSED_COPPER_DOOR
+      - WEATHERED_COPPER_DOOR
+      - OXIDIZED_COPPER_DOOR
+      - WAXED_COPPER_DOOR
+      - WAXED_EXPOSED_COPPER_DOOR
+      - WAXED_WEATHERED_COPPER_DOOR
+      - WAXED_OXIDIZED_COPPER_DOOR
+
+  # Sitting: right-click a block in the list to sit on it. The default list is
+  # every stair and slab material; add or remove freely. Armor-stand seating is
+  # used, so the player sits in place (no boat/entity) and sneaks to get back up.
+  sit:
+    enabled: true
+    # Per-block seat height above the floor (in blocks). 0 = default.
+    # Most stairs/slabs use the default; tweak per-material if a seat looks off.
+    seat-height: 0
+    seat-blocks:
+      - OAK_STAIRS
+      - SPRUCE_STAIRS
+      - BIRCH_STAIRS
+      - JUNGLE_STAIRS
+      - ACACIA_STAIRS
+      - CHERRY_STAIRS
+      - DARK_OAK_STAIRS
+      - MANGROVE_STAIRS
+      - PALE_OAK_STAIRS
+      - BAMBOO_STAIRS
+      - BAMBOO_MOSAIC_STAIRS
+      - COBBLESTONE_STAIRS
+      - MOSSY_COBBLESTONE_STAIRS
+      - STONE_STAIRS
+      - STONE_BRICK_STAIRS
+      - MOSSY_STONE_BRICK_STAIRS
+      - BRICK_STAIRS
+      - NETHER_BRICK_STAIRS
+      - RED_NETHER_BRICK_STAIRS
+      - SANDSTONE_STAIRS
+      - RED_SANDSTONE_STAIRS
+      - SMOOTH_SANDSTONE_STAIRS
+      - SMOOTH_RED_SANDSTONE_STAIRS
+      - PURPUR_STAIRS
+      - PRISMARINE_STAIRS
+      - PRISMARINE_BRICK_STAIRS
+      - DARK_PRISMARINE_STAIRS
+      - ANDESITE_STAIRS
+      - POLISHED_ANDESITE_STAIRS
+      - DIORITE_STAIRS
+      - POLISHED_DIORITE_STAIRS
+      - GRANITE_STAIRS
+      - POLISHED_GRANITE_STAIRS
+      - QUARTZ_STAIRS
+      - SMOOTH_QUARTZ_STAIRS
+      - BLACKSTONE_STAIRS
+      - POLISHED_BLACKSTONE_STAIRS
+      - POLISHED_BLACKSTONE_BRICK_STAIRS
+      - CRIMSON_STAIRS
+      - WARPED_STAIRS
+      - CUT_COPPER_STAIRS
+      - EXPOSED_CUT_COPPER_STAIRS
+      - WEATHERED_CUT_COPPER_STAIRS
+      - OXIDIZED_CUT_COPPER_STAIRS
+      - WAXED_CUT_COPPER_STAIRS
+      - WAXED_EXPOSED_CUT_COPPER_STAIRS
+      - WAXED_WEATHERED_CUT_COPPER_STAIRS
+      - WAXED_OXIDIZED_CUT_COPPER_STAIRS
+      - TUFF_STAIRS
+      - POLISHED_TUFF_STAIRS
+      - TUFF_BRICK_STAIRS
+      - MUD_BRICK_STAIRS
+      - OAK_SLAB
+      - SPRUCE_SLAB
+      - BIRCH_SLAB
+      - JUNGLE_SLAB
+      - ACACIA_SLAB
+      - CHERRY_SLAB
+      - DARK_OAK_SLAB
+      - MANGROVE_SLAB
+      - PALE_OAK_SLAB
+      - BAMBOO_SLAB
+      - BAMBOO_MOSAIC_SLAB
+      - COBBLESTONE_SLAB
+      - MOSSY_COBBLESTONE_SLAB
+      - STONE_SLAB
+      - STONE_BRICK_SLAB
+      - MOSSY_STONE_BRICK_SLAB
+      - BRICK_SLAB
+      - NETHER_BRICK_SLAB
+      - RED_NETHER_BRICK_SLAB
+      - SANDSTONE_SLAB
+      - RED_SANDSTONE_SLAB
+      - SMOOTH_SANDSTONE_SLAB
+      - SMOOTH_RED_SANDSTONE_SLAB
+      - PURPUR_SLAB
+      - PRISMARINE_SLAB
+      - PRISMARINE_BRICK_SLAB
+      - DARK_PRISMARINE_SLAB
+      - ANDESITE_SLAB
+      - POLISHED_ANDESITE_SLAB
+      - DIORITE_SLAB
+      - POLISHED_DIORITE_SLAB
+      - GRANITE_SLAB
+      - POLISHED_GRANITE_SLAB
+      - QUARTZ_SLAB
+      - SMOOTH_QUARTZ_SLAB
+      - BLACKSTONE_SLAB
+      - POLISHED_BLACKSTONE_SLAB
+      - POLISHED_BLACKSTONE_BRICK_SLAB
+      - CRIMSON_SLAB
+      - WARPED_SLAB
+      - CUT_COPPER_SLAB
+      - EXPOSED_CUT_COPPER_SLAB
+      - WEATHERED_CUT_COPPER_SLAB
+      - OXIDIZED_CUT_COPPER_SLAB
+      - WAXED_CUT_COPPER_SLAB
+      - WAXED_EXPOSED_CUT_COPPER_SLAB
+      - WAXED_WEATHERED_CUT_COPPER_SLAB
+      - WAXED_OXIDIZED_CUT_COPPER_SLAB
+      - TUFF_SLAB
+      - POLISHED_TUFF_SLAB
+      - TUFF_BRICK_SLAB
+      - MUD_BRICK_SLAB
+
+messages: {}

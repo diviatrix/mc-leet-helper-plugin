@@ -2,7 +2,7 @@
 
 **Owning plugin:** LeetCrafting · Config file `plugins/LeetCrafting/features/crafting.yml`.
 
-> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../../Admin.md)
 
 Adds **custom crafting items** — non-food condiments (e.g. Salt) and **food dishes** (Croissant, Ramen, Borsh, Jerky, Chocolate, …). All of it is one server-level feature: when `base.enabled` is `true`, every recipe is available to **all** players — no skill, no permission, no per-player toggle. Dish items are placed on an already-edible base material and reapply custom hunger/saturation when eaten, so the combined dishes restore more than their raw parts.
 
@@ -15,7 +15,7 @@ Adds **custom crafting items** — non-food condiments (e.g. Salt) and **food di
 - Recipes are registered as vanilla **crafting** recipes, so they show up in the recipe book like any other recipe. The engine supports **SHAPELESS**, **SHAPED** (3x3) and **SMELT** (furnace) recipes.
 - While the feature is enabled the recipe crafts for anyone; when it is disabled (or a world is excluded), the recipe simply shows **no result** in the crafting matrix — it is uncraftable.
 - Dish items carry a plugin tag that the feature reads on eat: vanilla consumption is cancelled and the configured `hunger`/`saturation` are applied instead (base materials are chosen to be edible so the item can be eaten at all).
-- Each item shows a **custom icon** on the client from the resource pack owned by LeetCrafting — see [Resource Pack Distribution](../resource-pack.md).
+- Each item shows a **custom icon** on the client from the resource pack owned by LeetCrafting — see [Resource Pack Distribution](../../resource-pack.md).
 
 ## Recipes & items
 

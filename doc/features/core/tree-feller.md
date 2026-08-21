@@ -1,13 +1,13 @@
 # Feature: Tree Feller
 
-> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../../Admin.md)
 
 **Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/tree_feller.yml`.
 
 Breaking one log automatically breaks the whole connected tree.
 
 **Permissions**
-- See [Feature permissions](../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.tree_feller` · default `false`. The node also unlocks the `/leet tree` personal off-toggle.
+- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.tree_feller` · default `false`. The node also unlocks the `/leet tree` personal off-toggle.
 
 **Behavior**
 1. A player breaks a log (`BlockBreakEvent`).

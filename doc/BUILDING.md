@@ -13,11 +13,12 @@ How to compile and package **LeetHelper** from source. This is **optional** — 
 It's a multi-project Gradle build (`settings.gradle.kts`). Each subproject is an independent Paper plugin that applies the same paperweight toolchain:
 
 ```
-settings.gradle.kts     # rootProject + include("leet-core", "leet-skills", "leet-crafting")
+settings.gradle.kts     # rootProject + include("leet-core", "leet-skills", "leet-crafting", "leet-vanity")
 build.gradle.kts        # subprojects { version = "..." }; jars routed to build/libs/
 leet-core/              # LeetCore plugin
 leet-skills/            # LeetSkills plugin
 leet-crafting/          # LeetCrafting plugin
+leet-vanity/            # LeetVanity plugin
 ```
 
 ## Commands
@@ -39,9 +40,10 @@ leet-crafting/          # LeetCrafting plugin
 build/libs/leet-core-<version>.jar
 build/libs/leet-skills-<version>.jar
 leet-crafting-<version>.jar
+leet-vanity-<version>.jar
 ```
 
-Deploy **all three** into the server `plugins/` folder together — LeetSkills and LeetCrafting soft-depend on LeetCore (`softdepend: [LeetCore]`), so LeetCore must be present (and loads first) for them to function.
+Deploy **all four** into the server `plugins/` folder together — LeetSkills, LeetCrafting, and LeetVanity soft-depend on LeetCore (`softdepend: [LeetCore]`), so LeetCore must be present (and loads first) for them to function.
 
 > **Version is single-sourced:** the release version lives in the root **`build.gradle.kts`** `subprojects { version = ... }` block. It drives both each jar filename and the `version` injected into the packaged `plugin.yml` at build time — bump it in exactly one place.
 
@@ -49,7 +51,7 @@ Deploy **all three** into the server `plugins/` folder together — LeetSkills a
 
 ## What the build does
 
-The root `build.gradle.kts` `subprojects` block applies `io.papermc.paperweight.userdev` (v2.0.0-beta.21) with `paperDevBundle("26.2.build.+")` to every subproject. Each subproject also pulls The Vault API as a `compileOnly` dependency (JitPack `com.github.MilkBowl:VaultAPI:1.7.1`); `leet-skills` and `leet-crafting` add a `compileOnly` dependency on `:leet-core` so they can compile against the shared `CoreApi`.
+The root `build.gradle.kts` `subprojects` block applies `io.papermc.paperweight.userdev` (v2.0.0-beta.21) with `paperDevBundle("26.2.build.+")` to every subproject. Each subproject also pulls The Vault API as a `compileOnly` dependency (JitPack `com.github.MilkBowl:VaultAPI:1.7.1`); `leet-skills`, `leet-crafting`, and `leet-vanity` add a `compileOnly` dependency on `:leet-core` so they can compile against the shared `CoreApi`.
 
 The version is injected into each `plugin.yml` at build time via `tasks.processResources` (a `filesMatching("plugin.yml")` + `expand`), so `project.version` is the single source of truth for both the jar filename and the runtime version.
 

@@ -1,13 +1,13 @@
 # Feature: Durability
 
-> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../../Admin.md)
 
 **Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/durability.yml`.
 
 Modifies durability damage for **whitelisted** items.
 
 **Permissions**
-- See [Feature permissions](../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.durability` · default `false`. There is no `/leet` toggle for this feature — access is purely permission-driven.
+- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.durability` · default `false`. There is no `/leet` toggle for this feature — access is purely permission-driven.
 
 **Behavior**
 1. A held/broken item takes durability damage (`PlayerItemDamageEvent`).

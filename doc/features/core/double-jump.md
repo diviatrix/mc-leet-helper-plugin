@@ -1,13 +1,13 @@
 # Feature: Double Jump
 
-> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../../Admin.md)
 
 **Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/double_jump.yml`.
 
 Allows a mid-air double jump.
 
 **Permissions**
-- See [Feature permissions](../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.double_jump` · default `false`. The node also unlocks the `/leet dj` personal off-toggle.
+- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.double_jump` · default `false`. The node also unlocks the `/leet dj` personal off-toggle.
 
 **Behavior**
 1. Player on the ground → flight is enabled for them automatically.
@@ -17,7 +17,7 @@ Allows a mid-air double jump.
 3. The runtime cooldown starts.
 4. When the player lands (or enters a vehicle), flight is re-enabled.
 
-**Fall damage is no longer part of Double Jump** — it has its own feature and `/leet` toggle (see [Feature: Fall Damage](fall-damage.md)).
+**Fall damage is a separate feature** with its own `/leet` toggle (see [Feature: Fall Damage](fall-damage.md)); it is not part of Double Jump.
 
 **Limits:** skipped entirely for Creative and Spectator game modes. The movement check is **block-level only** — it only re-enables flight when the player's block position changes (a performance optimization).
 

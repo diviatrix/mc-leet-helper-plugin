@@ -1,6 +1,6 @@
 # LeetHelper
 
-A bundle of **Paper 26.2** plugins providing modular gameplay features, split into three cooperating jars: **LeetCore**, **LeetSkills**, and **LeetCrafting**. Each feature has its own on-disk YAML config, its own permission node, per-world whitelisting, optional cooldowns, and an optional per-use Vault economy cost.
+A bundle of **Paper 26.2** plugins providing modular gameplay features, split into four cooperating jars: **LeetCore**, **LeetSkills**, **LeetCrafting**, and **LeetVanity**. Each feature has its own on-disk YAML config, its own permission node, per-world whitelisting, optional cooldowns, and an optional per-use Vault economy cost.
 
 ## Table of Contents
 
@@ -27,13 +27,14 @@ A bundle of **Paper 26.2** plugins providing modular gameplay features, split in
 
 ## Overview
 
-LeetHelper is delivered as **three jars** that must be deployed together. Each plugin owns its own features and data folder; LeetSkills and LeetCrafting bind to LeetCore through a shared service API (see [Architecture](doc/ARCHITECTURE.md)).
+LeetHelper is delivered as **four jars** that must be deployed together. Each plugin owns its own features and data folder; LeetSkills, LeetCrafting and LeetVanity bind to LeetCore through a shared service API (see [Architecture](doc/ARCHITECTURE.md)).
 
 | Plugin | Jar | Package | What it provides |
 |---|---|---|---|
 | **LeetCore** | `leet-core-<v>.jar` | `com.leet.core` | Shared infrastructure (storage, item registry, feature registry, GUI, Vault) + the **7 standalone features** + the cross-plugin commands (`/leeta`, `/back`, `/leet`) |
 | **LeetSkills** | `leet-skills-<v>.jar` | `com.leet.skills` | The **Skills** feature — an XP-spent skill tree (`/skills`) |
 | **LeetCrafting** | `leet-crafting-<v>.jar` | `com.leet.crafting` | The **Crafting** feature — custom foods and condiment items, plus the item resource pack |
+| **LeetVanity** | `leet-vanity-<v>.jar` | `com.leet.vanity` | The **Vanity** hub feature — several distinct capabilities (e.g. connected openings) under one feature id |
 
 ### Features by plugin
 
@@ -41,17 +42,19 @@ LeetCore registers **seven** standalone features:
 
 | Feature | ID | Description |
 |---|---|---|
-| [Double Jump](doc/features/double-jump.md) | `double_jump` | Mid-air double jump with configurable velocity and cooldown |
-| [Durability](doc/features/durability.md) | `durability` | Configurable durability multiplier for whitelisted tools/equipment |
-| [Auto Crop](doc/features/auto-crop.md) | `auto_crop` | Auto-harvest nearby mature crops when breaking one |
-| [Back](doc/features/back.md) | `back` | Teleport back to your death location, with optional cost and cooldown |
-| [Tree Feller](doc/features/tree-feller.md) | `tree_feller` | Felling a log drops the whole connected tree |
-| [Fall Damage](doc/features/fall-damage.md) | `fall_damage` | Negates all fall damage for eligible players |
-| [XP](doc/features/xp.md) | `xp` | Bonus vanilla XP for mining, woodcutting, crops, fishing, building, and killing |
+| [Double Jump](doc/features/core/double-jump.md) | `double_jump` | Mid-air double jump with configurable velocity and cooldown |
+| [Durability](doc/features/core/durability.md) | `durability` | Configurable durability multiplier for whitelisted tools/equipment |
+| [Auto Crop](doc/features/core/auto-crop.md) | `auto_crop` | Auto-harvest nearby mature crops when breaking one |
+| [Back](doc/features/core/back.md) | `back` | Teleport back to your death location, with optional cost and cooldown |
+| [Tree Feller](doc/features/core/tree-feller.md) | `tree_feller` | Felling a log drops the whole connected tree |
+| [Fall Damage](doc/features/core/fall-damage.md) | `fall_damage` | Negates all fall damage for eligible players |
+| [XP](doc/features/core/xp.md) | `xp` | Bonus vanilla XP for mining, woodcutting, crops, fishing, building, and killing |
 
-LeetSkills registers the **Skills** feature: a skill tree (Traveler + 8 passive skills + advanced skills) leveled up by spending XP points.
+LeetSkills registers the **Skills** feature: a skill tree (Traveler + 8 passive skills + advanced skills) leveled up by spending XP points (see [Feature: Skills](doc/features/skills/skills.md)).
 
-LeetCrafting registers the **Crafting** feature: a single server-level domain that bundles custom food items (Salt and ~20 dishes) and their recipes into one feature.
+LeetCrafting registers the **Crafting** feature: a single server-level domain that bundles custom food items (Salt and ~20 dishes) and their recipes into one feature (see [Feature: Crafting](doc/features/crafting/crafting.md)).
+
+LeetVanity registers the **Vanity** feature: a hub for several distinct capabilities under one feature id (see [Feature: Vanity](doc/features/vanity/vanity.md)).
 
 Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, `give`); full per-feature details (config keys, limitations, permissions) are in **[doc/features/](doc/features/)**.
 
@@ -62,7 +65,7 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, 
 | Requirement | Version |
 |---|---|
 | Server software | Paper **26.2**+ (Bundled API jar is compiled against `26.2`). Spigot/CraftBukkit are **not** supported. |
-| All three jars | **LeetCore, LeetSkills, LeetCrafting** must be present together. LeetSkills and LeetCrafting soft-depend on LeetCore and disable themselves if it's absent. |
+| All four jars | **LeetCore, LeetSkills, LeetCrafting, LeetVanity** must be present together. LeetSkills, LeetCrafting and LeetVanity soft-depend on LeetCore and disable themselves if it's absent. |
 | Java | **25+** — the JVM your server runs the plugins on. (Build/toolchain details, which also target Java 25, are in [Building from Source](doc/BUILDING.md).) |
 | Vault | Optional. Only needed for feature per-use costs. The plugins work fully without it. |
 
@@ -70,10 +73,10 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, 
 
 ## Installation
 
-1. **Download the three jars** (`.jar` for each of LeetCore, LeetSkills, LeetCrafting) from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases).
+1. **Download the four jars** (`.jar` for each of LeetCore, LeetSkills, LeetCrafting, LeetVanity) from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases).
   Building from source is optional — see [Building from Source](doc/BUILDING.md).
-2. **Copy all three jars** into your server's `plugins/` folder.
-3. **Start the server.** LeetCore loads first (it provides the shared services); LeetSkills and LeetCrafting then bind to it. On first launch each plugin creates its own data folder and writes default configuration files:
+2. **Copy all four jars** into your server's `plugins/` folder.
+3. **Start the server.** LeetCore loads first (it provides the shared services); LeetSkills, LeetCrafting and LeetVanity then bind to it. On first launch each plugin creates its own data folder and writes default configuration files:
 
    ```
    plugins/LeetCore/
@@ -98,6 +101,11 @@ Admin features are managed with the `/leeta` command (`list`, `toggle`, `info`, 
    ├── config.yml                 # Global settings + resource-pack.* distribution
    └── features/
        └── crafting.yml           # Custom food and condiment items, with all recipes
+
+   plugins/LeetVanity/
+   ├── config.yml                 # Global settings (log level)
+   └── features/
+       └── vanity.yml             # Hub config: each capability gets its own section
    ```
 
 4. **Configure to taste** — edit the files inside each plugin's `Plugins/<Name>/features/` folder. Restart the server for changes to take effect (there is **no reload command**; `base.enabled` toggles are the only thing that can be changed live, via `/leeta toggle`).
@@ -146,7 +154,7 @@ Tab completion is provided for subcommands, feature IDs, and item IDs.
 
 | Command | Permission | Description |
 |---|---|---|
-| `/back` | `leet.feat.back` | Teleports the player to their last death location (see [Feature: Back](doc/features/back.md)) |
+| `/back` | `leet.feat.back` | Teleports the player to their last death location (see [Feature: Back](doc/features/core/back.md)) |
 
 This command is player-only (the console receives a "This command can only be used by players." message). On success/failure, feedback is delivered via the Back feature's `message-type`.
 
@@ -168,7 +176,7 @@ Player-side feature control (provided by **LeetCore**). Each player can turn sup
 - The command is only available to players who have at least **one** `leet.feat.<id>` permission. If a player has **none**, `/leet` reports `No permission.` and does nothing (including `list`, and no tab completion).
 - Tab completion and the status list only show the features the player is actually permissioned for.
 - Toggling a feature still checks that feature's permission (e.g. `leet.feat.double_jump`); without it, `/leet <sub>` is declined.
-- Because these toggle features default to `false`, their `/leet` subcommands need a granted permission — but **Crafting needs no permission**: it is controlled at the server level by `base.enabled` (see [Feature: Crafting](doc/features/crafting.md)).
+- Because these toggle features default to `false`, their `/leet` subcommands need a granted permission — but **Crafting needs no permission**: it is controlled at the server level by `base.enabled` (see [Feature: Crafting](doc/features/crafting/crafting.md)).
 - `/leet skills` is shown/toggled **only when** the skills feature is registered by its owning plugin (LeetSkills); `/leet` degrades gracefully if that plugin isn't loaded.
 
 **How the toggle applies:** a player's off-toggle adds a layer inside `AbstractFeature.check()` (server enabled → base permission → personal toggle → world whitelist). When off, the feature stops firing for that player only; other players and the rest of the config are unaffected. Crafting is the exception — it bypasses the permission/toggle layers and enables for the whole server.
@@ -179,7 +187,7 @@ Provided by **LeetSkills**. Opens the skill-tree GUI (Traveler in the center; th
 
 | Command | Permission | Description |
 |---|---|---|
-| `/skills` | `leet.feat.skills` | Open the skill tree (see [Feature: Skills](doc/features/skills.md)) |
+| `/skills` | `leet.feat.skills` | Open the skill tree (see [Feature: Skills](doc/features/skills/skills.md)) |
 
 In the tree, click a skill to see its description and a Level Up button; confirm to spend XP and advance a level. The GUI is player-only. There is **no** static command permission for `/skills`; access is gate entirely by the runtime `leet.feat.skills` node (default-denied).
 
@@ -190,6 +198,7 @@ In the tree, click a skill to see its description and a Level Up button; confirm
 - **LeetCore** — runtime (in-memory) + persistent SQLite `plugins/LeetCore/data.db`. Holds the `/leet` per-player toggles and the Back feature's death locations / persistent cooldowns. Resolves the optional Vault economy and passes it to features that declare a `cost`.
 - **LeetSkills** — its own SQLite `plugins/LeetSkills/data.db`, holding per-player skill **levels** and skill toggles.
 - **LeetCrafting** — no database; it owns only the item domain (item registry + recipes) and the served item resource pack.
+- **LeetVanity** — no database; stateless capability toggles only (`features/vanity.yml`).
 
 See the **[Architecture](doc/ARCHITECTURE.md)** doc for the storage and Vault internals.
 

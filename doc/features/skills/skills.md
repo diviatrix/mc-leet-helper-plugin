@@ -4,7 +4,7 @@
 
 > Each skill that duplicates a standalone feature (`smith`↔`durability`, `tree-feller`↔`tree_feller`, `auto-crop`↔`auto_crop`, `fall-nullify`↔`fall_damage`, `double-jump`↔`double_jump`) declares that binding in `skills.yml` with `binds-feature: <feature-id>` (and `toggleable: true` where the player may toggle it via `/leet`). The skill *ignores the feature's enabled state* and keys off the feature's **permission**: if a player holds `leet.feat.<feature>`, the skill shows as **already acquired** and the feature is the only provider of the effect (the skill won't also fire — no double application). A player without that permission can still level the skill with XP and get the effect from the skill. Either way, exactly one thing fires per effect.
 
-> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../../Admin.md)
 
 A **skill tree** opened with `/skills`. **Traveler** sits at the center. Around it are the eight **ring skills** (**lumberjack, miner, smith, farmer, animalist, fisherman, warrior, explorer**), each unlocked once Traveler reaches its max level (10). Around the tree are the **advanced skills** in a lower tier, each unlocked once its ring skill reaches level 10 (three are 1-level — Tree Feller, Fall Nullify, Double Jump; **Auto Crop** spans 3 — its radius equals its level; **Gardener**, **Breeder**, **Lucky Catch**, **Swimmer** and **Diver** span 10). Players spend **vanilla XP points** (`player.getTotalExperience()` / `giveExp(-cost)`) to level skills up.
 
@@ -275,7 +275,7 @@ The generic `effects` list is the single source of truth for both the skill tree
 
 ## Feedback & currency
 - Level-up / insufficient-XP feedback goes through the generic `messages` + `base.message-type` system (ACTION_BAR by default). Placeholders: `level-up` uses `<skill>`, `<level>`, `<cost>`; `insufficient-xp` uses `<needed>`; `locked` uses `<skill>`, `<required>`, `<require-level>`.
-- Skills spend **XP points**, not levels or money — the same pool the [XP feature](xp.md) grants. There is **no** Vault `cost` for leveling.
+- Skills spend **XP points**, not levels or money — the same pool the [XP feature](../core/xp.md) grants. There is **no** Vault `cost` for leveling.
 
 ## Limits
 - Ring skills stay **locked** until Traveler reaches `max-level` (10); each advanced skill stays locked until its `requires` skill reaches `require-level`.

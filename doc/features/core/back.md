@@ -1,6 +1,6 @@
 # Feature: Back
 
-> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../Admin.md)
+> Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../../Admin.md)
 
 **Owning plugin:** LeetCore · Config file `plugins/LeetCore/features/back.yml`.
 Death locations and persistent cooldowns are stored in LeetCore's `plugins/LeetCore/data.db`.
@@ -8,7 +8,7 @@ Death locations and persistent cooldowns are stored in LeetCore's `plugins/LeetC
 Teleports players to their last death location. **Persistent** via SQLite — survives server restarts.
 
 **Permissions**
-- See [Feature permissions](../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.back` · default `false`. The node also unlocks the `/back` command (the command is registered with `permission: leet.feat.back`).
+- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.back` · default `false`. The node also unlocks the `/back` command (the command is registered with `permission: leet.feat.back`).
 
 **Behavior — on death**
 1. Player dies → `check()` (enabled + permission + world).

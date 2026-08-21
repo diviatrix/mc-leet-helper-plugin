@@ -1,0 +1,7 @@
+name: LeetVanity
+version: "${version}"
+main: com.leet.vanity.LeetVanity
+api-version: "26.2"
+description: Leet vanity plugin - a growing bundle of distinct gameplay features
+author: Leet
+softdepend: [LeetCore]
