@@ -65,6 +65,7 @@ public final class SkillPassiveHandler implements Listener {
     private boolean harvesting; // reentrancy guard for farmer auto-crop
     private int treeFellerMaxBlocks = 100;
     private boolean autoCropRequireMature = true;
+    private boolean autoCropRequireHoe = false;
     private double doubleJumpHorizontal = 0.25;
     private double doubleJumpVertical = 1.0;
 
@@ -88,10 +89,11 @@ public final class SkillPassiveHandler implements Listener {
         return new Owned(feature.skill(skillId), feature.getState(player).level(skillId));
     }
 
-    void configure(int treeFellerMaxBlocks, boolean autoCropRequireMature,
+    void configure(int treeFellerMaxBlocks, boolean autoCropRequireMature, boolean autoCropRequireHoe,
                    double doubleJumpHorizontal, double doubleJumpVertical) {
         this.treeFellerMaxBlocks = treeFellerMaxBlocks;
         this.autoCropRequireMature = autoCropRequireMature;
+        this.autoCropRequireHoe = autoCropRequireHoe;
         this.doubleJumpHorizontal = doubleJumpHorizontal;
         this.doubleJumpVertical = doubleJumpVertical;
     }
@@ -169,6 +171,7 @@ public final class SkillPassiveHandler implements Listener {
                 }
             } else if (isCrop && feature.skillEnabled(player, "auto-crop")
                 && !feature.hasFeaturePermission(player, "auto-crop") && feature.levelOf(player, "auto-crop") >= 1) {
+                if (autoCropRequireHoe && !AutoCropUtil.isHoe(tool)) return;
                 harvesting = true;
                 try {
                     int radius = Math.min(3, Math.max(1, feature.levelOf(player, "auto-crop")));

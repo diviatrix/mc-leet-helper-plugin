@@ -71,6 +71,7 @@ public class SkillsFeature extends AbstractFeature implements CooldownAware, Mes
         passive.configure(
             Math.max(1, cfg.getInt("feature.tree-feller.max-blocks", 100)),
             cfg.getBoolean("feature.auto-crop.require-mature", true),
+            cfg.getBoolean("feature.auto-crop.require-hoe", false),
             cfg.getDouble("feature.double-jump.horizontal-multiplier", 0.25),
             cfg.getDouble("feature.double-jump.vertical-multiplier", 1.0)
         );

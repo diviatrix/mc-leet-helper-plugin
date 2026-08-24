@@ -20,6 +20,8 @@ feature:
     # Whether auto-crop harvests only mature crops. Radius comes from the
     # skill's level (1-3).
     require-mature: true
+    # Whether auto-crop requires the player to hold any hoe.
+    require-hoe: false
   double-jump:
     # Horizontal/vertical multipliers for the double-jump skill launch.
     horizontal-multiplier: 0.25
