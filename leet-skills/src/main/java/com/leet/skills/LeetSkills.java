@@ -33,7 +33,45 @@ public final class LeetSkills extends JavaPlugin {
         }
 
         getCommand("skills").setExecutor(new SkillsCommand(this));
+
+        registerReactorAdapters(skills);
         getLogger().info("LeetSkills registered the 'skills' feature with LeetCore.");
+    }
+
+    /**
+     * Contributes the plugin's domain seam into core's reactor: a
+     * {@code skill-level} condition ({@code skill: <id>, level: <min>}) and a
+     * {@code skill-level-up} action ({@code skill: <id>}, spends the player's XP).
+     */
+    private void registerReactorAdapters(SkillsFeature skills) {
+        if (core.reactor() == null) return;
+        core.reactor().conditions().register(new com.leet.core.reactor.Condition() {
+            @Override
+            public String type() {
+                return "skill-level";
+            }
+
+            @Override
+            public boolean passes(org.bukkit.entity.Player player, java.util.Map<String, Object> params) {
+                String skill = com.leet.core.reactor.Params.str(params.get("skill"));
+                int min = com.leet.core.reactor.Params.intVal(params.get("level"), 1);
+                return skill != null && skills.levelOf(player, skill) >= min;
+            }
+        });
+        core.reactor().actions().register(new com.leet.core.reactor.Action() {
+            @Override
+            public String type() {
+                return "skill-level-up";
+            }
+
+            @Override
+            public void execute(org.bukkit.entity.Player player, java.util.Map<String, Object> params) {
+                String skill = com.leet.core.reactor.Params.str(params.get("skill"));
+                if (skill != null) {
+                    skills.levelUp(player, skill);
+                }
+            }
+        });
     }
 
     @Override

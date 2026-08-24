@@ -2,6 +2,61 @@
 
 All notable changes to **LeetHelper**. Entries are newest first.
 
+## Unreleased — bindings tooling + reload fixes
+
+**Added**
+- `/leeta bindings` (contributed by LeetInteraction) — lists every NPC, block and chest binding
+  with its location and definition, flagging bindings whose definition no longer exists.
+
+**Fixed**
+- `/leeta reload interact` now reloads `definitions/*.yml` and chest bindings (previously they were
+  only read at startup); `/leeta reload core` also reloads `plugins/LeetCore/rules/*.yml`.
+- `/leeta` usage strings now mention the contributed `bind`/`unbind` subcommands.
+
+**Changed**
+- Dead trade feedback templates removed from `features/interaction.yml` (that feedback now comes
+  from the reactor's built-in actions).
+
+## Unreleased — shared reactor kernel (triggers / conditions / actions)
+
+**Changed**
+- **Reactor in LeetCore** (`com.leet.core.reactor`) — the interaction plugin's trigger → conditions →
+  actions kernel moved into core and generalized. `CoreApi.reactor()` exposes it to every plugin:
+  shared `DefinitionLoader`, `ActionRegistry` (generic built-ins: teleport, give/take-items, sell,
+  buy, enchant, open-disposal, run-command, message, sound, give-exp), `ConditionRegistry`
+  (built-ins: world, chance, has-item) and the `Reactor.run` engine (conditions → permission →
+  cooldown → Vault cost → actions).
+- **Event rules** — core now loads `plugins/LeetCore/rules/*.yml`; definitions with a `triggers:`
+  list fire on `join`, `death`, `block-break` and `consume-item` (bundled example: `welcome.yml`).
+- **LeetInteraction slimmed** — it keeps its bindings (signs, NPCs, blocks), chests, quests and
+  reputation, and contributes its domain actions/condition (`kit`, `open-chest`, `quest`,
+  `reputation`) into the shared registry. Definitions and rules use the same file format.
+- **LeetSkills adapters** — contributes a `skill-level` condition and a `skill-level-up` action
+  into the reactor, so quests/rules can gate on and grant skill levels.
+
+## Unreleased — LeetInteraction plugin (signs, NPCs, quests)
+
+**Added**
+- **LeetInteraction** — a fifth plugin (`leet-interaction-<v>.jar`, package `com.leet.interaction`). It
+  soft-depends on LeetCore and contributes a single `interaction` hub feature: a trigger → engine →
+  action system. YAML definitions in `plugins/LeetInteraction/definitions/` are bound to the world via
+  classic text signs (`[interact] <id>`), vanilla entities tagged with `/leeta bind <id>` (default
+  NPC behavior is cancelled for bound entities), or any block bound with `/leeta bind` (block
+  bindings persist in the plugin's own SQLite store).
+- **Classic signs** — `[Sell]`, `[Buy]`, `[Free]`, `[Enchant]`, `[Repair]`, `[Kit]`, `[Warp]`, `[Weather]`,
+  `[Time]`, `[Heal]`, `[Disposal]`, `[Chest] #id` and `[Quest] <id>` signs, gated by runtime
+  create/use permissions (`leet.interaction.sign.create.<type>` and `leet.interaction.sign.use.<type>`).
+  `[Chest]` signs placed on a chest bind it (single
+  or double); any other `[Chest] #id` sign opens that chest's inventory remotely.
+- **Actions** — teleport (inline location or named warp), give/take items, sell, buy, enchant, kit,
+  disposal GUI, open chest, run commands, message, sound, give exp, reputation, quest. Item specs
+  support vanilla materials and LeetCrafting custom items (`item:<id>`).
+- **Quests & reputation** — definitions may carry a `quest:` section (requirements: items/money/
+  reputation; rewards: items/money/exp/reputation/commands; repeatable + cooldown). Per-player quest
+  state and reputation live in `plugins/LeetInteraction/data.db`.
+- **Core seam** — `CoreApi.registerAdminSubcommand` lets feature plugins contribute `/leeta`
+  subcommands (used for `/leeta bind|unbind`); `/leeta reload interact` reloads definitions.
+
 ## Unreleased — LeetVanity plugin + connected openings
 
 **Added**
@@ -47,7 +102,7 @@ All notable changes to **LeetHelper**. Entries are newest first.
 **Docs**
 - `doc/features/cooking.md` deleted; all dish recipes + Salt + the config layout
   now live in `doc/features/crafting.md`.
-- `doc/ARCHITECTURE.md`, `doc/Admin.md`, `doc/permissions.md`, `doc/resource-pack.md`,
+- `doc/ARCHITECTURE.md`, `doc/Admin.md`, `doc/permissions.md`, `doc/features/crafting/resource-pack.md`,
   and `README.md` updated to drop the Cooking feature references and the
   `/leet cook` subcommand.
 
@@ -56,7 +111,7 @@ All notable changes to **LeetHelper**. Entries are newest first.
 ## Unreleased — Resource-pack ops doc + docs cleanup
 
 **Docs**
-- New **`doc/resource-pack.md`** — the canonical operational guide for the
+- New **`doc/features/crafting/resource-pack.md`** — the canonical operational guide for the
   LeetCrafting item-texture resource pack: config keys, the embedded HTTP server,
   FRPC / reverse-proxy deployment, the **`/craft-pack.zip` path-routing rule**, log-line
   diagnostics (`[RP]`, `[RP-HTTP]`, `Callback fired`, `Callback timed out`), and a full

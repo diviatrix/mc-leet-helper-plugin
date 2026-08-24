@@ -1,0 +1,89 @@
+base:
+  enabled: true
+  permission: leet.feat.interaction
+  default-permission: false
+  worlds: []
+  cooldown: 0
+  message-type: ACTION_BAR
+
+feature:
+  # Text signs ([Sell], [Buy], [Warp], ...). Every sign type has its own pair of
+  # runtime-registered permissions:
+  #   create: leet.interaction.sign.create.<type>  (default below, op)
+  #   use:    leet.interaction.sign.use.<type>     (default below, true)
+  signs:
+    enabled: true
+    create-permission-default: op
+    use-permission-default: true
+    cooldowns:
+      sell: 1
+      buy: 1
+      free: 1
+      enchant: 1
+      repair: 1
+      kit: 1
+      warp: 1
+      weather: 1
+      time: 1
+      heal: 1
+      disposal: 1
+      chest: 1
+      quest: 1
+      interact: 1
+
+  # Vanilla entities bound to definitions via /leeta bind.
+  npcs:
+    enabled: true
+
+  # Blocks (buttons, levers, plates, command blocks, anything) bound to
+  # definitions via /leeta bind.
+  blocks:
+    enabled: true
+
+  # Quest definitions and [Quest] signs.
+  quests:
+    enabled: true
+
+  # [Chest] #id remote chest signs.
+  chests:
+    enabled: true
+
+  # Kits referenced by [Kit] signs and the kit action.
+  kits:
+    starter:
+      cooldown: 3600
+      items:
+        - { item: "material:STONE_SWORD", amount: 1 }
+        - { item: "material:BREAD", amount: 5 }
+
+  # Warps referenced by [Warp] signs and usable inline in teleport actions.
+  warps:
+    spawn:
+      world: "world"
+      x: 0.5
+      y: 64
+      z: 0.5
+      yaw: 0
+      pitch: 0
+
+# messages: sold/bought/insufficient-funds feedback for generic trade actions
+# comes from LeetCore's reactor; only interaction-specific templates live here.
+messages:
+  kit-given: "<green>Kit <kit> given."
+  kit-cooldown: "<red>Kit <kit> is on cooldown (<seconds>s left)."
+  warped: "<green>Warped to <warp>."
+  warp-unknown: "<red>Unknown warp <warp>."
+  chest-unknown: "<red>No chest is bound to <id>."
+  chest-gone: "<red>The bound chest no longer exists."
+  chest-already-bound: "<red>Chest id <id> is already bound. Break the old sign first."
+  chest-bound: "<green>Chest bound to id <id>."
+  chest-unbound: "<green>Chest binding removed."
+  quest-accepted: "<green>Quest accepted: <quest>."
+  quest-active: "<yellow>You are on: <quest>."
+  quest-complete: "<green>Quest complete: <quest>!"
+  quest-not-ready: "<red>You don't meet the requirements yet."
+  quest-requirements: "<gray>Bring: <reqs>"
+  quest-cooldown: "<red>This quest is on cooldown (<seconds>s left)."
+  definition-unknown: "<red>Unknown interaction: <id>."
+  cooldown: "<red>Wait <seconds>s before using this again."
+  sign-no-permission: "<red>You can't use this sign."

@@ -7,7 +7,14 @@
 Auto-harvests nearby mature crops when a player breaks one.
 
 **Permissions**
-- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.auto_crop` · default `false`. The node also unlocks the `/leet crop` personal off-toggle.
+
+See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat.
+
+| Node | Default | Notes |
+|---|---|---|
+| `leet.feat.auto_crop` | `false` | Also unlocks the `/leet crop` personal off-toggle |
+
+**Player command:** `/leet crop` toggles Auto Crop off or on for the current player. It never grants permission.
 
 **Behavior**
 1. A player breaks a block (`BlockBreakEvent`).

@@ -1,10 +1,11 @@
 # Permissions
 
-Permissions come from **three sources** across the four plugins:
+Permissions come from four sources across the five plugins:
 
 1. **Static admin permissions** (`leet.admin.*`) — declared in **LeetCore's** `plugin.yml`, gate `/leeta`. Documented in [Admin.md](Admin.md).
 2. **Runtime feature permissions** (`leet.feat.<id>`) — registered at startup by the owning plugin for each gated feature.
-3. **No permission at all** — Crafting is server-wide (open to all when `base.enabled` is true); Skills gates via a single runtime node.
+3. **Static gameplay permissions** — command-specific nodes declared in LeetCore's `plugin.yml`.
+4. **No permission at all** — Crafting is server-wide when `base.enabled` is true.
 
 Each gameplay feature's `leet.feat.*` permission is documented in its own feature document (index: [features/](features/)).
 
@@ -16,10 +17,7 @@ Declared in `leet-core/src/main/resources/plugin.yml`. Documented in [Admin.md](
 
 Feature permissions are **not** declared in any `plugin.yml` (unlike the admin `/leeta` permissions). Instead, the owning plugin's feature registers them at runtime on every startup via `Bukkit.getPluginManager().addPermission()`, using each feature's `base.permission` node and `base.default-permission`. Every gated feature permission follows the pattern `leet.feat.<id>` (e.g. `leet.feat.double_jump`), and all fall back to `false`.
 
-- **LeetCore** registers nodes for its seven standalone features (`double_jump`, `durability`, `auto_crop`, `back`, `tree_feller`, `fall_damage`, `xp`) — one per feature, plus the static `leet.feat.back` command permission, from the config's `base.permission`.
-- **LeetSkills** registers a single `leet.feat.skills` node (default `false`). `/skills` has **no static command permission** — access is gated entirely by this same node at runtime (`SkillsCommand` checks `skillsFeature.appliesTo(player)`).
-- **LeetCrafting** registers **no** feature permission — Crafting declares no `base.permission` key, and `registerPermission()` skips a node when the config lacks the key. It is server-wide.
-- **Vanity** registers a single `leet.feat.vanity` node (default `false`). All of the plugin's distinct capabilities share this one node (see [Feature: Vanity](features/vanity/vanity.md)).
+- Each owning feature page defines its own permission nodes, defaults and command gates. Use [the feature index](features/README.md) to find that page.
 
 `base.default-permission` maps to a Bukkit default:
 - `true` → `PermissionDefault.TRUE` (every player)
@@ -44,3 +42,8 @@ Feature permissions are **not** declared in any `plugin.yml` (unlike the admin `
 | Skills | LeetSkills | `leet.feat.skills` | `false` |
 | Crafting | LeetCrafting | — (none) | server-wide |
 | Vanity | Vanity | `leet.feat.vanity` | `false` |
+| Interaction | LeetInteraction | `leet.feat.interaction` | `false` |
+| Sign create (one node per sign type) | LeetInteraction | `leet.interaction.sign.create.<type>` — e.g. `leet.interaction.sign.create.sell`, `leet.interaction.sign.create.warp` | `op` |
+| Sign use (one node per sign type) | LeetInteraction | `leet.interaction.sign.use.<type>` — e.g. `leet.interaction.sign.use.disposal`, `leet.interaction.sign.use.quest` | `true` |
+| Home teleport | LeetCore | `leet.home` | `true` |
+| Set home | LeetCore | `leet.sethome` | `true` |

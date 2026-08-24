@@ -7,7 +7,14 @@
 Breaking one log automatically breaks the whole connected tree.
 
 **Permissions**
-- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.tree_feller` · default `false`. The node also unlocks the `/leet tree` personal off-toggle.
+
+See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat.
+
+| Node | Default | Notes |
+|---|---|---|
+| `leet.feat.tree_feller` | `false` | Also unlocks the `/leet tree` personal off-toggle |
+
+**Player command:** `/leet tree` toggles Tree Feller off or on for the current player. It never grants permission.
 
 **Behavior**
 1. A player breaks a log (`BlockBreakEvent`).

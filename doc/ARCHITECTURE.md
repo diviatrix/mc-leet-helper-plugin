@@ -1,6 +1,6 @@
 # Architecture
 
-How LeetHelper is structured and works internally as **four cooperating plugins**. For end-user configuration, permissions, and commands see [README](../README.md).
+How LeetHelper is structured and works internally as **five cooperating plugins**. For end-user installation see [README](../README.md); feature-specific commands, configuration and workflows live in the canonical pages under [features](features/README.md).
 
 Contents:
 
@@ -16,7 +16,7 @@ Contents:
 
 ## Project Structure
 
-The codebase is a Gradle multi-project build (see [BUILDING](BUILDING.md)). Four subprojects, each a standalone Paper plugin:
+The codebase is a Gradle multi-project build (see [BUILDING](BUILDING.md)). Five subprojects, each a standalone Paper plugin:
 
 ```
 build.gradle.kts, settings.gradle.kts   # multi-project build (version single-sourced)
@@ -104,6 +104,22 @@ leet-vanity/                          # LeetVanity — a hub of distinct gamepla
       plugin.yml                        # LeetVanity metadata (softdepend LeetCore); no commands
       config.yml                        # Global settings (log level)
       features/vanity.yml               # Hub config; each capability has its own section
+
+leet-interaction/                     # LeetInteraction — signs, NPCs, blocks, chests, quests
+  src/main/java/com/leet/interaction/
+    LeetInteraction.java               # Plugin lifecycle; binds to CoreApi; own SQLite store
+    InteractionFeature.java            # The 'interaction' hub feature + all event triggers
+    definition/                        # InteractionDefinition + DefinitionRegistry (definitions/*.yml)
+    engine via action/                 # ActionRegistry + stateless Action implementations
+    trigger/ (inside InteractionFeature)  # sign / entity / block listeners + SignChangeEvent
+    chest/ChestRegistry.java           # [Chest] #id bindings (persisted chest index)
+    quest/QuestManager.java            # accept / turn-in flow + QuestDefinition
+    reputation/ReputationManager.java  # per-player reputation score
+    command/BindSubcommand.java        # /leeta bind|unbind (contributed admin subcommands)
+  src/main/resources/
+    plugin.yml                         # LeetInteraction metadata (softdepend LeetCore, Vault)
+    features/interaction.yml           # Capability toggles, kits, warps
+    definitions/                       # Example definition files (warp npc, shopkeeper, quest)
 tools/cooking/                        # One-off Python tooling for the cooking values/textures (run from repo root)
 ```
 
@@ -113,6 +129,7 @@ tools/cooking/                        # One-off Python tooling for the cooking v
 - **LeetSkills** soft-depends on LeetCore, looks up `CoreApi`, contributes the `skills` feature, and keeps its **own** SQLite store for skill levels/toggles.
 - **LeetCrafting** soft-depends on LeetCore, contributes the single `crafting` feature (food + condiment items and recipes), and owns the item domain: `LeetItemRegistry` (registered with core as a read-only `CustomItemView`, so `/leeta give` and command/eat handling work) and the `ResourcePackService`.
 - **LeetVanity** soft-depends on LeetCore, contributes the single `vanity` hub feature (a group of distinct capabilities sharing one feature id), and owns no database.
+- **LeetInteraction** soft-depends on LeetCore, contributes the `interaction` feature, registers interaction-specific `/leeta` subcommands, and owns its own SQLite database for bindings, quests and reputation.
 
 ---
 
@@ -126,9 +143,22 @@ Core exposes a **narrow service contract** (`CoreApi`) registered via the Bukkit
 - `guiManager()` — the generic GUI backend skills uses.
 - `economy()` — the resolved Vault economy (or null).
 - `registerFeature(AbstractFeature)` — the entry point the other plugins use to add a feature to the shared registry.
+- `registerAdminSubcommand(name, handler)` — lets other plugins contribute `/leeta` subcommands (LeetInteraction registers `bind`/`unbind`); `adminSubcommands()` exposes them to core's command layer.
+- `reactor()` — the shared trigger → conditions → actions kernel (see [The reactor](#the-reactor)).
+- **`log(String)`** — console logging with the LeetCore prefix.
 - `log(String)` — console logging with the LeetCore prefix.
 
 Core never reaches into the concrete classes of the other plugins: it drives everything through `FeatureRegistry` and the role interfaces, so `/leeta`, `/leet`, and the toggle lifecycle work uniformly across features regardless of which plugin registered them.
+
+### The reactor (shared trigger → conditions → actions kernel)
+
+`com.leet.core.reactor` in LeetCore owns the declarative pipeline that LeetInteraction introduced, generalized for every plugin:
+
+- **Definition** (`id` / `triggers` / `conditions` / `actions`) parsed by the shared `DefinitionLoader` from any YAML file. Core loads `plugins/LeetCore/rules/*.yml` as event-rules; LeetInteraction loads `definitions/*.yml` the same way.
+- **Reactor.run(player, definition)** — the engine: pluggable conditions → extra `permission` → per-player `cooldown` (runtime store) → Vault `cost` → ordered actions. Feedback uses hardcoded MiniMessage lines so any plugin can drive it without wiring templates.
+- **ActionRegistry** — core registers the generic built-ins (`teleport`, `give-items`, `take-items`, `sell`, `buy`, `enchant`, `open-disposal`, `run-command`, `message`, `sound`, `give-exp`); feature plugins contribute domain actions at boot (LeetInteraction: `kit`, `open-chest`, `quest`, `reputation`; LeetSkills: `skill-level-up`).
+- **ConditionRegistry** — built-ins `world`, `chance`, `has-item`; contributed: LeetInteraction's `reputation`, LeetSkills' `skill-level`. Item specs (`material:X` / `item:<custom-id>`) resolve vanilla or LeetCrafting custom items uniformly.
+- **ReactorTriggers** — core listener firing rule definitions on generic events (`join`, `death`, `block-break`, `consume-item`). Interaction surfaces (signs, NPCs, bound blocks) call `reactor().run` directly from their own listeners.
 
 ### Crafting engine & resource pack
 
@@ -299,17 +329,25 @@ No database — it owns only the item domain and the served resource pack.
 
 No database — its capabilities are stateless, driven entirely by `features/vanity.yml`.
 
+### LeetInteraction (`plugins/LeetInteraction/data.db`)
+
+Its own `StorageManager`, holding block/chest bindings (zero-UUID rows), per-player quest state (`quest:<id>` = active/done/cooldown timestamp) and per-player reputation.
+
 > **Backups:** backing up each plugin's `data.db` preserves saved death locations and player toggle preferences (core) and skill levels (skills). Deleting a DB clears that plugin's state.
 
 ---
 
 ## Vault / Economy Integration
 
-Vault is an **optional soft dependency** (`softdepend: [Vault]`), resolved by **LeetCore** at startup; it works entirely without Vault. Core passes the resolved economy to features via `CoreApi.economy()`.
+Vault is a **soft dependency** (`softdepend: [Vault]`), resolved by **LeetCore** at startup; non-economy features work without it. Core passes the resolved economy to features via `CoreApi.economy()`.
+
+**LeetCore is also an economy provider.** When Vault is present, `LeetCore.onLoad()` registers `LeetEconomy` — a minimal SQLite-backed `Economy` implementation (balances in `kv_store` under feature id `economy`, integer cents, no bank support) — with `ServicePriority.Lowest`, so it only fills the gap when no dedicated economy plugin (EssentialsX, etc.) is installed. LeetCore loads at `STARTUP` so the provider is available before regular plugins enable (e.g. plugins that disable themselves when no economy is found).
 
 | Area | Without Vault | With Vault (economy provider) |
 |---|---|---|
 | Economy (`feature.cost`) | Cost is silently skipped — no charges, no balance checks | Cost checked and deducted per use for any feature with `feature.cost > 0` |
+| `[Sell]` / `[Buy]` / `[Enchant]` signs and rules-engine money actions | Transaction blocked: "No economy is available for this transaction." | Money is deposited/withdrawn normally |
+| `/bal`, `/pay`, `/leeta eco` | Command refuses: "No economy is installed..." | Commands operate on the resolved economy |
 | Permissions | Uses Bukkit `player.hasPermission()` | Still uses Bukkit `player.hasPermission()` (the Vault `Permission` provider is resolved but **not used**) |
 
 Notes:
@@ -322,6 +360,6 @@ Notes:
 
 ## Related docs
 
-- [BUILDING.md](BUILDING.md) — how to compile and package the three plugins
+- [BUILDING.md](BUILDING.md) — how to compile and package the five plugins
 - [README](../README.md) — configuration, permissions, commands, and operational usage
-- [CHANGELOG.md](CHANGELOG.md) — release history, including the rework that produced this three-plugin split
+- [CHANGELOG.md](CHANGELOG.md) — release history

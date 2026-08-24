@@ -1,0 +1,13 @@
+# Example: an NPC that teleports the player when right-clicked.
+# Bind it: spawn any entity (e.g. a villager), look at it, run /leeta bind warp_npc
+id: warp_spawn
+conditions:
+  cost: 0
+  cooldown: 5
+actions:
+  - type: teleport
+    location: "world,0.5,64,0.5,0,0"
+  - type: message
+    text: "<green>Welcome to spawn!"
+  - type: sound
+    sound: ENTITY_ENDERMAN_TELEPORT

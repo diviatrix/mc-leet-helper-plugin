@@ -1,0 +1,7 @@
+name: LeetInteraction
+version: "${version}"
+main: com.leet.interaction.LeetInteraction
+api-version: "26.2"
+description: Leet interaction plugin - signs, NPCs, blocks, chests and quests driven by trigger/action definitions
+author: Leet
+softdepend: [LeetCore, Vault]

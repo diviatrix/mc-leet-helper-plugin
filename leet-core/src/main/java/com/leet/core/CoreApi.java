@@ -1,11 +1,15 @@
 package com.leet.core;
 
+import com.leet.core.command.AdminSubcommand;
 import com.leet.core.craft.CustomItemView;
 import com.leet.core.feature.AbstractFeature;
 import com.leet.core.feature.FeatureRegistry;
 import com.leet.core.gui.GuiManager;
+import com.leet.core.reactor.Reactor;
 import com.leet.core.storage.StorageManager;
 import net.milkbowl.vault.economy.Economy;
+
+import java.util.Map;
 
 /**
  * The cross-plugin service contract exposed by LeetCore. The skills and crafting
@@ -32,11 +36,25 @@ public interface CoreApi {
     Economy economy();
 
     /**
-     * Registers a feature contributed by any plugin into the shared registry,
+     * The shared trigger -> conditions -> actions kernel. Any plugin registers
+     * its domain actions/conditions here and runs definitions through it.
+     */
+    Reactor reactor();
+
+    /** Registers a feature contributed by any plugin into the shared registry,
      * adds its permission node, and enables it. Returns true when registered.
      * The feature must already be wired to its owning plugin via its constructor.
      */
     boolean registerFeature(AbstractFeature feature);
+
+    /**
+     * Registers a /leeta subcommand contributed by another plugin (e.g.
+     * LeetInteraction's bind/unbind). Returns false when the name is taken.
+     */
+    boolean registerAdminSubcommand(String name, AdminSubcommand subcommand);
+
+    /** Registered contributed /leeta subcommands (name -> handler). */
+    Map<String, AdminSubcommand> adminSubcommands();
 
     /** Logs a prefixed message to the server console. */
     void log(String message);

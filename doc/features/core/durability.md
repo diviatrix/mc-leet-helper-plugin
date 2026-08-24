@@ -7,7 +7,14 @@
 Modifies durability damage for **whitelisted** items.
 
 **Permissions**
-- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.durability` · default `false`. There is no `/leet` toggle for this feature — access is purely permission-driven.
+
+See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat.
+
+| Node | Default | Notes |
+|---|---|---|
+| `leet.feat.durability` | `false` | No `/leet` toggle for this feature — access is purely permission-driven |
+
+Durability has no standalone player command. Grant the feature permission and configure the whitelist in `plugins/LeetCore/features/durability.yml`.
 
 **Behavior**
 1. A held/broken item takes durability damage (`PlayerItemDamageEvent`).
@@ -102,8 +109,11 @@ messages:
 > **Note:** any entry that is not a valid Bukkit `Material` name is skipped with a `Invalid material in durability whitelist:` warning at load and has no effect. Only use exact enum names (e.g. `WOODEN_SWORD`, `DIAMOND_PICKAXE`) — generic names like `HELMET`, `CHESTPLATE`, `LEGGINGS`, `BOOTS` (unprefixed armor slots) are not valid Materials and were removed from the defaults; use the material-specific forms (`LEATHER_HELMET`, `IRON_CHESTPLATE`, etc.) instead.
 
 **Multiplier examples**
-- `0.5` — items last ~2× longer
-- `1.0` — vanilla behavior
-- `2.0` — items break ~2× faster
+
+| Multiplier | Effect |
+|---|---|
+| `0.5` | items last ~2× longer |
+| `1.0` | vanilla behavior |
+| `2.0` | items break ~2× faster |
 
 **Cooldown:** none.

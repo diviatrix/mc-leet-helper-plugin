@@ -2,6 +2,8 @@
 
 **Owning plugin:** LeetSkills · Config files `plugins/LeetSkills/features/skills.yml` and `plugins/LeetSkills/features/skill-tree.yml`. Skill levels/toggles persist in LeetSkills' `plugins/LeetSkills/data.db`.
 
+**Feature id:** `skills` · **Command:** `/skills` · **Permission:** `leet.feat.skills` (default `false`).
+
 > Each skill that duplicates a standalone feature (`smith`↔`durability`, `tree-feller`↔`tree_feller`, `auto-crop`↔`auto_crop`, `fall-nullify`↔`fall_damage`, `double-jump`↔`double_jump`) declares that binding in `skills.yml` with `binds-feature: <feature-id>` (and `toggleable: true` where the player may toggle it via `/leet`). The skill *ignores the feature's enabled state* and keys off the feature's **permission**: if a player holds `leet.feat.<feature>`, the skill shows as **already acquired** and the feature is the only provider of the effect (the skill won't also fire — no double application). A player without that permission can still level the skill with XP and get the effect from the skill. Either way, exactly one thing fires per effect.
 
 > Common `base:`/`messages:` config layout and control model: [ARCHITECTURE.md](../../ARCHITECTURE.md#common-feature-config-layout) · Admin: [Admin.md](../../Admin.md)
@@ -9,27 +11,52 @@
 A **skill tree** opened with `/skills`. **Traveler** sits at the center. Around it are the eight **ring skills** (**lumberjack, miner, smith, farmer, animalist, fisherman, warrior, explorer**), each unlocked once Traveler reaches its max level (10). Around the tree are the **advanced skills** in a lower tier, each unlocked once its ring skill reaches level 10 (three are 1-level — Tree Feller, Fall Nullify, Double Jump; **Auto Crop** spans 3 — its radius equals its level; **Gardener**, **Breeder**, **Lucky Catch**, **Swimmer** and **Diver** span 10). Players spend **vanilla XP points** (`player.getTotalExperience()` / `giveExp(-cost)`) to level skills up.
 
 The feature is split across **two config files**:
-- `features/skills.yml` — the **skill definitions**: each skill's name, icon, `max-level`, `exp` costs, effects, and materials.
-- `features/skill-tree.yml` — the **tree topology**: which skills sit in the ring vs the advanced tier, and each skill's prerequisite (`requires`/`require-level`).
+
+| Config file | Contents |
+|---|---|
+| `features/skills.yml` | The **skill definitions**: each skill's name, icon, `max-level`, `exp` costs, effects, and materials. |
+| `features/skill-tree.yml` | The **tree topology**: which skills sit in the ring vs the advanced tier, and each skill's prerequisite (`requires`/`require-level`). |
 
 Separating them lets you reshape the tree (reorder skills, drop `double-jump` or `tree-feller`, add your own, rewire prerequisites) in `skill-tree.yml` without touching a skill's definition; removing a skill from the tree simply leaves that effect to the matching standalone feature.
 
 **Permissions**
-- **Node:** `leet.feat.skills` · **default:** `false` (nobody), registered at runtime by LeetSkills.
-- `/skills` has **no static command permission** — access is gated entirely by this same `leet.feat.skills` node at runtime (`SkillsCommand` checks `skillsFeature.appliesTo(player)`), so there's a single source of truth for the node (default-denied).
-- Grant the node (e.g. LuckPerms) to open `/skills` and to have passive effects apply; it also unlocks the `/leet skills` personal off-toggle. The node alone is not enough — `base.enabled`, the permission, `base.worlds` and the player toggle must all pass.
-- Set `base.default-permission` in `skills.yml` to `true` (everyone) or `op` (ops only) to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**.
+
+See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules and restart caveat.
+
+| Node | Default | Notes |
+|---|---|---|
+| `leet.feat.skills` | `false` | Registered at runtime by LeetSkills. `/skills` has **no static command permission** — access is gated entirely by this same node at runtime (`SkillsCommand` checks `skillsFeature.appliesTo(player)`), a single source of truth (default-denied). |
+| `leet.feat.skills` (grant) | — | Grant the node (e.g. LuckPerms) to open `/skills` and to have passive effects apply; it also unlocks the `/leet skills` personal off-toggle. The node alone is not enough — `base.enabled`, the permission, `base.worlds` and the player toggle must all pass. |
+| `base.default-permission` | `false` | Set to `true` (everyone) or `op` (ops only) in `skills.yml` to change the out-of-box default. Nodes are registered at startup, so permission config changes require a **restart**. |
+
+**Command:** `/skills` opens the skill tree. `/leet skills` is the personal off-switch and `/leet list` shows the player's current feature switch state. The command is player-only and requires `leet.feat.skills`.
+
+## Setup
+
+1. Grant `leet.feat.skills` with the permission manager.
+2. Confirm the feature is enabled with `/leeta info skills`.
+3. Run `/skills` in game.
+4. Click Traveler and spend vanilla XP to level it.
+5. Reach prerequisites shown in the GUI to unlock ring and advanced skills.
+
+Edit `plugins/LeetSkills/features/skills.yml` for definitions and `skill-tree.yml` for order, prerequisites and slots. Run `/leeta reload skills` after edits; restart after permission or structural changes if the reload is not sufficient.
 
 **UX flow**
-- `/skills` → skill tree (Traveler centered; ring of 8 once Traveler is maxed, advanced skills around the tree). A bottom-center **Exit** button (door) or `ESC` closes the skills menu.
-- Click a skill → detail screen (description + Level Up). Hover any skill shows name, `Level x/10`, and the XP cost of the next level.
-- Click Level Up → if you have enough total XP, an **Apply / Back** confirm screen; Apply deducts XP and advances one level. When you can't afford the next level, the Level Up button shows a red **X** instead of the potion (and clicking it sends the `insufficient-xp` message and stays).
-- Skills whose prerequisite isn't met appear as a glinting emerald lock showing **"Reach `<skill>` level N"**.
+
+| Step | Detail |
+|---|---|
+| Tree screen | `/skills` → skill tree (Traveler centered; ring of 8 once Traveler is maxed, advanced skills around the tree). A bottom-center **Exit** button (door) or `ESC` closes the skills menu. |
+| Detail screen | Click a skill → detail screen (description + Level Up). Hover any skill shows name, `Level x/10`, and the XP cost of the next level. |
+| Level Up | Click Level Up → if you have enough total XP, an **Apply / Back** confirm screen; Apply deducts XP and advances one level. When you can't afford the next level, the Level Up button shows a red **X** instead of the potion (and clicking it sends the `insufficient-xp` message and stays). |
+| Locked skills | Skills whose prerequisite isn't met appear as a glinting emerald lock showing **"Reach `<skill>` level N"**. |
 
 **Leveling**
-- Each skill starts at 0 and maxes at `max-level`. Per-skill `exp` list: entry *i* = XP to go from level *i* to *i+1* (a table per skill in `skills.yml`). Advanced skills have `max-level: 1` and a one-entry `exp` table.
-- A skill cannot be leveled until its prerequisite is met (`requires` in `skill-tree.yml`); beyond the GUI lock, `levelUp` refuses with the `locked` message.
-- Levels are persisted per-player in the skills plugin's SQLite `kv_store` (`plugins/LeetSkills/data.db`, key `levels`, a Gson map of skill id → level), so they survive restarts.
+
+| Rule | Detail |
+|---|---|
+| Levels | Each skill starts at 0 and maxes at `max-level`. Per-skill `exp` list: entry *i* = XP to go from level *i* to *i+1* (a table per skill in `skills.yml`). Advanced skills have `max-level: 1` and a one-entry `exp` table. |
+| Prerequisites | A skill cannot be leveled until its prerequisite is met (`requires` in `skill-tree.yml`); beyond the GUI lock, `levelUp` refuses with the `locked` message. |
+| Persistence | Levels are persisted per-player in the skills plugin's SQLite `kv_store` (`plugins/LeetSkills/data.db`, key `levels`, a Gson map of skill id → level), so they survive restarts. |
 
 ## The skill-tree config (`features/skill-tree.yml`)
 
@@ -54,9 +81,11 @@ tree:
     ...
 ```
 
-- `ring` / `advanced` are **ordered lists of skill ids** (each must have a matching `feature.skills.<id>` definition in `skills.yml`). Traveler is always the center and root. Reorder to change display order; remove an id to pull that skill out of the tree (its definition stays, so it can be added back). Unknown ids are skipped.
-- `requires` gives each skill the prerequisite it needs to unlock/level: reach `level` of `skill`. A skill with no entry has no prerequisite (open). Referencing `stamina` (the Traveler skill's id) is how the ring skills get gated at level 10; the advanced skills reference their ring skill at 10.
-- `slots` maps each advanced skill id to its GUI slot on the tree screen. **Every id in `advanced` needs a slot here**, or it will not render (and the plugin logs a warning at load). This is config-driven so a newly-added advanced skill either renders or logs loudly — never silently disappears.
+| Key | Detail |
+|---|---|
+| `ring` / `advanced` | **Ordered lists of skill ids** (each must have a matching `feature.skills.<id>` definition in `skills.yml`). Traveler is always the center and root. Reorder to change display order; remove an id to pull that skill out of the tree (its definition stays, so it can be added back). Unknown ids are skipped. |
+| `requires` | Gives each skill the prerequisite it needs to unlock/level: reach `level` of `skill`. A skill with no entry has no prerequisite (open). Referencing `stamina` (the Traveler skill's id) is how the ring skills get gated at level 10; the advanced skills reference their ring skill at 10. |
+| `slots` | Maps each advanced skill id to its GUI slot on the tree screen. **Every id in `advanced` needs a slot here**, or it will not render (and the plugin logs a warning at load). This is config-driven so a newly-added advanced skill either renders or logs loudly — never silently disappears. |
 
 ## Ring skills (outer tier, unlocked by Traveler level 10)
 
@@ -91,17 +120,21 @@ Advanced skills are `max-level: 1`; buying them costs its single `exp` entry and
 | **Lucky Catch** | fisherman level 10 | Chance a catch is upgraded to a higher-tier item (1 → 10%) |
 
 **Generic effect model** — every ring skill is a named body of `effects`, so the skill tree and the passive engine share the same data. Each effect is either:
-- a **numeric** `per-level` increment: current value at level N = `N × per-level` (shown on the detail screen as `+N×x%`); or
-- a level-gated **unlock** `unlock-at: N` (an optional `unlock-value` supplies the flat percentage). Its detail icon shows "Unlocks at level N" until active.
+
+| Kind | Detail |
+|---|---|
+| Numeric `per-level` increment | Current value at level N = `N × per-level` (shown on the detail screen as `+N×x%`). |
+| Level-gated unlock `unlock-at: N` | An optional `unlock-value` supplies the flat percentage. Its detail icon shows "Unlocks at level N" until active. |
 
 The detail screen renders every effect as its own icon with its current modifier; the tree hover shows each effect's **current value + `desc`** (e.g. Smith at level 10 → `50% chance a tool takes no durability damage`). Locked skills show a glinting emerald lock.
 
 ### Skills vs. the standalone features
 Skills that duplicate a standalone feature (**Smith**↔`durability`, **Tree Feller**↔`tree_feller`, **Auto Crop**↔`auto_crop`, **Fall Nullify**↔`fall_damage`, **Double Jump**↔`double_jump`) ignore the feature's `base.enabled` entirely and key off the feature's **permission**. The duplication is declared **in config**, not hard-coded: each such skill sets `binds-feature: <feature-id>` in its `skills.yml` definition, and `toggleable: true` where the player may also toggle it via `/leet`.
-- If the player holds `leet.feat.<feature>`, the skill is shown as **already acquired** (maxed, not purchasable) and the feature is the single provider of the effect — the skill's own passive does not fire for that player.
-- Otherwise the skill is a normal purchasable skill: level it with XP and the skill itself provides the effect.
 
-Because ownership switches on the permission, exactly one path ever fires per effect — no double invocation. A prerequisite that is a feature-granted skill (e.g. Double Jump needs Fall Nullify) counts as met when the player holds that feature's permission. At load time a config check (`validateBindings`) warns if a `binds-feature` references a feature that isn't registered.
+| Player holds `leet.feat.<feature>` | Result |
+|---|---|
+| Yes | The skill is shown as **already acquired** (maxed, not purchasable) and the feature is the single provider of the effect — the skill's own passive does not fire for that player. |
+| No | The skill is a normal purchasable skill: level it with XP and the skill itself provides the effect. |Because ownership switches on the permission, exactly one path ever fires per effect — no double invocation. A prerequisite that is a feature-granted skill (e.g. Double Jump needs Fall Nullify) counts as met when the player holds that feature's permission. At load time a config check (`validateBindings`) warns if a `binds-feature` references a feature that isn't registered.
 
 ## Example config
 
@@ -274,12 +307,18 @@ tree:
 The generic `effects` list is the single source of truth for both the skill tree's detail screen (each effect becomes its own icon with the current modifier) and the passive engine. Invalid material/damage-cause names are skipped with a warning.
 
 ## Feedback & currency
-- Level-up / insufficient-XP feedback goes through the generic `messages` + `base.message-type` system (ACTION_BAR by default). Placeholders: `level-up` uses `<skill>`, `<level>`, `<cost>`; `insufficient-xp` uses `<needed>`; `locked` uses `<skill>`, `<required>`, `<require-level>`.
-- Skills spend **XP points**, not levels or money — the same pool the [XP feature](../core/xp.md) grants. There is **no** Vault `cost` for leveling.
+
+| Topic | Detail |
+|---|---|
+| Feedback | Level-up / insufficient-XP feedback goes through the generic `messages` + `base.message-type` system (ACTION_BAR by default). Placeholders: `level-up` uses `<skill>`, `<level>`, `<cost>`; `insufficient-xp` uses `<needed>`; `locked` uses `<skill>`, `<required>`, `<require-level>`. |
+| Currency | Skills spend **XP points**, not levels or money — the same pool the [XP feature](../core/xp.md) grants. There is **no** Vault `cost` for leveling. |
 
 ## Limits
-- Ring skills stay **locked** until Traveler reaches `max-level` (10); each advanced skill stays locked until its `requires` skill reaches `require-level`.
-- Traveler regen is approximated by a repeating task that adds `regen × level / 100` HP per second (regen effect value / 100) when you're in the natural-regen food range (hunger ≥ 18); it does not interfere with vanilla regen.
-- Explorer's speed boost sets your walk speed to `0.2 × (1 + speed × level / 100)` and persists while the skill is active; it overrides potion-based speed while equipped.
+
+| Limit | Detail |
+|---|---|
+| Prerequisites | Ring skills stay **locked** until Traveler reaches `max-level` (10); each advanced skill stays locked until its `requires` skill reaches `require-level`. |
+| Traveler regen | Approximated by a repeating task that adds `regen × level / 100` HP per second (regen effect value / 100) when you're in the natural-regen food range (hunger ≥ 18); it does not interfere with vanilla regen. |
+| Explorer speed | Sets your walk speed to `0.2 × (1 + speed × level / 100)` and persists while the skill is active; it overrides potion-based speed while equipped. |
 
 **Cooldown:** none (by default).

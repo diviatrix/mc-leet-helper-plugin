@@ -1,0 +1,13 @@
+# Example: a shopkeeper NPC that sells and buys items.
+# Bind it: spawn an entity, look at it, run /leeta bind shopkeeper
+# (requires Vault + an economy provider for the priced trades)
+id: shopkeeper
+conditions:
+  cooldown: 1
+actions:
+  - type: message
+    text: "<yellow>The shopkeeper nods. Use the signs!"
+  - type: sell
+    item: "material:WHEAT"
+    amount: 16
+    price: 10

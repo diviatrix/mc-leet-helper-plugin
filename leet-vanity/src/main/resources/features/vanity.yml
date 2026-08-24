@@ -10,6 +10,8 @@ feature:
   # Opening either half of a double door opens/closes its matching neighbour too.
   connected:
     enabled: true
+    permission: leet.vanity.connected
+    default-permission: false
     openable-types:
       - OAK_DOOR
       - SPRUCE_DOOR
@@ -37,6 +39,8 @@ feature:
   # used, so the player sits in place (no boat/entity) and sneaks to get back up.
   sit:
     enabled: true
+    permission: leet.vanity.sit
+    default-permission: false
     # Per-block seat height above the floor (in blocks). 0 = default.
     # Most stairs/slabs use the default; tweak per-material if a seat looks off.
     seat-height: 0
@@ -145,5 +149,10 @@ feature:
       - POLISHED_TUFF_SLAB
       - TUFF_BRICK_SLAB
       - MUD_BRICK_SLAB
+
+  dance:
+    enabled: true
+    permission: leet.vanity.dance
+    default-permission: false
 
 messages: {}

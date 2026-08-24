@@ -1,0 +1,14 @@
+# Example reactor rule: greet players when they join, once per 60 seconds.
+# Rules live in plugins/LeetCore/rules/*.yml and fire on generic triggers:
+# join, death, block-break, consume-item. Conditions and actions are the same
+# ones the interaction plugin's definitions use.
+id: welcome
+triggers: [join]
+conditions:
+  cooldown: 60
+actions:
+  - type: message
+    text: "<yellow>Welcome back, %player%!"
+  - type: sound
+    sound: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.5

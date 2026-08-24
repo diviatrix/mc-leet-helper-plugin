@@ -35,11 +35,16 @@ public final class VanityFeature extends AbstractFeature {
     private static final String FEATURE_ID = "vanity";
 
     private boolean connectedEnabled;
+    private String connectedPermission;
     private Set<Material> connectedTypes = EnumSet.noneOf(Material.class);
 
     private boolean sitEnabled;
+    private String sitPermission;
     private double seatHeight;
     private Set<Material> seatBlocks = EnumSet.noneOf(Material.class);
+
+    private boolean danceEnabled;
+    private String dancePermission;
 
     public VanityFeature(CoreApi core, JavaPlugin owner) {
         super(core, owner);
@@ -54,10 +59,13 @@ public final class VanityFeature extends AbstractFeature {
     protected void loadFeatureConfig(YamlConfiguration cfg) {
         loadConnected(cfg.getConfigurationSection("feature.connected"));
         loadSit(cfg.getConfigurationSection("feature.sit"));
+        loadDance(cfg.getConfigurationSection("feature.dance"));
     }
 
     private void loadConnected(ConfigurationSection connected) {
         connectedEnabled = connected != null && connected.getBoolean("enabled", true);
+        connectedPermission = connected == null ? "leet.vanity.connected" : connected.getString("permission", "leet.vanity.connected");
+        registerCapabilityPermission(connectedPermission, connected == null ? "false" : connected.getString("default-permission", "false"));
         connectedTypes = EnumSet.noneOf(Material.class);
         if (connected == null) return;
         for (String name : connected.getStringList("openable-types")) {
@@ -71,6 +79,8 @@ public final class VanityFeature extends AbstractFeature {
 
     private void loadSit(ConfigurationSection sit) {
         sitEnabled = sit != null && sit.getBoolean("enabled", true);
+        sitPermission = sit == null ? "leet.vanity.sit" : sit.getString("permission", "leet.vanity.sit");
+        registerCapabilityPermission(sitPermission, sit == null ? "false" : sit.getString("default-permission", "false"));
         seatHeight = sit != null ? sit.getDouble("seat-height", 0) : 0;
         seatBlocks = EnumSet.noneOf(Material.class);
         if (sit == null) return;
@@ -83,6 +93,28 @@ public final class VanityFeature extends AbstractFeature {
         }
     }
 
+    private void loadDance(ConfigurationSection dance) {
+        danceEnabled = dance == null || dance.getBoolean("enabled", true);
+        dancePermission = dance == null ? "leet.vanity.dance" : dance.getString("permission", "leet.vanity.dance");
+        registerCapabilityPermission(dancePermission, dance == null ? "false" : dance.getString("default-permission", "false"));
+    }
+
+    private void registerCapabilityPermission(String node, String def) {
+        org.bukkit.permissions.PermissionDefault pd = switch (def.toLowerCase(Locale.ROOT)) {
+            case "true" -> org.bukkit.permissions.PermissionDefault.TRUE;
+            case "op" -> org.bukkit.permissions.PermissionDefault.OP;
+            default -> org.bukkit.permissions.PermissionDefault.FALSE;
+        };
+        try {
+            Bukkit.getPluginManager().addPermission(new org.bukkit.permissions.Permission(node, pd));
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
+
+    public boolean danceAppliesTo(Player player) {
+        return danceEnabled && check(player) && player.hasPermission(dancePermission);
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
@@ -92,13 +124,13 @@ public final class VanityFeature extends AbstractFeature {
         if (block == null) return;
         if (!check(player)) return;
 
-        if (sitEnabled && seatBlocks.contains(block.getType())) {
+        if (sitEnabled && player.hasPermission(sitPermission) && seatBlocks.contains(block.getType())) {
             event.setCancelled(true);
             sit(player, block);
             return;
         }
 
-        if (connectedEnabled && connectedTypes.contains(block.getType())) {
+        if (connectedEnabled && player.hasPermission(connectedPermission) && connectedTypes.contains(block.getType())) {
             syncLater(block);
         }
     }

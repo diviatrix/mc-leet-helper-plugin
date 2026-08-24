@@ -1,136 +1,77 @@
-# LeetHelper — Admin
+# LeetHelper Administration
 
-The `/leeta` admin command and the `leet.admin.*` permission nodes that gate it.
+This document describes the administration model only. Feature-specific commands, permissions, configuration, setup and troubleshooting belong to the canonical feature pages under [doc/features/](features/README.md).
 
-`/leeta` is provided by **LeetCore**, but because it browses LeetCore's **shared
-feature registry**, it manages features from **all four** plugins (LeetCore's seven
-standalone features, LeetSkills' `skills`, LeetCrafting's `crafting`, LeetVanity's `vanity`).
+## Administration Model
 
-> Feature-facing permissions (`leet.feat.*`) are documented per feature — see the
-> [feature docs index](features/).
+LeetCore owns the `/leeta` command and the shared feature registry. The other plugins register their features and contribute their own administration subcommands through LeetCore.
 
----
-
-## /leeta
-
-The admin command for managing features and giving custom items. Entry point for
-`list`, `toggle`, `info`, and `give` subcommands, with tab completion for
-subcommands, feature IDs, and item IDs. It lists and toggles features from every
-plugin that registers into LeetCore's shared registry, and its `/leeta give` hands
-out any custom item in the item registry (owned by LeetCrafting).
-
-| Subcommand | Permission | Description |
-|---|---|---|
-| `/leeta` | (base command) | Prints usage: `/leeta <list\|toggle\|info\|give>` |
-| `/leeta list` | `leet.admin` | Lists all features with ON/OFF status |
-| `/leeta toggle <id>` | `leet.admin.toggle` | Toggles a feature on/off and **persists** `base.enabled` to its YAML |
-| `/leeta info <id>` | `leet.admin` | Shows the feature's ID, permission node, and current status |
-| `/leeta give <item-id> [amount] [player]` | `leet.admin` | Gives a **custom item** (built from the shared custom-item registry, so it carries the correct `ci` tag + `leet:item/<id>` texture). Defaults to the sender if a player, stacked to 64 |
-
-**On toggle:** `FeatureManager.toggle()` disables the feature (unregisters listeners),
-re-enables it if it was off, and writes the new state back to `base.enabled` in the
-feature's YAML — so the toggle survives a restart. A toggle does **not** reload the rest
-of the config; config-file edits still need a restart.
-
-**On give:** `/leeta give` hands out any registered custom item (e.g. `salt`, `dough`,
-`croissant`). This is the supported way to obtain custom items for testing — a plain
-vanilla `/give` will not produce them, because they only exist as tagged custom items
-inside the item registry (which LeetCrafting builds and registers with LeetCore).
-
----
-
-## Permissions
-
-Declared statically in **LeetCore's** `plugin.yml` (Bukkit-native, `op` by default). They control the
-`/leeta` management command. `leet.admin` automatically inherits its three children
-(`list`, `toggle`, `info`) via its `children` block, so granting `leet.admin` alone is
-enough for an operator.
-
-| Permission | Default | Description |
-|---|---|---|
-| `leet.admin` | op | Full admin access to `/leeta`. Automatically inherits `leet.admin.list`, `leet.admin.toggle`, and `leet.admin.info` via its `children` block. Also unlocks `/leeta give`. |
-| `leet.admin.list` | op | Use `/leeta list`. |
-| `leet.admin.toggle` | op | Use `/leeta toggle <id>`. |
-| `leet.admin.info` | op | Use `/leeta info <id>`. |
-
-- These are **Bukkit native** permissions — they integrate with your permission plugin
-  (LuckPerms, PEX, GroupManager, ...) and are never bypassed by the plugin itself.
-- The `/leeta` command itself is registered with `permission: leet.admin`, so non-ops
-  without `leet.admin` never reach the executor.
-- Because these are static `plugin.yml` declarations, editing them requires a server
-  restart to take effect.
-
----
-
-## Configuration
-
-The **LeetCore** global `config.yml` lives in its data folder (`plugins/LeetCore/config.yml`):
-
-```yaml
-config-version: 1
-log-level: INFO
-```
-
-> **LeetCrafting** has its own `config.yml` too (`plugins/LeetCrafting/config.yml`) with the
-> same `config-version`/`log-level` plus the `resource-pack.*` distribution settings. The full
-> operational guide for the resource pack — config keys, FRPC/reverse-proxy deployment, the
-> `/craft-pack.zip` path-routing rule, and log-line diagnostics — lives in
-> **[Resource Pack Distribution](resource-pack.md)**; the [Crafting](features/crafting/crafting.md) feature
-> doc links it from its "Behavior" section. **LeetSkills** has no global `config.yml` — its
-> configuration lives entirely in `features/skills.yml` and `features/skill-tree.yml`.
-> **LeetVanity** has a `config.yml` with `config-version`/`log-level`; its feature settings live in
-> `features/vanity.yml`.
-
-| Key | Type | Description |
-|---|---|---|
-| `config-version` | integer | Schema version of `config.yml`. On startup, any keys missing from the on-disk file are auto-added from the bundled default while preserving existing values (see [Automatic config merging](ARCHITECTURE.md#automatic-config-merging-backfill)). |
-| `log-level` | `OFF`, `INFO`, `DEBUG` | Logging verbosity. See [Logging](#logging). |
-
----
-
-## Logging
-
-The `log-level` key (see [Configuration](#configuration)) selects a verbosity level:
-
-| Level | What is logged |
+| Plugin | Administration surface |
 |---|---|
-| `OFF` | Only critical errors (SEVERE), e.g. storage failures, feature-enable exceptions |
-| `INFO` | Startup, no-Vault notice, feature enable failures, invalid-whitelist warnings, config errors |
-| `DEBUG` | Reserved for fine-grained diagnostics; currently no extra DEBUG output is emitted beyond INFO |
+| LeetCore | `/leeta` feature registry and shared administration |
+| LeetSkills | Skill feature registered in the shared registry |
+| LeetCrafting | Crafting feature and custom-item registry |
+| LeetVanity | Vanity feature registered in the shared registry |
+| LeetInteraction | Interaction feature plus binding subcommands |
 
-The `log-level` is read from `config.yml`, though most feature-related messages are logged at the `INFO`/`WARNING`/`SEVERE` level regardless.
+Use [features/README.md](features/README.md) to select the owning plugin and then follow that feature's page. That page is the source of truth for what to grant, edit, run and test.
 
-> **Console prefix & color:** startup and status messages (e.g. `[LeetCore] Initializing LeetCore v<version>`, `[LeetCore] Enabled 7/7 core feature(s).`, the Vault status) are sent to the console via the console sender with a green `[LeetCore]` prefix. These colored lines appear in the live console but color codes are stripped from `logs/latest.log`. The automatically-printed Paper line `[LeetCore] Enabling LeetCore v<version>` and the plugin-logger `[LeetCore]` WARN/SEVERE lines come from Paper's logger and are not recolored. LeetSkills, LeetCrafting and LeetVanity log under their own plugin names (`[LeetSkills]`, `[LeetCrafting]`, `[LeetVanity]`).
+## Admin Permission
 
----
+The base administrator permission is `leet.admin`, declared statically by LeetCore and defaulting to operators. Its static child nodes are:
 
-## Troubleshooting
+| Permission | Default | Purpose |
+|---|---|---|
+| `leet.admin` | `op` | Access to the `/leeta` command and administrator operations |
+| `leet.admin.list` | `op` | List registered features |
+| `leet.admin.toggle` | `op` | Toggle a registered feature's server-level enabled state |
+| `leet.admin.info` | `op` | Inspect a registered feature |
+| `leet.admin.reload` | `op` | Use reload operations contributed by plugins |
 
-| Symptom | Likely cause / fix |
-|---|---|
-| Plugin(s) don't load on start | Server is not Paper 26.2+, or the JVM is older than Java 25. Check console for a version mismatch. |
-| Skills / Crafting / LeetVanity don't load | **LeetCore is missing.** LeetSkills, LeetCrafting and LeetVanity `softdepend` on it and disable themselves if it isn't loaded. Deploy all four jars together (LeetCore first). |
-| Feature config changes have no effect | Feature configs are read at startup; there is **no reload command**. Restart the server. |
-| `/leeta` not recognized / "unknown command" | The `leeta` command permission (`leet.admin`) is `op` by default — grant it or run as op. |
-| Durability whitelist warnings at startup | `Invalid material in durability whitelist:` — an entry in the on-disk `features/durability.yml` (in `plugins/LeetCore/features/`) whitelist is not a valid `Material` name (e.g. leftover `STEEL_*` or `HELMET`) and is being ignored. Remove it or use the correct enum name (see the note in [Durability](features/core/durability.md)). |
-| Feature cost not charged | Vault is not installed, or no economy provider is registered. Without Vault the cost feature is silently disabled. |
-| Death locations reset on restart | LeetCore's `plugins/LeetCore/data.db` file was deleted/moved, or the SQLite connection failed to initialize (SEVERE log). |
-| Skill levels reset on restart | LeetSkills' `plugins/LeetSkills/data.db` file was deleted/moved, or the SQLite connection failed to initialize (SEVERE log). |
-| `data.db` not created | Check the startup logs for `Failed to initialize SQLite`. The plugin degrades gracefully (Back feature won't persist). |
-| DoubleJump not triggering | Check game mode (Creative/Spectator excluded), `double_jump` cooldown (1s default), or the permission/world whitelist. |
-| Custom dish/condiment items show no custom icon | The resource pack was never delivered. See the [Resource Pack guide](resource-pack.md#troubleshooting) — common causes: `resource-pack.url` path doesn't end in `/craft-pack.zip`, FRPC isn't forwarding port 8043, `server-ip` is empty in `server.properties` (so the client URL is `localhost`), or the client declined an optional pack (`require: false`). |
-| `[LeetCrafting] Callback timed out after 10s, proceeding anyway.` | The client never sent the final callback. Verify with `[RP-HTTP] GET /craft-pack.zip -> 200 OK` in the log; if missing, the client can't reach the URL at all. If present but the callback still times out, check for `FAILED_RELOAD` (SHA1 mismatch) or `DECLINED` (player rejected an optional pack). Full matrix in [Resource Pack guide](resource-pack.md#troubleshooting). |
-| `[LeetCrafting] No resource-pack URL available. Set resource-pack.url in config.yml.` | `resource-pack.url` is empty **and** `server-ip` is blank in `server.properties` — the embedded server fell back to `localhost`, which remote clients can't reach. Set `url` (path must end with `/craft-pack.zip`) or `server-ip`. |
+`leet.admin` inherits the listed child permissions through `plugin.yml`. Permission changes to static command declarations require a server restart.
 
----
+## `/leeta` Approach
 
-## Known Limitations
+`/leeta` is a router for registered administration operations. Its exact subcommands depend on the plugins that are currently enabled.
 
-- **All four jars must be deployed together** — LeetSkills, LeetCrafting and LeetVanity disable themselves without LeetCore; missing any jar removes its features.
-- **No reload command** — config file changes require a restart. Only `/leeta toggle` can change `base.enabled` live.
-- **`config-version` is informational only** — the merge adds missing keys regardless of the version value; it never removes or rewrites existing keys.
-- **Vault permission provider is unused** — permission checks are Bukkit-native even with Vault installed.
-- **No admin bypass** for feature cooldowns/costs (e.g. Back cooldown/cost/max-age).
-- **No bStats** — sends zero analytics/metrics telemetry.
-- **Auto Crop scan is server-thread** — large radii can be expensive on busy worlds.
-- **No unit tests** — verification is manual on a Paper server.
+| Operation | General purpose | Owner documentation |
+|---|---|---|
+| `list` | Inspect registered feature IDs and server state | [Feature index](features/README.md) |
+| `info <feature-id>` | Inspect one feature's ID, permission and state | The selected feature page |
+| `toggle <feature-id>` | Change a feature's server-level `base.enabled` value | The selected feature page |
+| `reload <group>` | Reload a plugin-owned group when supported | The owning plugin's feature page |
+| Plugin-contributed subcommands | Perform plugin-owned administration | The owning plugin's feature page |
+
+`/leeta toggle` changes only the server-level enable switch. It does not grant permissions, change player toggles, or reload unrelated configuration. Feature pages document whether a particular feature supports live toggling or requires a restart after edits.
+
+## Operational Rules
+
+1. Install all five LeetHelper jars from the same release.
+2. Ensure LeetCore enables before dependent plugins.
+3. Grant `leet.admin` to trusted administrators.
+4. Select the owning feature page before changing permissions or configuration.
+5. Back up YAML files and SQLite databases before upgrades or resets.
+6. Never delete a database as a YAML configuration reset; databases contain player data.
+7. Test changes in game with the exact player permission and world where the feature will run.
+
+## Storage Ownership
+
+| Database | Owner | Player or feature data |
+|---|---|---|
+| `plugins/LeetCore/data.db` | LeetCore | Core feature state, homes and built-in economy data |
+| `plugins/LeetSkills/data.db` | LeetSkills | Skill levels and skill toggles |
+| `plugins/LeetInteraction/data.db` | LeetInteraction | Bindings, quest state, reputation and interaction state |
+
+Deleting one of these files deletes the data owned by that plugin. See the relevant feature page before resetting anything.
+
+## Troubleshooting Approach
+
+1. Confirm Paper `26.2+` and Java `25+`.
+2. Confirm all five jars are installed and enabled.
+3. Check the owning plugin's startup log.
+4. Run `/leeta list` and `/leeta info <feature-id>`.
+5. Check the feature page for its permission, world list, personal toggle and configuration path.
+6. Verify Vault only when the feature uses money.
+7. Back up and regenerate only the affected YAML file when a default reset is explicitly required.
+
+Feature-specific diagnostics are intentionally kept with the feature so this document does not become a second, conflicting reference.

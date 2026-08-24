@@ -1,6 +1,6 @@
 # Building from Source
 
-How to compile and package **LeetHelper** from source. This is **optional** — the default way to get the plugins is to download the three prebuilt jars from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases) page. Building from source is only needed for contributors or for testing unreleased changes.
+How to compile and package **LeetHelper** from source. This is **optional** — the default way to get the plugins is to download the five prebuilt jars from the [GitHub Releases](https://github.com/diviatrix/mc-leet-helper-plugin/releases) page. Building from source is only needed for contributors or for testing unreleased changes.
 
 ## Prerequisites
 
@@ -13,18 +13,19 @@ How to compile and package **LeetHelper** from source. This is **optional** — 
 It's a multi-project Gradle build (`settings.gradle.kts`). Each subproject is an independent Paper plugin that applies the same paperweight toolchain:
 
 ```
-settings.gradle.kts     # rootProject + include("leet-core", "leet-skills", "leet-crafting", "leet-vanity")
+settings.gradle.kts     # rootProject + include("leet-core", "leet-skills", "leet-crafting", "leet-vanity", "leet-interaction")
 build.gradle.kts        # subprojects { version = "..." }; jars routed to build/libs/
 leet-core/              # LeetCore plugin
 leet-skills/            # LeetSkills plugin
 leet-crafting/          # LeetCrafting plugin
 leet-vanity/            # LeetVanity plugin
+leet-interaction/       # LeetInteraction plugin
 ```
 
 ## Commands
 
 ```bash
-# Full build (compiles all three plugins and produces the jars)
+# Full build (compiles all five plugins and produces the jars)
 ./gradlew build
 
 # Clean + build
@@ -34,16 +35,17 @@ leet-vanity/            # LeetVanity plugin
 ./gradlew :leet-core:compileJava
 ```
 
-**Output artifacts** — all three jars land in the shared root `build/libs/`:
+**Output artifacts** — all five jars land in the shared root `build/libs/`:
 
 ```
 build/libs/leet-core-<version>.jar
 build/libs/leet-skills-<version>.jar
 leet-crafting-<version>.jar
 leet-vanity-<version>.jar
+leet-interaction-<version>.jar
 ```
 
-Deploy **all four** into the server `plugins/` folder together — LeetSkills, LeetCrafting, and LeetVanity soft-depend on LeetCore (`softdepend: [LeetCore]`), so LeetCore must be present (and loads first) for them to function.
+Deploy **all five** into the server `plugins/` folder together — LeetSkills, LeetCrafting, LeetVanity, and LeetInteraction soft-depend on LeetCore, so LeetCore must be present and load first.
 
 > **Version is single-sourced:** the release version lives in the root **`build.gradle.kts`** `subprojects { version = ... }` block. It drives both each jar filename and the `version` injected into the packaged `plugin.yml` at build time — bump it in exactly one place.
 
@@ -57,9 +59,9 @@ The version is injected into each `plugin.yml` at build time via `tasks.processR
 
 ## Testing
 
-There is no unit-test suite or test plugin wired into the Gradle build (`gradle.properties` enables Gradle configuration-cache only). Verification is manual on a Paper 26.2 server with all three jars installed — see the per-feature behavior notes and troubleshooting in [Admin.md](Admin.md#troubleshooting).
+There is no unit-test suite or test plugin wired into the Gradle build (`gradle.properties` enables Gradle configuration-cache only). Verification is manual on a Paper 26.2 server with all five jars installed — see the canonical feature documents.
 
 ## Related docs
 
-- [Architecture](ARCHITECTURE.md) — how the three plugins are structured internally and how they cooperate
+- [Architecture](ARCHITECTURE.md) — how the five plugins are structured internally and how they cooperate
 - [README](../README.md) — configuration, permissions, commands, and operational usage

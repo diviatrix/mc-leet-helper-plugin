@@ -28,7 +28,13 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info|give|reload> [args]"));
+            sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info|give|eco|warp|reload|bind|unbind> [args]"));
+            return true;
+        }
+
+        var contributed = plugin.adminSubcommands().get(args[0].toLowerCase());
+        if (contributed != null) {
+            contributed.handle(sender, java.util.Arrays.copyOfRange(args, 1, args.length));
             return true;
         }
 
@@ -38,7 +44,7 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
             case "info" -> handleInfo(sender, args);
             case "give" -> handleGive(sender, args);
             case "reload" -> handleReload(sender, args);
-            default -> sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info|give|reload> [args]"));
+            default -> sender.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Usage: /leeta <list|toggle|info|give|eco|warp|reload|bind|unbind> [args]"));
         }
         return true;
     }
@@ -153,6 +159,7 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
             "double_jump", "durability", "auto_crop", "back", "tree_feller", "fall_damage", "xp"));
         RELOAD_GROUPS.put("skills", List.of("skills"));
         RELOAD_GROUPS.put("craft", List.of("crafting"));
+        RELOAD_GROUPS.put("interact", List.of("interaction"));
     }
 
     private void handleReload(CommandSender sender, String[] args) {
@@ -162,10 +169,13 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
         }
         if (args.length < 2 || !RELOAD_GROUPS.containsKey(args[1].toLowerCase())) {
             sender.sendMessage(MiniMessage.miniMessage().deserialize(
-                "<yellow>Usage: /leeta reload <core|skills|craft>"));
+                "<yellow>Usage: /leeta reload <core|skills|craft|interact>"));
             return;
         }
         String group = args[1].toLowerCase();
+        if (group.equals("core")) {
+            plugin.reloadRules();
+        }
         List<String> ids = RELOAD_GROUPS.get(group);
         List<String> reloaded = new ArrayList<>();
         for (String id : ids) {
@@ -185,7 +195,14 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
-            return CommandUtil.filterPrefix(List.of("list", "toggle", "info", "give", "reload"), args[0]);
+            var names = new ArrayList<>(List.of("list", "toggle", "info", "give", "reload"));
+            names.addAll(plugin.adminSubcommands().keySet());
+            return CommandUtil.filterPrefix(names, args[0]);
+        }
+        var contributed = plugin.adminSubcommands().get(args[0].toLowerCase());
+        if (contributed != null && args.length >= 2) {
+            return CommandUtil.filterPrefix(contributed.tab(sender,
+                java.util.Arrays.copyOfRange(args, 1, args.length)), args[args.length - 1]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("give")) {
             var view = plugin.itemRegistry();
@@ -204,4 +221,3 @@ public class HelperCommand implements CommandExecutor, TabCompleter {
         return Collections.emptyList();
     }
 }
-

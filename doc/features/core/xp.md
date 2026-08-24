@@ -7,7 +7,14 @@
 Grants bonus **vanilla** XP for various in-game actions (no custom entity or XP pool — it adds directly to the player's XP bar via `player.giveExp`). **Effort-based balance:** the easiest, spammable action (building) pays a baseline of 1 XP per block, while the more-effortful jobs (mining, woodcutting, fishing, killing) pay more per action — all adjustable per material/mob below.
 
 **Permissions**
-- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.xp` · default `false`. The node also unlocks the `/leet xp` personal off-toggle.
+
+See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat.
+
+| Node | Default | Notes |
+|---|---|---|
+| `leet.feat.xp` | `false` | Also unlocks the `/leet xp` personal off-toggle |
+
+**Player command:** `/leet xp` toggles XP rewards off or on for the current player. It never grants permission.
 
 **Behavior**
 
@@ -86,10 +93,13 @@ messages:
 **Feedback:** after earning XP, the `xp-gained` message is delivered via `base.message-type` (ACTION_BAR by default). The placeholders are `<amount>` (XP gained) and `<action>` (the action label, e.g. `Mining`, `Fishing`, `Killing`). To make XP **silent**, remove/empty the `xp-gained` message template — a missing or empty template produces no message, while XP is still granted.
 
 **Notes & limits**
-- Uses vanilla `player.giveExp`, so XP respects the vanilla level curve and can level the player up.
-- Per-material amounts keep the XP economy fully controllable; only listed materials award anything.
-- **Player-placed blocks give no break XP** — mining/woodcutting/crops XP is skipped for a block the player themselves placed (tracked from `BlockPlaceEvent`). Placing still gives its own building XP. Choose how to store that memory with `feature.placed-tracking` (`memory` by default, or `persistent` for SQLite).
-- No cooldown by default; set `base.cooldown > 0` to throttle it if desired (applies to every grant uniformly).
+
+| Note | Detail |
+|---|---|
+| Vanilla XP | Uses vanilla `player.giveExp`, so XP respects the vanilla level curve and can level the player up. |
+| Per-material amounts | Keep the XP economy fully controllable; only listed materials award anything. |
+| Player-placed blocks | Give no break XP — mining/woodcutting/crops XP is skipped for a block the player themselves placed (tracked from `BlockPlaceEvent`). Placing still gives its own building XP. Choose how to store that memory with `feature.placed-tracking` (`memory` by default, or `persistent` for SQLite). |
+| Cooldown | None by default; set `base.cooldown > 0` to throttle it if desired (applies to every grant uniformly). |
 
 > **Placement tracking caveat (both backends):** placed-block markers survive for **~1 hour** and are dropped on break. Block edits made by non-`BlockPlaceEvent` tools (e.g. WorldEdit) are not tracked and may still award break XP when broken. The only difference between `memory` and `persistent` is restart survival: a `persistent` marker placed just before a restart is still honored after it; an in-memory one is not.
 

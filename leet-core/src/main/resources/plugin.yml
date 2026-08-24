@@ -4,17 +4,47 @@ main: com.leet.core.LeetCore
 api-version: "26.2"
 description: Leet core plugin - shared mechanics, storage, and commands
 author: Leet
+load: STARTUP
 softdepend: [Vault]
 
 commands:
   leeta:
     description: Admin helper command
-    usage: /leeta <list|toggle|info|give|reload> [args]
+    usage: /leeta <list|toggle|info|give|eco|warp|reload|bind|unbind> [args]
     permission: leet.admin
   back:
     description: Teleport back to death location
     usage: /back
     permission: leet.feat.back
+  bal:
+    description: Show your balance
+    usage: /bal
+    aliases: [balance, money]
+    permission: leet.economy.balance
+  pay:
+    description: Pay another player
+    usage: /pay <player> <amount>
+    permission: leet.economy.pay
+  spawn:
+    description: Teleport to the server spawn
+    usage: /spawn
+    permission: leet.spawn
+  setspawn:
+    description: Set the server spawn point
+    usage: /setspawn
+    permission: leet.admin
+  home:
+    description: Teleport to your home
+    usage: /home
+    permission: leet.home
+  sethome:
+    description: Set your home location
+    usage: /sethome
+    permission: leet.sethome
+  warp:
+    description: Teleport to a saved warp
+    usage: /warp <name>
+    permission: leet.warp
   leet:
     description: Toggle features on/off for yourself
     usage: /leet <list|dj|crop|tree|fall|xp|skills>
@@ -41,3 +71,21 @@ permissions:
   leet.admin.reload:
     description: Reload feature configs from disk
     default: op
+  leet.economy.balance:
+    description: Check your own balance
+    default: true
+  leet.economy.pay:
+    description: Pay other players
+    default: true
+  leet.spawn:
+    description: Teleport to the server spawn
+    default: true
+  leet.warp:
+    description: Teleport to saved warps
+    default: true
+  leet.home:
+    description: Teleport to your home
+    default: true
+  leet.sethome:
+    description: Set your home location
+    default: true

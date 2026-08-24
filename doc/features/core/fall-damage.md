@@ -7,7 +7,14 @@
 Negates all fall damage for eligible players, as a standalone feature **independent of Double Jump**.
 
 **Permissions**
-- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.fall_damage` · default `false`. The node also unlocks the `/leet fall` personal off-toggle.
+
+See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat.
+
+| Node | Default | Notes |
+|---|---|---|
+| `leet.feat.fall_damage` | `false` | Also unlocks the `/leet fall` personal off-toggle |
+
+**Player command:** `/leet fall` toggles Fall Damage protection off or on for the current player. It never grants permission.
 
 **Behavior**
 1. A player takes fall damage (`EntityDamageEvent`, cause `FALL`).

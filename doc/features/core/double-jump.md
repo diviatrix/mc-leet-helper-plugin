@@ -7,7 +7,14 @@
 Allows a mid-air double jump.
 
 **Permissions**
-- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.double_jump` · default `false`. The node also unlocks the `/leet dj` personal off-toggle.
+
+See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat.
+
+| Node | Default | Notes |
+|---|---|---|
+| `leet.feat.double_jump` | `false` | Also unlocks the `/leet dj` personal off-toggle |
+
+**Player command:** `/leet dj` toggles Double Jump off or on for the current player. It never grants permission.
 
 **Behavior**
 1. Player on the ground → flight is enabled for them automatically.

@@ -16,6 +16,7 @@ import com.leet.core.feature.TreeFellerFeature;
 import com.leet.core.feature.XpFeature;
 import com.leet.core.gui.GuiManager;
 import com.leet.core.plugin.FeaturePluginSupport;
+import com.leet.core.reactor.Reactor;
 import com.leet.core.storage.StorageManager;
 import com.leet.core.util.MiniMessageUtil;
 import net.milkbowl.vault.economy.Economy;
@@ -39,6 +40,18 @@ public class LeetCore extends JavaPlugin implements CoreApi {
     private FeatureManager featureManager;
     private Economy economy;
     private GuiManager guiManager;
+    private Reactor reactor;
+    private final java.util.Map<String, com.leet.core.command.AdminSubcommand> adminSubcommands =
+        new java.util.LinkedHashMap<>();
+
+    @Override
+    public void onLoad() {
+        storageManager = new StorageManager(getDataFolder(), getLogger());
+        if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
+            Bukkit.getServicesManager().register(Economy.class, new com.leet.core.economy.LeetEconomy(storageManager),
+                this, org.bukkit.plugin.ServicePriority.Lowest);
+        }
+    }
 
     @Override
     public void onEnable() {
@@ -53,9 +66,18 @@ public class LeetCore extends JavaPlugin implements CoreApi {
         FeaturePluginSupport.saveResourceIfMissing(this, "features/tree_feller.yml");
         FeaturePluginSupport.saveResourceIfMissing(this, "features/fall_damage.yml");
         FeaturePluginSupport.saveResourceIfMissing(this, "features/xp.yml");
+        FeaturePluginSupport.saveResourceIfMissing(this, "rules/welcome.yml");
 
-        storageManager = new StorageManager(getDataFolder(), getLogger());
+        if (storageManager == null) {
+            storageManager = new StorageManager(getDataFolder(), getLogger());
+        }
         setupVault();
+
+        reactor = new Reactor(storageManager, economy);
+        com.leet.core.reactor.BuiltInActions.registerAll(reactor, economy);
+        Bukkit.getPluginManager().registerEvents(
+            new com.leet.core.reactor.ReactorTriggers(reactor), this);
+        loadRules();
 
         featureManager = new FeatureManager(getLogger());
         guiManager = new GuiManager(this);
@@ -73,6 +95,23 @@ public class LeetCore extends JavaPlugin implements CoreApi {
         getCommand("leeta").setExecutor(new HelperCommand(this));
         getCommand("leeta").setTabCompleter(new HelperCommand(this));
         getCommand("back").setExecutor(new BackCommand(this));
+        var economyCommand = new com.leet.core.command.EconomyCommand(this);
+        getCommand("bal").setExecutor(economyCommand);
+        getCommand("bal").setTabCompleter(economyCommand);
+        getCommand("pay").setExecutor(economyCommand);
+        getCommand("pay").setTabCompleter(economyCommand);
+        var spawnCommand = new com.leet.core.command.SpawnCommand(this);
+        getCommand("spawn").setExecutor(spawnCommand);
+        getCommand("spawn").setTabCompleter(spawnCommand);
+        getCommand("setspawn").setExecutor(spawnCommand);
+        var homeCommand = new com.leet.core.command.HomeCommand(this);
+        getCommand("home").setExecutor(homeCommand);
+        getCommand("sethome").setExecutor(homeCommand);
+        var warpCommand = new com.leet.core.command.WarpCommand(this);
+        getCommand("warp").setExecutor(warpCommand);
+        getCommand("warp").setTabCompleter(warpCommand);
+        registerAdminSubcommand("eco", new com.leet.core.command.EconomyAdminSubcommand(this));
+        registerAdminSubcommand("warp", new com.leet.core.command.WarpAdminSubcommand(this, warpCommand));
         getCommand("leet").setExecutor(new LeetCommand(this));
         getCommand("leet").setTabCompleter(new LeetCommand(this));
 
@@ -100,6 +139,46 @@ public class LeetCore extends JavaPlugin implements CoreApi {
         if (storageManager != null) {
             storageManager.close();
         }
+    }
+
+    @Override
+    public Reactor reactor() {
+        return reactor;
+    }
+
+    /** (Re)loads every rule definition from plugins/LeetCore/rules/*.yml. */
+    public void reloadRules() {
+        reactor.clearDefinitions();
+        loadRules();
+    }
+
+    private void loadRules() {
+        File dir = new File(getDataFolder(), "rules");
+        File[] files = dir.listFiles((d, name) -> name.toLowerCase().endsWith(".yml"));
+        if (files == null) return;
+        for (File file : files) {
+            try {
+                var def = com.leet.core.reactor.DefinitionLoader.parse(
+                    YamlConfiguration.loadConfiguration(file));
+                if (def != null) {
+                    reactor.register(def);
+                }
+            } catch (Exception e) {
+                getLogger().warning("Failed to load rule " + file.getName() + ": " + e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public boolean registerAdminSubcommand(String name, com.leet.core.command.AdminSubcommand subcommand) {
+        if (adminSubcommands.containsKey(name)) return false;
+        adminSubcommands.put(name, subcommand);
+        return true;
+    }
+
+    @Override
+    public java.util.Map<String, com.leet.core.command.AdminSubcommand> adminSubcommands() {
+        return java.util.Collections.unmodifiableMap(adminSubcommands);
     }
 
     @Override

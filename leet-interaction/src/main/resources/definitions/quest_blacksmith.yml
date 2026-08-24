@@ -1,0 +1,26 @@
+# Example: a quest NPC. The player clicks to accept, brings the requirements,
+# clicks again to turn in and receive the rewards.
+# Bind it: spawn an entity, look at it, run /leeta bind quest_blacksmith
+id: quest_blacksmith
+conditions:
+  cooldown: 1
+actions:
+  - type: quest
+    quest: quest_blacksmith
+quest:
+  name: "Iron Errand"
+  description: "Bring the blacksmith 5 iron ingots and 100 coins."
+  repeatable: true
+  cooldown: 3600
+  requirements:
+    items:
+      - { item: "material:IRON_INGOT", amount: 5 }
+    money: 100
+  rewards:
+    items:
+      - { item: "material:DIAMOND", amount: 1 }
+    money: 25
+    exp: 100
+    reputation: 5
+    commands:
+      - "say %player% completed the Iron Errand quest!"

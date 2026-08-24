@@ -5,3 +5,9 @@ api-version: "26.2"
 description: Leet vanity plugin - a growing bundle of distinct gameplay features
 author: Leet
 softdepend: [LeetCore]
+
+commands:
+  dance:
+    description: Play a vanity dance animation
+    usage: /dance [list|stop|name]
+    permission: leet.vanity.dance

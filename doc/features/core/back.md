@@ -8,7 +8,14 @@ Death locations and persistent cooldowns are stored in LeetCore's `plugins/LeetC
 Teleports players to their last death location. **Persistent** via SQLite — survives server restarts.
 
 **Permissions**
-- See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat. Node: `leet.feat.back` · default `false`. The node also unlocks the `/back` command (the command is registered with `permission: leet.feat.back`).
+
+See [Feature permissions](../../ARCHITECTURE.md#feature-permissions) for the gating rules, default-deny behavior, and restart caveat.
+
+| Node | Default | Notes |
+|---|---|---|
+| `leet.feat.back` | `false` | Also unlocks the `/back` command (the command is registered with `permission: leet.feat.back`) |
+
+**Command:** `/back` returns the player to the saved death location. The player must have `leet.feat.back`, remain in the same world, and use it before `max-age` and cooldown expire.
 
 **Behavior — on death**
 1. Player dies → `check()` (enabled + permission + world).
@@ -68,7 +75,10 @@ messages:
 | `no-location` | — | No saved location, or permission/world blocked |
 
 **Restrictions & notes**
-- **Cross-world teleportation is not allowed** — you must be in the world where you died.
-- Cooldown is **persistent** (survives restarts) and stored in SQLite, separate from the runtime cooldown used by other features.
-- There is **no admin bypass** — cooldown, cost and `max-age` apply equally to everyone.
-- `cost` requires Vault with a running economy provider. Without Vault, cost is silently skipped (no charge, no check).
+
+| Restriction | Detail |
+|---|---|
+| Cross-world | **Cross-world teleportation is not allowed** — you must be in the world where you died. |
+| Cooldown | **Persistent** (survives restarts), stored in SQLite, separate from the runtime cooldown used by other features. |
+| Admin bypass | **None** — cooldown, cost and `max-age` apply equally to everyone. |
+| Vault | `cost` requires Vault with a running economy provider. Without Vault, cost is silently skipped (no charge, no check). |

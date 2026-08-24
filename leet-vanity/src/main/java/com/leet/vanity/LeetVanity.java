@@ -21,6 +21,10 @@ public final class LeetVanity extends JavaPlugin {
             return;
         }
 
+        DanceCommand danceCommand = new DanceCommand(this, feature);
+        getCommand("dance").setExecutor(danceCommand);
+        getCommand("dance").setTabCompleter(danceCommand);
+
         getLogger().info("LeetVanity registered the 'vanity' feature with LeetCore.");
     }
 
