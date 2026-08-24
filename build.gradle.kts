@@ -7,7 +7,7 @@ subprojects {
     apply(plugin = "java")
 
     group = "com.leet"
-    version = "1.8.0"
+    version = "1.8.1"
 
     extensions.configure<JavaPluginExtension> {
         toolchain {

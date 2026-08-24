@@ -35,7 +35,7 @@ public class AutoCropFeature extends AbstractFeature implements CostedFeature, B
     protected void loadFeatureConfig(YamlConfiguration cfg) {
         radius = Math.min(cfg.getInt("feature.radius", 3), 5);
         requireMature = cfg.getBoolean("feature.require-mature", true);
-        requireHoe = cfg.getBoolean("feature.require-hoe", false);
+        requireHoe = cfg.getBoolean("feature.require-hoe", true);
         materials = MaterialSets.readSet(owner.getLogger(), cfg.getStringList("feature.materials"), "auto_crop materials");
     }
 

@@ -9,7 +9,7 @@ base:
 feature:
   radius: 3
   require-mature: true
-  require-hoe: false
+  require-hoe: true
   cost: 0
   materials:
     - WHEAT
