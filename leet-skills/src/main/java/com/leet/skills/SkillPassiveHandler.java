@@ -65,7 +65,7 @@ public final class SkillPassiveHandler implements Listener {
     private boolean harvesting; // reentrancy guard for farmer auto-crop
     private int treeFellerMaxBlocks = 100;
     private boolean autoCropRequireMature = true;
-    private boolean autoCropRequireHoe = false;
+    private boolean autoCropRequireHoe = true;
     private double doubleJumpHorizontal = 0.25;
     private double doubleJumpVertical = 1.0;
 
