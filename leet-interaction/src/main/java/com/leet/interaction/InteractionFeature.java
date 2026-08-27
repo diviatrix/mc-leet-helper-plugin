@@ -53,7 +53,7 @@ public final class InteractionFeature extends AbstractFeature implements Messagi
 
     private static final List<String> SIGN_TYPES = List.of(
         "sell", "buy", "free", "enchant", "repair", "kit", "warp", "disposal", "chest", "quest", "interact",
-        "weather", "time", "heal");
+        "weather", "time", "heal", "balance");
 
     private final LeetInteraction plugin;
 
@@ -326,6 +326,7 @@ public final class InteractionFeature extends AbstractFeature implements Messagi
             case "weather" -> weather(player, arg(lines, 1), arg(lines, 3));
             case "time" -> time(player, arg(lines, 1), arg(lines, 3));
             case "heal" -> heal(player, arg(lines, 1), arg(lines, 3));
+            case "balance" -> showBalance(player);
             case "disposal" -> {
                 if (chargePrice(player, arg(lines, 3))) reactor().execute(player, "open-disposal", Map.of());
             }
@@ -595,6 +596,15 @@ public final class InteractionFeature extends AbstractFeature implements Messagi
         player.setHealth(Math.min(max, player.getHealth() + amount));
         player.setFireTicks(0);
         player.sendMessage(MM.deserialize("<gray>Healed."));
+    }
+
+    private void showBalance(Player player) {
+        Economy economy = plugin.core().economy();
+        if (economy == null) {
+            message(player, "no-economy");
+            return;
+        }
+        message(player, "balance-shown", "<balance>", economy.format(economy.getBalance(player)));
     }
 
     // --- triggers: NPCs ---

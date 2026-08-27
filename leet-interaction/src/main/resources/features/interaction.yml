@@ -30,6 +30,7 @@ feature:
       chest: 1
       quest: 1
       interact: 1
+      balance: 1
 
   # Vanilla entities bound to definitions via /leeta bind.
   npcs:
@@ -87,3 +88,5 @@ messages:
   definition-unknown: "<red>Unknown interaction: <id>."
   cooldown: "<red>Wait <seconds>s before using this again."
   sign-no-permission: "<red>You can't use this sign."
+  balance-shown: "<gray>Balance: <green><balance>"
+  no-economy: "<red>No economy is available."
