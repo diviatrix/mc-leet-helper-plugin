@@ -97,9 +97,9 @@ The `Lines` column below describes sign rows 2, 3, and 4 after the bracket tag. 
 
 | Sign | Lines | Behavior | Create permission | Use permission |
 |---|---|---|---|---|
-| `[Sell]` | item · amount · price | Removes `amount` of item from your inventory, pays `price` (Vault) | `leet.interaction.sign.create.sell` | `leet.interaction.sign.use.sell` |
-| `[Buy]` | item · amount · price | Charges `price`, gives `amount` of item | `leet.interaction.sign.create.buy` | `leet.interaction.sign.use.buy` |
-| `[Free]` | item · amount · price | Opens a 54-slot inventory filled with stacks of the configured item; row 3 defaults to a full stack and can override the amount per slot | `leet.interaction.sign.create.free` | `leet.interaction.sign.use.free` |
+| `[Sell]` | amount · item · price | Removes `amount` of item from your inventory, pays `price` (Vault) | `leet.interaction.sign.create.sell` | `leet.interaction.sign.use.sell` |
+| `[Buy]` | amount · item · price | Charges `price`, gives `amount` of item | `leet.interaction.sign.create.buy` | `leet.interaction.sign.use.buy` |
+| `[Free]` | amount · item · price | Opens a 54-slot inventory filled with stacks of the configured item; row 2 defaults to a full stack and can override the amount per slot | `leet.interaction.sign.create.free` | `leet.interaction.sign.use.free` |
 | `[Enchant]` | enchantment · level · price | Enchants your main-hand item (unsafe levels allowed) | `leet.interaction.sign.create.enchant` | `leet.interaction.sign.use.enchant` |
 | `[Repair]` | — · `hand`/`all` · price | Repairs the main-hand item by default; line 3 accepts `hand` or `all` | `leet.interaction.sign.create.repair` | `leet.interaction.sign.use.repair` |
 | `[Kit]` | kit name · — · price | Gives `feature.kits.<name>` (list of item specs + per-kit cooldown) | `leet.interaction.sign.create.kit` | `leet.interaction.sign.use.kit` |

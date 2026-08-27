@@ -139,7 +139,12 @@ public final class BuiltInActions {
         protected void trade(Player player, Map<String, Object> params, boolean sell) {
             String spec = Params.str(params.get("item"));
             int amount = Params.intVal(params.get("amount"), 1);
-            double price = Params.doubleVal(params.get("price"), 0);
+            Double parsedPrice = Params.money(params.get("price"));
+            if (parsedPrice == null) {
+                Params.send(player, "<red>Invalid or missing price on this sign.");
+                return;
+            }
+            double price = parsedPrice;
             if (spec == null) return;
             ItemStack stack = ItemSpec.build(spec, Math.max(1, amount));
             if (stack == null) return;
@@ -226,7 +231,13 @@ public final class BuiltInActions {
         @Override public void execute(Player player, Map<String, Object> params) {
             String name = Params.str(params.get("enchantment"));
             int level = Params.intVal(params.get("level"), 1);
-            double price = Params.doubleVal(params.get("price"), 0);
+            Double parsedPrice = Params.money(params.get("price"));
+            if (params.get("price") != null && !String.valueOf(params.get("price")).trim().isEmpty()
+                    && parsedPrice == null) {
+                Params.send(player, "<red>Invalid or missing price on this sign.");
+                return;
+            }
+            double price = parsedPrice == null ? 0 : parsedPrice;
             if (name == null) return;
 
             Enchantment enchantment = enchantment(name);

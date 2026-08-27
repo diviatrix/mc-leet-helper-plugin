@@ -383,19 +383,19 @@ public final class InteractionFeature extends AbstractFeature implements Messagi
     }
 
     private void trade(Player player, List<String> lines, boolean sell) {
-        String item = arg(lines, 1);
+        String item = arg(lines, 2);
         if (item == null) return;
         Map<String, Object> params = new LinkedHashMap<>();
         params.put("item", item);
-        params.put("amount", arg(lines, 2));
+        params.put("amount", arg(lines, 1));
         params.put("price", arg(lines, 3));
         reactor().execute(player, sell ? "sell" : "buy", params);
     }
 
     private void free(Player player, List<String> lines, Block signBlock) {
-        String item = arg(lines, 1);
+        String item = arg(lines, 2);
         if (item == null) return;
-        Object amount = arg(lines, 2) == null ? 64 : arg(lines, 2);
+        Object amount = arg(lines, 1) == null ? 64 : arg(lines, 1);
         ItemStack stack = ItemSpec.build(item, parseAmount(amount));
         if (stack == null) return;
         if (!chargePrice(player, arg(lines, 3))) return;
@@ -492,13 +492,12 @@ public final class InteractionFeature extends AbstractFeature implements Messagi
 
     private double chargePriceAmount(Player player, String priceText) {
         if (priceText == null || priceText.isBlank()) return 0;
-        double price;
-        try {
-            price = Double.parseDouble(priceText);
-        } catch (NumberFormatException e) {
+        Double parsed = com.leet.core.reactor.Params.money(priceText);
+        if (parsed == null) {
             player.sendMessage(MM.deserialize("<yellow>Line 4 must be a price."));
             return -1;
         }
+        double price = parsed;
         if (price <= 0) return 0;
         Economy economy = plugin.core().economy();
         if (economy == null) {

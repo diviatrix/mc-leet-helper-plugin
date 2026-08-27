@@ -33,6 +33,18 @@ public final class Params {
         }
     }
 
+    public static Double money(Object o) {
+        if (o == null) return null;
+        if (o instanceof Number n) return n.doubleValue();
+        String s = String.valueOf(o).replaceAll("[\\s,$€£¥¢]", "");
+        if (s.isEmpty()) return null;
+        try {
+            return Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static java.util.List<Map<String, Object>> itemMaps(Object o) {
         if (o instanceof java.util.List<?> list) {

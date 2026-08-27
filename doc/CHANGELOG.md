@@ -16,6 +16,8 @@ All notable changes to **LeetHelper**. Entries are newest first.
 **Changed**
 - Dead trade feedback templates removed from `features/interaction.yml` (that feedback now comes
   from the reactor's built-in actions).
+- Fixed `[Sell]`, `[Buy]` and `[Free]` signs to parse their rows as `amount · item · price`
+  (row 2 amount, row 3 item, row 4 price), matching the long-standing sign format on the server.
 
 ## Unreleased — shared reactor kernel (triggers / conditions / actions)
 
